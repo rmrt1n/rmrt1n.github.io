@@ -1,0 +1,8 @@
+name: "rmrtin.github.io"
+navbar: 
+  title: "rmrtin.github.io"
+  left:
+    - text: "home"
+      href: index.html
+    - text: "chess eda"
+      href: chess_eda.html

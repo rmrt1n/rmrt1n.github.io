@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Exploratory Data Analysis of Hikaru Nakamura’s Games</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 64px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.section h2 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.section h3 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.section h4 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.section h5 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.section h6 {
+  padding-top: 69px;
+  margin-top: -69px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">rmrtin.github.io</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">home</a>
+</li>
+<li>
+  <a href="chess_eda.html">chess eda</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Exploratory Data Analysis of Hikaru Nakamura’s Games</h1>
+
+</div>
+
+
+<div id="import-libraries" class="section level2">
+<h2><strong>Import Libraries</strong></h2>
+<pre class="r"><code>library(readr)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)</code></pre>
+</div>
+<div id="import-and-view-data" class="section level2">
+<h2><strong>Import and View Data</strong></h2>
+<pre class="r"><code>df &lt;- read_csv(&quot;cleaned_data.csv&quot;)
+head(df)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   Color Rating Opponent        Opponent_rating Result Opening        Moves  Year
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;                     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;
+## 1 White   2736 Peter T Robers…            2435 Win    Réti Opening      40  2020
+## 2 White   2736 Lazaro Bruzon …            2640 Win    King&#39;s Indian…    53  2020
+## 3 Black   2736 Justin Tan                 2511 Draw   Ruy López Ope…    14  2020
+## 4 Black   2736 David L Haydon             2294 Win    Réti Opening      54  2020
+## 5 Black   2736 Leinier Doming…            2758 Win    Giuoco Piano …    58  2020
+## 6 Black   2736 Le Quang Liem              2713 Win    Queen&#39;s Gambi…    47  2020</code></pre>
+</div>
+<div id="analysis" class="section level2">
+<h2><strong>Analysis</strong></h2>
+<div id="what-is-his-win-percentage-overall" class="section level3">
+<h3><strong>1. What is His Win Percentage Overall?</strong></h3>
+<pre class="r"><code># count of win, draw, loss
+overall_win &lt;- df %&gt;%
+  group_by(Result) %&gt;%
+  summarise(Count = n())
+
+# vars for inline code
+ngame &lt;- summarise(df, n()) %&gt;% as.character()
+wins &lt;- overall_win[3, 2] %&gt;% as.character()
+loss &lt;- overall_win[2, 2] %&gt;% as.character()
+draw &lt;- overall_win[1, 2] %&gt;% as.character()
+wr &lt;- round(as.numeric(wins) / as.numeric(ngame) * 100, 2)
+
+# plot
+overall_win %&gt;%
+  ggplot(aes(x = reorder(Result, -Count), y = Count)) +
+  geom_bar(stat = &quot;identity&quot;, width = 0.6) +
+  labs(
+    title = &quot;Comparison of number of wins, losses, and draws&quot;,
+    x = &quot;Result&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /> His win percentage is 42.24 %. Out of 3262 games, 1378 are wins, 576 are losses, and 1308 are draws. Most of his games end in either a win or a draw.</p>
+</div>
+<div id="what-is-his-win-percentage-grouped-by-color" class="section level3">
+<h3><strong>2. What is His Win Percentage Grouped by Color?</strong></h3>
+<pre class="r"><code># ratio of win, draw, loss by color
+winrate &lt;- df %&gt;%
+  group_by(Color, Result) %&gt;%
+  summarise(count = n()) %&gt;%
+  mutate(Percentage = count / sum(count) * 100) %&gt;%
+  select(-count) 
+
+# vars for inline code
+w_wr &lt;- round(winrate[6, 3], 2) %&gt;% as.character()
+b_wr &lt;- round(winrate[3, 3], 2) %&gt;% as.character()
+
+# plot
+winrate %&gt;%
+  ggplot(aes(x = Color, y = Percentage, fill = Result)) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;fill&quot;, width = 0.6) +
+  coord_flip() +
+  labs(
+    title = &quot;Ratio of Wins, Losses &amp; Draws Grouped by Color&quot;,
+    y = &quot;Win : Loss : Draw&quot;
+  ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /> His win-rate as white is 47.74 %, which is higher than his win-rate as black 36.7 %. Win to loss to draw ratio is roughly the same as white or black.</p>
+</div>
+<div id="which-openings-does-he-play-the-most-overall" class="section level3">
+<h3><strong>3. Which Openings Does He Play the Most Overall?</strong></h3>
+<pre class="r"><code># openings and their game count
+overall_op &lt;- df %&gt;%
+  group_by(Opening) %&gt;%
+  summarise(N_games = n()) %&gt;%
+  arrange(desc(N_games))
+
+# top 10 most played openings
+head(overall_op, 10) %&gt;%
+  ggplot(aes(x = reorder(Opening, N_games), y = N_games)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(
+    title = &quot;Most Played Openings Overall&quot;,
+    x = &quot;Opening&quot;,
+    y = &quot;Number of Games&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="which-openings-does-he-play-the-most-grouped-by-color" class="section level3">
+<h3><strong>4. Which Openings Does He Play the Most Grouped by Color?</strong></h3>
+<pre class="r"><code># top 10 most played openings grouped by color
+top_by_color &lt;- df %&gt;%
+  group_by(Color, Opening) %&gt;%
+  summarise(N_games = n()) %&gt;%
+  top_n(n = 10, wt = N_games)
+
+# top 10 most played openings by white
+white &lt;- head(top_by_color, 10) %&gt;%
+  ggplot(aes(x = reorder(Opening, N_games), y = N_games)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(
+    title = &quot;Most Played Openings as White&quot;,
+    x = &quot;Openings&quot;,
+    y = &quot;Number of Games&quot;
+  ) +
+  theme_light()
+
+
+# top 10 most played openings by black
+black &lt;- tail(top_by_color, 10) %&gt;%
+  ggplot(aes(x = reorder(Opening, N_games), y = N_games)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(
+    title = &quot;Most Played Openings as Black&quot;,
+    x = &quot;Openings&quot;,
+    y = &quot;Number of Games&quot;
+  ) +
+  theme_light()
+
+grid.arrange(white, black)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /> It looks like the most played opening is the sicilian defense for both white and black. This might happen because there are many variations of the sicilian defense, but all of them are grouped together in the data.</p>
+</div>
+<div id="does-he-lose-more-against-higher-rated-opponents" class="section level3">
+<h3><strong>5. Does He Lose More Against Higher Rated Opponents?</strong></h3>
+<pre class="r"><code># results against/not-against higher rated opponents
+vs_higher &lt;-df %&gt;%
+  mutate(Vs_higher = if_else(Opponent_rating &gt; Rating, &quot;yes&quot;,&quot;no&quot;)) %&gt;%
+  group_by(Vs_higher, Result) %&gt;%
+  summarise(count = n()) %&gt;%
+  mutate(Percentage = count / sum(count) * 100) %&gt;%
+  select(-count) %&gt;%
+  arrange(desc(Vs_higher))
+
+# vars for inline code
+highdraw &lt;- round(vs_higher[1, 3], 2) %&gt;% as.character()
+lowwin &lt;- round(vs_higher[6, 3], 2) %&gt;% as.character()
+
+#plot
+vs_higher %&gt;%
+  ggplot(aes(x = Vs_higher, y = Percentage, fill = Result)) +
+  geom_bar(stat = &quot;identity&quot;, width = 0.6) +
+  coord_flip() +
+  labs(
+    title = &quot;Ratio of Game Results Against &amp; not Against Higher-Rated Opponents&quot;,
+    x = &quot;Against Higher-Rated Opponents?&quot;,
+    y = &quot;Win : Loss : Draw&quot;
+  ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Against higher-rated opponents, nearly half of his games end in a draw. More specifically 45.37 %. His win-rate is only slightly higher than his lose rate. On the other hand, 48.14 % of his games against lower-rated opponents are wins.</p>
+</div>
+<div id="what-is-the-average-move-count-in-his-games" class="section level3">
+<h3><strong>6. What is the Average Move Count in his Games?</strong></h3>
+<pre class="r"><code># avg number of moves
+avg_mv &lt;- round(mean(df$Moves)) %&gt;% as.character()
+
+# move count distribution
+df %&gt;%
+  ggplot(aes(x = Moves)) +
+  geom_histogram(binwidth = 5) +
+  labs(
+    title = &quot;Distribution of Number of Moves in a Game&quot;,
+    x = &quot;Number of Moves&quot;,
+    y = &quot;Count&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-9-1.png" width="672" /> The average number of moves of his games is 48 moves.</p>
+</div>
+<div id="does-the-number-of-moves-effect-game-results" class="section level3">
+<h3><strong>7. Does the Number of Moves Effect Game Results?</strong></h3>
+<pre class="r"><code># avg moves for win/draw/loss plot
+df %&gt;%
+  group_by(Result) %&gt;%
+  summarise(Mean_moves = mean(Moves)) %&gt;%
+  ggplot(aes(x = reorder(Result, Mean_moves), y = Mean_moves)) +
+  geom_bar(stat = &quot;identity&quot;, width = 0.6) +
+  labs(
+    title = &quot;Average move counts of different game results&quot;,
+    x = &quot;Results&quot;,
+    y = &quot;Average move count&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-10-1.png" width="672" /> The average move count is roughly the same for wins, losses, and draws. Number of moves is unlikely to effect game results.</p>
+</div>
+<div id="which-year-did-he-perform-the-best-in" class="section level3">
+<h3><strong>8. Which year did he perform the best in?</strong></h3>
+<pre class="r"><code># highest rating of each year 2003-2020
+df %&gt;%
+  group_by(Year) %&gt;%
+  filter(Year &gt; 2002) %&gt;%
+  summarise(highest_rt = max(Rating, na.rm = TRUE)) %&gt;%
+  ggplot(aes(x = Year, y = highest_rt)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(2002, 2020, 2)) +
+  labs(
+    title = &quot;Yearly Highest Rating from 2003 to mid 2020&quot;,
+    y = &quot;Rating&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>max_rt &lt;- max(df$Rating) %&gt;% as.character()</code></pre>
+<p>This chart starts from 2003, the year he became a GM. His highest rating was 2816 back in 2015.</p>
+</div>
+<div id="who-does-he-play-with-most-often" class="section level3">
+<h3><strong>9. Who does he play with most often?</strong></h3>
+<pre class="r"><code># top 10 most played opponents
+reg_opp &lt;- df %&gt;%
+  group_by(Opponent) %&gt;%
+  summarise(n = n()) %&gt;%
+  arrange(desc(n)) %&gt;%
+  head(10)
+
+# top 10 barchart
+reg_opp %&gt;%
+  ggplot(aes(x = reorder(Opponent, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, width = 0.6) +
+  coord_flip() +
+  labs(
+    title = &quot;Top 10 Players He Plays with Most Often&quot;,
+    x = &quot;Opponent&quot;,
+    y = &quot;Number of games played&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="what-are-hikarus-game-results-like-against-them" class="section level3">
+<h3><strong>10. What are Hikaru’s Game Results Like Against Them?</strong></h3>
+<pre class="r"><code># w/d/l ratio 
+df %&gt;%
+  group_by(Opponent, Result) %&gt;%
+  filter(Opponent %in% reg_opp$Opponent) %&gt;%
+  summarise(n = n()) %&gt;%
+  ggplot(aes(x = Opponent, y = n, fill = Result)) +
+  geom_bar(stat = &quot;identity&quot;,position = &quot;fill&quot;, width = 0.6) +
+  coord_flip() +
+  labs(
+    title = &quot;Results Against Players He Plays With Most Often&quot;,
+    x = &quot;Opponent&quot;,
+    y = &quot;Win : Loss : Draw&quot;
+  ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" width="672" /> Against the players he plays with most often, the result is usually a draw. His win-rates are higher than his lose-rates except against Magnus Carlsen, the world champion.</p>
+</div>
+<div id="does-the-opening-played-effect-the-game-result" class="section level3">
+<h3><strong>11. Does the Opening Played Effect the Game Result?</strong></h3>
+<div id="performing-a-cochran-maentel-haenszel-test" class="section level4">
+<h4><strong>Performing a Cochran-Maentel-Haenszel Test</strong></h4>
+<p>before doing the test, I filtered the data to include only openings that were played<br />
+atleast 20 times. The null hypothesis is that there is no relationship between the opening played, the piece color, and the game result. The alternative hypothesis is that there is a relationship. Alpha value is 0.05.</p>
+<pre class="r"><code># openings with game number &gt; 20
+freq_op &lt;- df %&gt;%
+  group_by(Opening) %&gt;%
+  summarise(count = n()) %&gt;%
+  filter(count &gt; 20)
+
+# colors, openings, results 
+op_res &lt;- df %&gt;%
+  select(Color, Opening, Result) %&gt;%
+  filter(Opening %in% freq_op$Opening)
+
+# cochran-mantel-haenszel tes on op_res
+tb &lt;- table(op_res$Color, op_res$Opening, op_res$Result)
+mantelhaen.test(tb)</code></pre>
+<pre><code>## 
+##  Cochran-Mantel-Haenszel test
+## 
+## data:  tb
+## Cochran-Mantel-Haenszel M^2 = 432.41, df = 29, p-value &lt; 2.2e-16</code></pre>
+<p>The p-value is significantly lower than the alpha value. The null hypothesis is rejected.</p>
+</div>
+</div>
+<div id="which-openings-have-the-highest-win-rate-overall" class="section level3">
+<h3><strong>12. Which Openings Have the Highest Win-Rate Overall?</strong></h3>
+<pre class="r"><code># top 10 op overal
+df %&gt;%
+  filter(Opening %in% op_res$Opening) %&gt;%
+  group_by(Opening, Result) %&gt;%
+  summarise(Count = n()) %&gt;%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %&gt;%
+  filter(Result == &quot;Win&quot;) %&gt;%
+  select(-Count, -Result) %&gt;%
+  arrange(desc(Winrate)) %&gt;%
+  head(10) %&gt;%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = &quot;Identity&quot;, width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = &quot;Top 10 Win-Rates of Openings Overall&quot;,
+    x = &quot;Opening&quot;,
+    y = &quot;Win-rate in percentages(%)&quot;
+  ) +
+  theme_light()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="which-openings-have-the-highest-win-rate-grouped-by-color" class="section level3">
+<h3><strong>12. Which Openings Have the Highest Win-Rate Grouped by Color?</strong></h3>
+<pre class="r"><code># top 10 white op
+opw &lt;- df %&gt;%
+  filter(Opening %in% op_res$Opening) %&gt;%
+  group_by(Color, Opening, Result) %&gt;%
+  summarise(Count = n()) %&gt;%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %&gt;%
+  filter(Result == &quot;Win&quot; &amp; Color == &quot;White&quot;) %&gt;%
+  select(-Count, -Result) %&gt;%
+  arrange(desc(Winrate)) %&gt;%
+  head(10) %&gt;%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = &quot;Identity&quot;, width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = &quot;Top 10 Win-rates of Openings Played as White&quot;,
+    x = &quot;Opening&quot;,
+    y = &quot;Win-Rate in Percentages(%)&quot;
+  ) +
+  theme_light()
+
+
+# top 10 black op
+opb &lt;- df %&gt;%
+  filter(Opening %in% op_res$Opening) %&gt;%
+  group_by(Color, Opening, Result) %&gt;%
+  summarise(Count = n()) %&gt;%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %&gt;%
+  filter(Result == &quot;Win&quot; &amp; Color == &quot;Black&quot;) %&gt;%
+  select(-Count, -Result) %&gt;%
+  arrange(desc(Winrate)) %&gt;%
+  head(10) %&gt;%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = &quot;Identity&quot;, width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = &quot;Top 10 Win-rates of Openings Played as Black&quot;,
+    x = &quot;Opening&quot;,
+    y = &quot;Win-Rate in Percentages(%)&quot;
+  ) +
+  theme_light()
+
+grid.arrange(opw, opb)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
