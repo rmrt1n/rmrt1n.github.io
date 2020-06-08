@@ -428,7 +428,7 @@ overall_win %&gt;%
     x = &quot;Result&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /> His win percentage is 42.24 %. Out of 3262 games, 1378 are wins, 576 are losses, and 1308 are draws. Most of his games end in either a win or a draw.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /> His win percentage is 42.24 %. Out of 3262 games, 1378 are wins, 576 are losses, and 1308 are draws. Most of his games end in either a win or a draw.</p>
 </div>
 <div id="what-is-his-win-percentage-grouped-by-color" class="section level3">
 <h3><strong>2. What is His Win Percentage Grouped by Color?</strong></h3>
@@ -454,7 +454,7 @@ winrate %&gt;%
   ) +
   guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /> His win-rate as white is 47.74 %, which is higher than his win-rate as black 36.7 %. Win to loss to draw ratio is roughly the same as white or black.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /> His win-rate as white is 47.74 %, which is higher than his win-rate as black 36.7 %. Win to loss to draw ratio is roughly the same as white or black.</p>
 </div>
 <div id="which-openings-does-he-play-the-most-overall" class="section level3">
 <h3><strong>3. Which Openings Does He Play the Most Overall?</strong></h3>
@@ -475,7 +475,7 @@ head(overall_op, 10) %&gt;%
     y = &quot;Number of Games&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="which-openings-does-he-play-the-most-grouped-by-color" class="section level3">
 <h3><strong>4. Which Openings Does He Play the Most Grouped by Color?</strong></h3>
@@ -511,7 +511,7 @@ black &lt;- tail(top_by_color, 10) %&gt;%
   theme_light()
 
 grid.arrange(white, black)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /> It looks like the most played opening is the sicilian defense for both white and black. This might happen because there are many variations of the sicilian defense, but all of them are grouped together in the data.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /> It looks like the most played opening is the sicilian defense for both white and black. This might happen because there are many variations of the sicilian defense, but all of them are grouped together in the data.</p>
 </div>
 <div id="does-he-lose-more-against-higher-rated-opponents" class="section level3">
 <h3><strong>5. Does He Lose More Against Higher Rated Opponents?</strong></h3>
@@ -540,7 +540,7 @@ vs_higher %&gt;%
   ) +
   guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Against higher-rated opponents, nearly half of his games end in a draw. More specifically 45.37 %. His win-rate is only slightly higher than his lose rate. On the other hand, 48.14 % of his games against lower-rated opponents are wins.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Against higher-rated opponents, nearly half of his games end in a draw. More specifically 45.37 %. His win-rate is only slightly higher than his lose rate. On the other hand, 48.14 % of his games against lower-rated opponents are wins.</p>
 </div>
 <div id="what-is-the-average-move-count-in-his-games" class="section level3">
 <h3><strong>6. What is the Average Move Count in his Games?</strong></h3>
@@ -557,7 +557,7 @@ df %&gt;%
     y = &quot;Count&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-9-1.png" width="672" /> The average number of moves of his games is 48 moves.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-9-1.png" width="672" /> The average number of moves of his games is 48 moves.</p>
 </div>
 <div id="does-the-number-of-moves-effect-game-results" class="section level3">
 <h3><strong>7. Does the Number of Moves Effect Game Results?</strong></h3>
@@ -573,7 +573,7 @@ df %&gt;%
     y = &quot;Average move count&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-10-1.png" width="672" /> The average move count is roughly the same for wins, losses, and draws. Number of moves is unlikely to effect game results.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-10-1.png" width="672" /> The average move count is roughly the same for wins, losses, and draws. Number of moves is unlikely to effect game results.</p>
 </div>
 <div id="which-year-did-he-perform-the-best-in" class="section level3">
 <h3><strong>8. Which year did he perform the best in?</strong></h3>
@@ -590,7 +590,7 @@ df %&gt;%
     y = &quot;Rating&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code>max_rt &lt;- max(df$Rating) %&gt;% as.character()</code></pre>
 <p>This chart starts from 2003, the year he became a GM. His highest rating was 2816 back in 2015.</p>
 </div>
@@ -614,7 +614,7 @@ reg_opp %&gt;%
     y = &quot;Number of games played&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 </div>
 <div id="what-are-hikarus-game-results-like-against-them" class="section level3">
 <h3><strong>10. What are Hikaru’s Game Results Like Against Them?</strong></h3>
@@ -633,7 +633,7 @@ df %&gt;%
   ) +
   guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" width="672" /> Against the players he plays with most often, the result is usually a draw. His win-rates are higher than his lose-rates except against Magnus Carlsen, the world champion.</p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-13-1.png" width="672" /> Against the players he plays with most often, the result is usually a draw. His win-rates are higher than his lose-rates except against Magnus Carlsen, the world champion.</p>
 </div>
 <div id="does-the-opening-played-effect-the-game-result" class="section level3">
 <h3><strong>11. Does the Opening Played Effect the Game Result?</strong></h3>
@@ -685,7 +685,7 @@ df %&gt;%
     y = &quot;Win-rate in percentages(%)&quot;
   ) +
   theme_light()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
 <div id="which-openings-have-the-highest-win-rate-grouped-by-color" class="section level3">
 <h3><strong>12. Which Openings Have the Highest Win-Rate Grouped by Color?</strong></h3>
@@ -733,7 +733,7 @@ opb &lt;- df %&gt;%
   theme_light()
 
 grid.arrange(opw, opb)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="chess_eda_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
 </div>
 
