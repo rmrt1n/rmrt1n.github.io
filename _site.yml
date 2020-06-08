@@ -1,4 +1,5 @@
 name: "rmrtin.github.io"
+output_dir: "."
 navbar: 
   title: "rmrtin.github.io"
   left:
