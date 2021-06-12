@@ -1,0 +1,44 @@
+body {
+  margin:40px auto;
+  max-width:700px;
+  padding:0 10px;
+  line-height:1.6;
+  font-size:18px;
+  font-family: "Georgia";
+  background-color: #eeeeee;
+  color: #222222;
+}
+
+nav {
+  text-align: right;
+  padding: 10px;
+}
+
+nav a {
+  margin-left: 15px;
+}
+
+main {
+  height: 65vh;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  overflow-y: auto;
+  word-wrap: break-word;
+  padding: 10px 0;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0px;
+  font-weight: normal;
+}
+
+a {
+  color:inherit
+}
+
+h1 a {
+  text-decoration: none;
+}
+
+
