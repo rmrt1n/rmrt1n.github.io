@@ -1,0 +1,13 @@
+name: build 11ty page
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: build page
+        run: npm ci && npm run build
