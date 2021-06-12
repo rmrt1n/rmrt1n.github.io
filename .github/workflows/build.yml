@@ -1,8 +1,5 @@
 name: Eleventy Build
-on: 
-  push:
-    paths-ignore:
-      - README.md
+on: [push, workflow_dispatch]
 
 jobs:
   build-deploy:
