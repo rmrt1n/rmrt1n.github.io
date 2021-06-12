@@ -1,17 +1,20 @@
-name: build 11ty page
-
-on: [push, workflow_dispatch]
+name: Eleventy Build
+on: 
+  push:
+    paths-ignore:
+      - README.md
 
 jobs:
-  build:
+  build-deploy:
+    name: Eleventy Build
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: build page
-        run: npm ci && npm run build
-      - name: deploy page
+      - name: Git Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        uses: TartanLlama/actions-eleventy@v1.1
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          publish_dir: ./docs
+          publish_dir: ./_site 
           github_token: ${{ secrets.GITHUB_TOKEN }}
