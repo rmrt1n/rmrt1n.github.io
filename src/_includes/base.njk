@@ -19,6 +19,13 @@
     <main>
       {{ content | safe }}
     </main>
+    <footer>
+      <p>
+        <small>Copyright&copy; {% year %} • {{ meta.siteAuthor }}</small>
+        <small>-</small>
+        <small>Built using the awesome <a href="https://www.11ty.dev/">11ty</a></small>
+      </p>
+    </footer>
   </body>
 </html>
 
