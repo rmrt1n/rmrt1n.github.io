@@ -6,7 +6,7 @@ layout: posts
 Hi, I'm Ryan Martin. I'm a computer science student at
 [Asia Pasific University](https://apu.edu.my), Malaysia. My interests include
 but not limited to FOSS, compilers, databases, cybersecurity, linux, pixel
-graphic games.  
+graphic games.   
 
 Here are some links:
 - [Email](mailto:ryan.mrtinn@gmail.com)
