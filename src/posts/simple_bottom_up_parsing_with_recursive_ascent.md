@@ -239,7 +239,7 @@ Here's the first state. The general flow of the most functions looks like this.
 match the next unparsed token into an AST node. Then check if the node is a part 
 of a non terminal starting from the lowest rule. In this case, there are 2 non 
 terminals, num and expr. Num is checked first, then expr. Here, since a num is 
-always and expr, no checking is needed. 
+always an expr, no checking is needed. 
 
 ```python
 # the first state of the parser
