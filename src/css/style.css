@@ -4,7 +4,7 @@ body {
   padding:0 10px;
   line-height:1.6;
   font-size:16px;
-  font-family: "Georgia";
+  font-family: Helvetica, Verdana;
   color: #222222;
   background-color: #f5f5f5;
 }
@@ -15,26 +15,28 @@ nav {
 }
 
 nav a {
+  font-size: 18px;
   margin-left: 15px;
 }
 
 main {
-  height: 65vh;
+  height: 70vh;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
   overflow-y: auto;
   word-wrap: break-word;
-  padding: 10px 0;
+  padding: 15px;
 }
 
 h1, h2, h3, h4 {
   line-height: 1.2;
   margin: 0px;
-  font-weight: normal;
+  font-weight: bold;
 }
 
-h4 {
+.subtitle {
   color: #757575;
+  font-weight: normal;
 }
 
 h1 a, h1 a:visited {
@@ -49,7 +51,9 @@ a, a:visited {
 pre {
   border: 1px solid #bdbdbd;
   border-radius: 5px;
-  font-weight: bold;
+  /* font-weight: bold; */
+  font-size: 14px;
+  padding: 10px;
 }
 
 .post-title {
@@ -60,3 +64,13 @@ footer {
   text-align: center;
 }
 
+table, th, td {
+  border: 1px solid #222222;
+  border-collapse: collapse;
+  padding: 7.5px;
+  text-align: left;
+}
+
+th { 
+  background-color: #eeeeee;
+}
