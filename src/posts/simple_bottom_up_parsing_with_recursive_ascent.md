@@ -1,6 +1,6 @@
 ---
 title: Simple Bottom Up Parsing with Recursive Ascent
-date: "2021-06-14"
+date: "2021-06-15"
 ---
 
 Bottom up parsers have been a mysterious entity to me. I have only used recursive 
