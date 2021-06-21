@@ -74,3 +74,15 @@ table, th, td {
 th { 
   background-color: #eeeeee;
 }
+
+blockquote {
+  color: #666;
+  padding-left: 20px;
+  border-left: 3px solid #ccc;
+}
+
+code:not([class]) {
+  padding: 1px;
+  background: #e4e4e4;
+}
+
