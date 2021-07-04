@@ -10,7 +10,6 @@ order to wrap my head around them, I decided to write my own bottom up parser
 from scratch. I'll summarize my findings here, as well as make a small guide on 
 how to write one.
 
-
 ### Bottom Up Parsers
 Botom up parsers, like its name implies, parses tokens from the bottom up. They 
 recognize the lowest parts of the grammar first, unlike top down parsers which 
@@ -18,7 +17,6 @@ recognize the highest parts first. These types of parsers usually employ tables
 to tell the parser what to do. They can handle more grammars than top down 
 parsers, but are more difficult to understand and build. This is the reason why 
 most people parser generators to build bottom up parsers. 
-
 
 ### Recursive Ascent Parsers
 In my research, I stumbled upon the term *recursive ascent parser*. This parsing 
