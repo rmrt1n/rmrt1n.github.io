@@ -130,7 +130,8 @@ typedef struct Character Character;
 ```
 First I wrote the forward declaration of the struct. I decided to make the type 
 Character opaque, as doing this will not allow the user to access the struct 
-members. The way to access them is through accessor functions.
+members. The way to access them is through accessor functions. Here's the struct 
+definition: 
 
 ```c
 /* character.c */
@@ -146,10 +147,9 @@ typedef struct Character { char *name;
     } features;
 } Character;
 ```
-Here's the struct definition. A character will have a name, 6 stats, a genotype 
-denoting whether it is a mutant or true kin, a ftr_cnt indicating the number of 
-mutations/cybernetics, and an array of mutations/cybernetics depending on the 
-genotype.
+A character will have a name, 6 stats, a genotype denoting whether it is a 
+mutant or true kin, a ftr_cnt indicating the number of mutations/cybernetics, 
+and an array of mutations/cybernetics depending on the genotype.
 
 ```c
 /* character.h */
@@ -243,7 +243,8 @@ Cybernetics *chr_cybernetics(Character *chr) {
 }
 ```
 For `chr_mutations` and `chr_cybernetics`, if they are given a character of a 
-wrong type, they will return `NULL`. The library is now done. Time to test.
+wrong type, they will return `NULL`. The library is now done. Time to test. 
+Here's the main function:
 
 ```c
 /* main.c */
@@ -263,7 +264,7 @@ int main() {
 }
 ```
 
-Here's the main function. When compiled and ran, this will be the output:
+When compiled and ran, this will be the output:
 ```sh-session
 $ gcc main.c character.c
 $ ./a.out
