@@ -14,7 +14,7 @@ to launch the Nth application in the favorites bar. I tried to find a fix for
 this a long time ago, without success. Just a few days ago, I've finally had 
 enough of this and started looking for a solution again. 
 
-### dconf
+### Dconf And The Solution
 After some reading, I found out about `dconf`. Quoting from the [GNOME wiki](https://wiki.gnome.org/action/show/Projects/dconf?action=show&redirect=dconf) 
 about dconf:
 
@@ -58,6 +58,7 @@ $ for i in {1..6}; do \
 > done
 ```
 
+### Conclusion
 Done! just around half an hour of googling led to this. Just a few commands to 
 fix a problem that has been annoying me for a long time. To those reading with 
 the same problem, hope this helps!

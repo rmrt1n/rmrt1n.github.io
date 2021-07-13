@@ -73,8 +73,6 @@ The actions of an LR parser will look like the following:
 | 11    | expr + num | *eof*     | reduce (expr -> expr + num) |
 | 12    | expr       | *eof*     | accept                      |
  
-<br>
-
 ### Finite State Machine
 LR parsers can have only a certain number of possible states, hence why it is
 an example of a finite state machine. A finite state machine is an abstract 
@@ -97,8 +95,6 @@ expr -> expr '+' num
 expr -> num
 num -> 1
 ``` 
-
-<br>
 
 ### The DOT •
 An LR(0) item of a grammar is just a rule of the grammar with a special dot "•" 
@@ -187,9 +183,6 @@ sN = shift to state N,
 rN = reduce using rule N, 
 gtN = go to state N
 </small>
-
-<br>
-<br>
 
 ### Building The Parser
 Since I'll be making a recursive ascent parser, the table from the previous 

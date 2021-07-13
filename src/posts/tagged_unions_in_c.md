@@ -37,8 +37,6 @@ typedef struct TaggedUnion {
 } TaggedUnion;
 ```
 
-<br>
-
 ### Example
 Below is an example of a use case for tagged unions. I used an AST (abstract 
 syntax tree) as the example because that's what I used tagged unions for most 
@@ -104,8 +102,6 @@ switch (node.type) {
         puts("undefined node type");
 }
 ```
-
-<br>
 
 ### Another Example
 Say you are making a [Caves of Qud](https://www.cavesofqud.com/) rip-off. CoQ 
