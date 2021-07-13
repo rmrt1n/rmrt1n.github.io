@@ -151,7 +151,7 @@ struct redisCommand readonlyCommandTable[] = {
 ```
 
 ### Conclusion
-Lookup tables are one of the things I think that most programmers should know. 
+Lookup tables are one of the things I think most programmers should know about. 
 It makes code much cleaner and easier to read. This applies not only to C, but 
 also to other programming languages like Python, Java, etc.
 
