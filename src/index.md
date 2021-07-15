@@ -7,7 +7,7 @@ layout: base.njk
 {% assign posts = collections.posts | reverse %}
 {% for post in posts %}
 <li>
-  {{ post.date | date: "%Y-%m-%d" }}
+  <date>{{ post.date | date: "%Y-%m-%d" }}</date>
   <a href="{{ post.url }}" class="post-title">{{ post.data.title }}</a>
 </li>
 {% endfor %}
