@@ -78,6 +78,10 @@ th {
   background-color: #eeeeee;
 }
 
+img {
+  width: 100%;
+}
+
 blockquote {
   color: #666;
   padding-left: 20px;
