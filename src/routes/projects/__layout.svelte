@@ -8,7 +8,7 @@
 		<ul class="md:list-disc list-inside">
 			{#each PROJS as i, j}
 				<li class="list-item">
-					<a class="font-bold" href={`/projects/${i.title}`}>{i.title}</a>
+					<a class="font-bold" href={i.url}>{i.title}</a>
 					<p class="ml-4">{i.desc}</p>
 					<p />
 				</li>
