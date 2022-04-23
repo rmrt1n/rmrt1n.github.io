@@ -341,5 +341,5 @@ Here's the output. It works as expected.
 ### Conclusion
 So that was tagged unions, a neat data structure for storing objects with 
 different types, and also some ways of implementing them in the C programming 
-language. Thanks for reading!
+language.
 

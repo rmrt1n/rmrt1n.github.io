@@ -172,5 +172,4 @@ Then start the service with `docker-compose up`. To stop it, run `docker-compose
 ### Conclusion
 So that's about it. This took me around 3 days to figure out, but I finally got 
 it working. I might write about this again when I get to deploy the application. 
-For any comments or suggestions please send me an [email](mailto:ryan.mrtinn@gmail.com).
 

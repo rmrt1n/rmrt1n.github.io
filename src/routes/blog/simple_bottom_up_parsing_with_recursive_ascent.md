@@ -149,7 +149,7 @@ expr -> expr '+' num •
 
 Here's a diagram representing the LR items:  
 
-<img alt="lr items dfd" width="600px" src="{{ '/assets/lr_items.svg' | url }}">
+<img alt="lr items dfd" width="600px" src="/lr_items.svg">
 
 ### The Parse Table
 The parse table can be constructed based on the information we have so far. The 
@@ -313,7 +313,7 @@ factor -> number
 ```
 Here's the canonical collection of LR(0) items for the grammar: 
 
-<img alt="lr items dfd" width="650px" src="{{ '/assets/lr_items2.svg' | url }}">
+<img alt="lr items dfd" width="650px" src="/lr_items2.svg">
 
 And here's the code for the parser. I decided to immediately evaluate the rules 
 inside the parser. The program will have a REPL, for easier testing and 

@@ -96,10 +96,7 @@ After doing this, the pod was running successfully.
 Here's a quick summary. If you're using a SELinux system, and you don't want to
 deal with it anymore, set the mode to permissive or disable it completely. Else,
 use the `zZ` flag suffixes to volume binds. `:Z` is more restrictive, so just
-use `:z` if you don't want to think much about this. Haven't written in a few
-months now, so I'm having trouble thinking up words to write. I probably need to
-post more. 2022 just started, so hopefully I can keep this blog going again this
-year.
+use `:z` if you don't want to think much about this. 
 
 ### References
 - [Using SELinux with
