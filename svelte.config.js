@@ -8,16 +8,10 @@ const config = {
 	extensions: ['.svelte', ...mdsvexConfig.extensions],
 
 	kit: {
-		adapter: adapter({
-			pages: 'docs',
-			assets: 'docs',
-			fallback: null,
-			precompress: false
-		})
-	},
-
-	prerender: {
-		default: true
+		adapter: adapter(),
+		prerender: {
+			default: true
+		}
 	},
 
 	preprocess: [
