@@ -1,6 +1,6 @@
 <script>
-  import { BLOGS } from '$lib/constants'
-  import Details from '$lib/components/Details.svelte';
+	import { BLOGS } from '$lib/constants';
+	import Details from '$lib/components/Details.svelte';
 </script>
 
 <div class="h-full px-8 lg:pl-16 pt-6 md:overflow-y-auto">

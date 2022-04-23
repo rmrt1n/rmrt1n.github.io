@@ -12,7 +12,5 @@
 		<slot />
 	</main>
 
-	<footer class="h-6 text-xs px-4 text-center">
-		Made with ❤️ by Ryan Martin © 2021
-	</footer>
+	<footer class="h-6 text-xs px-4 text-center">Made with ❤️ by Ryan Martin © 2021</footer>
 </div>

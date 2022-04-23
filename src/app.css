@@ -4,76 +4,90 @@
 @tailwind utilities;
 
 * {
-  font-family: 'Open Sans', sans-serif;
-  color: #222222;
+	font-family: 'Open Sans', sans-serif;
+	color: #222222;
 }
 
-p, li, button, span, em, strong {
-  font-family: 'Merriweather', serif; 
+p,
+li,
+button,
+span,
+em,
+strong {
+	font-family: 'Merriweather', serif;
 }
 
-code, code span {
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 500;
+code,
+code span {
+	font-family: 'Roboto Mono', monospace;
+	font-weight: 500;
 }
 
 a {
-  color: blue;
-  font-family: inherit;
+	color: blue;
+	font-family: inherit;
 }
 
 summary {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 /* details animation */
 details[open] summary ~ * {
-  animation: sweep .2s ease-in-out;
+	animation: sweep 0.2s ease-in-out;
 }
 
 @keyframes sweep {
-  0%    {opacity: 0; margin-top: -10px}
-  100%  {opacity: 1; margin-top: 0px}
+	0% {
+		opacity: 0;
+		margin-top: -10px;
+	}
+	100% {
+		opacity: 1;
+		margin-top: 0px;
+	}
 }
 /* details animation */
 
-
 /* css for mdsvex generated blocks */
 article pre {
-  overflow-x: auto;
-  border: 1px solid lightgray;
-  /* border-radius: 5px; */
-  margin-bottom: 1rem;
+	overflow-x: auto;
+	border: 1px solid lightgray;
+	/* border-radius: 5px; */
+	margin-bottom: 1rem;
 }
 
-article p, article img {
-  margin-bottom: 1rem;
+article p,
+article img {
+	margin-bottom: 1rem;
 }
 
-article table, article th, article td {
-  border: 1px solid #222222;
-  border-collapse: collapse;
-  padding: 7.5px;
-  text-align: left;
+article table,
+article th,
+article td {
+	border: 1px solid #222222;
+	border-collapse: collapse;
+	padding: 7.5px;
+	text-align: left;
 }
 
 article th {
-  background: #eeeeee;
+	background: #eeeeee;
 }
 
 article h3 {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: bold;
-  margin-top: 1rem;
+	font-size: 1.25rem;
+	line-height: 1.75rem;
+	font-weight: bold;
+	margin-top: 1rem;
 }
 
 article code:not([class]) {
-  background: #eeeeee;
+	background: #eeeeee;
 }
 
 article li {
-  list-style-type: disc;
-  list-style-position: inside;
+	list-style-type: disc;
+	list-style-position: inside;
 }
 /* css for mdsvex generated blocks */

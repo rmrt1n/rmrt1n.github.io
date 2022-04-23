@@ -1,27 +1,28 @@
 ---
 title: Tagged Unions in C
-date: "2021-07-04"
+date: '2021-07-04'
 ---
 
-One of my favorite data structures is the tagged union. It is also usually called 
-as a variant, discriminated union, disjoint union, or sum type. Just like regular 
-unions, it can hold different types of data in the same place in memory. However, 
-unlike regular untagged unions, the tagged union has a ***tag*** field that 
+One of my favorite data structures is the tagged union. It is also usually called
+as a variant, discriminated union, disjoint union, or sum type. Just like regular
+unions, it can hold different types of data in the same place in memory. However,
+unlike regular untagged unions, the tagged union has a **_tag_** field that
 indicates what value it is supposed to store.
 
-An advantage of using tagged unions over its untagged counterpart is that it is 
-more type-safe. When using untagged unions, the programmer needs to keep track of 
-what values are being stored. Accessing a value that is not stored in the union 
+An advantage of using tagged unions over its untagged counterpart is that it is
+more type-safe. When using untagged unions, the programmer needs to keep track of
+what values are being stored. Accessing a value that is not stored in the union
 can lead to undefined behavior. This is not a problem with tagged unions.
 
-A lot of languages support tagged unions. Functional languages like Haskell or 
-OCaml rely heavily on tagged unions, or in their respective languages, called 
-just as types or datatypes. Modern languages like Rust and Swift also supports 
-them. C++ has a variant library from [Boost](https://www.boost.org/). In C 
+A lot of languages support tagged unions. Functional languages like Haskell or
+OCaml rely heavily on tagged unions, or in their respective languages, called
+just as types or datatypes. Modern languages like Rust and Swift also supports
+them. C++ has a variant library from [Boost](https://www.boost.org/). In C
 however, there is no support for tagged unions. We need to implement them ourselves.
 
-A straightforward way to define tagged unions in C is by encompassing the tag 
+A straightforward way to define tagged unions in C is by encompassing the tag
 and the union in a struct. It would look like this:
+
 ```c
 typedef enum Tag {tag1, tag2, tag3} Tag;
 
@@ -32,18 +33,20 @@ typedef union Union {
 } Union;
 
 typedef struct TaggedUnion {
-  Tag tag; 
+  Tag tag;
   Union value;
 } TaggedUnion;
 ```
 
 ### Example
-Below is an example of a use case for tagged unions. I used an AST (abstract 
-syntax tree) as the example because that's what I used tagged unions for most 
-often. An AST is a type of tree structure that is used to represent the 
+
+Below is an example of a use case for tagged unions. I used an AST (abstract
+syntax tree) as the example because that's what I used tagged unions for most
+often. An AST is a type of tree structure that is used to represent the
 structure of a program. Here's how I usually define them.
+
 ```c
-/* Here's an AST structure for arithmetic operations. It is a recursive data 
+/* Here's an AST structure for arithmetic operations. It is a recursive data
  * structure, meaning that it contains values of the same type.
  *
  * The type specifies the type of the node. In this case, there are 3 types:
@@ -52,8 +55,8 @@ structure of a program. Here's how I usually define them.
  * AST_BINOP: Represents a binary operation, e.g. 1 + 2, 3 * 4
  *
  * Each member of the union corresponds to a type. If the type is AST_LEAF, then
- * the value the struct will hold is leaf_val, if it's AST_UNOP then unop_val 
- * and for AST_BINOP, binop_val. 
+ * the value the struct will hold is leaf_val, if it's AST_UNOP then unop_val
+ * and for AST_BINOP, binop_val.
  */
 typedef struct Ast {
     enum {AST_LEAF, AST_UNOP, AST_BINOP} type;
@@ -65,7 +68,7 @@ typedef struct Ast {
             enum {UNOP_POS, UNOP_MIN} op;
             struct Ast *operand;
         } unop_val;
-     
+
         struct {
             enum {BINOP_ADD, BINOP_SUB, BINOP_MUL, BINOP_DIV} op;
             struct Ast *left;
@@ -75,14 +78,15 @@ typedef struct Ast {
 } Ast;
 ```
 
-Even though tagged unions are supposed to be safer than untagged unions, in C, 
-the programmer can still make mistakes like accessing the wrong value. This is 
-because even though there is the tag field, all of the members of the union can 
-still be accessed. In some languages, this is not possible because of the checking 
-done by the compiler. In C, there is no checking, so we need to check the tag 
+Even though tagged unions are supposed to be safer than untagged unions, in C,
+the programmer can still make mistakes like accessing the wrong value. This is
+because even though there is the tag field, all of the members of the union can
+still be accessed. In some languages, this is not possible because of the checking
+done by the compiler. In C, there is no checking, so we need to check the tag
 everytime before trying to access the value of the union.
 
 This can be done easily using a switch statement:
+
 ```c
 Ast node;
 node.type = AST_LEAF;
@@ -104,15 +108,16 @@ switch (node.type) {
 ```
 
 ### Another Example
-Say you are making a [Caves of Qud](https://www.cavesofqud.com/) rip-off. CoQ 
-is a fantasy roguelike game. In this game, players play a character that roams 
-around the CoQ world. The character can either be a mutant (a creature that can 
-have mutations like wings and night vision), or a true kin (one of the races in 
+
+Say you are making a [Caves of Qud](https://www.cavesofqud.com/) rip-off. CoQ
+is a fantasy roguelike game. In this game, players play a character that roams
+around the CoQ world. The character can either be a mutant (a creature that can
+have mutations like wings and night vision), or a true kin (one of the races in
 the CoQ world).
 
-Mutants can have different types of mutations, e.g. physical mutations and 
-mental mutations. True kins can upgrade themselves with cybernetic enhancements. 
-These are the 2 types of character a player can play as. This can  be represented 
+Mutants can have different types of mutations, e.g. physical mutations and
+mental mutations. True kins can upgrade themselves with cybernetic enhancements.
+These are the 2 types of character a player can play as. This can be represented
 with a tagged union. I'll wrap the character type in a library just to be neat.
 
 ```c
@@ -124,10 +129,11 @@ typedef struct Character Character;
 
 #endif
 ```
-First I wrote the forward declaration of the struct. I decided to make the type 
-Character opaque, as doing this will not allow the user to access the struct 
-members. The way to access them is through accessor functions. Here's the struct 
-definition: 
+
+First I wrote the forward declaration of the struct. I decided to make the type
+Character opaque, as doing this will not allow the user to access the struct
+members. The way to access them is through accessor functions. Here's the struct
+definition:
 
 ```c
 /* character.c */
@@ -143,14 +149,15 @@ typedef struct Character { char *name;
     } features;
 } Character;
 ```
-A character will have a name, 6 stats, a genotype denoting whether it is a 
-mutant or true kin, a ftr_cnt indicating the number of mutations/cybernetics, 
+
+A character will have a name, 6 stats, a genotype denoting whether it is a
+mutant or true kin, a ftr_cnt indicating the number of mutations/cybernetics,
 and an array of mutations/cybernetics depending on the genotype.
 
 ```c
 /* character.h */
 typedef struct Mutations {
-    enum {M_PHYSICAL, M_MENTAL} type;    
+    enum {M_PHYSICAL, M_MENTAL} type;
     char *name;
 } Mutations;
 
@@ -159,15 +166,18 @@ typedef struct Cybernetics {
     char *name;
 } Cybernetics;
 ```
-Each mutation/cybernetic has a type and a name. These structs and their members 
-can be accessed by the user. Next, in order to be able to use the Character type, 
-it needs to be constructed first with some constructor functions. First, the 
+
+Each mutation/cybernetic has a type and a name. These structs and their members
+can be accessed by the user. Next, in order to be able to use the Character type,
+it needs to be constructed first with some constructor functions. First, the
 function declarations:
+
 ```c
 /* character.h */
 Character *chr_init_mutant(char *name, int *stats, Mutations *features, int n);
 Character *chr_init_truekin(char *name, int *stats, Cybernetics *features, int n);
 ```
+
 And then the definitions:
 
 ```c
@@ -197,6 +207,7 @@ Character *chr_init_truekin(char *name, int *stats, Cybernetics *features, int n
     return chr;
 }
 ```
+
 Next, I'll declare the accessor functions.
 
 ```c
@@ -208,6 +219,7 @@ int chr_nfeatures(Character *chr);
 Mutations *chr_mutations(Character *chr);
 Cybernetics *chr_cybernetics(Character *chr);
 ```
+
 And the definitions:
 
 ```c
@@ -238,8 +250,9 @@ Cybernetics *chr_cybernetics(Character *chr) {
     return NULL;
 }
 ```
-For `chr_mutations` and `chr_cybernetics`, if they are given a character of a 
-wrong type, they will return `NULL`. The library is now done. Time to test. 
+
+For `chr_mutations` and `chr_cybernetics`, if they are given a character of a
+wrong type, they will return `NULL`. The library is now done. Time to test.
 Here's the main function:
 
 ```c
@@ -261,13 +274,16 @@ int main() {
 ```
 
 When compiled and ran, this will be the output:
+
 ```sh-session
 $ gcc main.c character.c
 $ ./a.out
 Arthur Boyle
 ```
-Great, it works! Since the `Character` type is supposed to be opaque, let's try 
+
+Great, it works! Since the `Character` type is supposed to be opaque, let's try
 to access one of its members.
+
 ```c
 /* main.c */
 ...
@@ -276,6 +292,7 @@ to access one of its members.
     return 0;
 }
 ```
+
 When compiled, this should produce an error.
 
 ```sh-session
@@ -285,9 +302,11 @@ main.c:12:13: error: invalid use of incomplete typedef 'Character'
    12 |     puts(chr->name);
       |             ^~
 ```
-Finally, I'll define a function to display the entire contents of the struct, 
-just to test the other accessor functions. The enum stats is just aliases for 
+
+Finally, I'll define a function to display the entire contents of the struct,
+just to test the other accessor functions. The enum stats is just aliases for
 the stats array indexes.
+
 ```c
 enum Stats {
     S_STRENGTH, S_TOUGHNESS, S_INTELLIGENCE,
@@ -307,8 +326,8 @@ void chr_display(Character *chr) {
     Mutations *m = chr_mutations(chr);
     for (int i = 0; i < chr_nfeatures(chr); i++) {
         printf("Mutation #%d: ", i + 1);
-        printf("%s ", m[i].type == M_PHYSICAL 
-                         ? "(Physical Mutation)" 
+        printf("%s ", m[i].type == M_PHYSICAL
+                         ? "(Physical Mutation)"
                          : "(Mental Mutation)");
         printf("%s\n", m[i].name);
     }
@@ -320,6 +339,7 @@ int main() {
     return 0;
 }
 ```
+
 And lastly, compile and run.
 
 ```sh-session
@@ -336,10 +356,11 @@ Mutation #1: (Physical Mutation) Super Strength
 Mutation #2: (Mental Mutation) Pyrokinesis
 Mutation #3: (Mental Mutation) Press of Death
 ```
+
 Here's the output. It works as expected.
 
 ### Conclusion
-So that was tagged unions, a neat data structure for storing objects with 
-different types, and also some ways of implementing them in the C programming 
-language.
 
+So that was tagged unions, a neat data structure for storing objects with
+different types, and also some ways of implementing them in the C programming
+language.
