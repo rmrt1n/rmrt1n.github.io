@@ -3,7 +3,7 @@
 	import Details from '$lib/components/Details.svelte';
 </script>
 
-<div class="h-full px-8 lg:px-16 pt-6 md:overflow-y-auto">
+<div class="h-full pt-6 md:overflow-y-auto">
 	<Details open title="About" emoji="👋">
 		<p class="mb-2">Hi there!</p>
 		<p class="mb-2">
@@ -18,7 +18,7 @@
 	</Details>
 </div>
 
-<div class="h-full px-8 lg:px-16 md:pt-6 md:overflow-y-auto">
+<div class="h-full md:pt-6 md:overflow-y-auto px-1">
 	<br class="md:hidden" /><br class="md:hidden" />
 
 	<Details title="Experience" emoji="💼">

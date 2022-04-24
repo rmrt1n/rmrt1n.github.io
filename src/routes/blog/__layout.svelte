@@ -3,7 +3,7 @@
 	import Details from '$lib/components/Details.svelte';
 </script>
 
-<div class="h-full px-8 lg:pl-16 pt-6 md:overflow-y-auto">
+<div class="h-full pt-6 md:overflow-y-auto">
 	<Details open title="Blog" emoji="✍️">
 		<ul class="md:list-disc list-inside">
 			{#each BLOGS as i, j}
@@ -15,6 +15,6 @@
 	</Details>
 </div>
 
-<div class="w-screen md:w-full h-full px-8 lg:pr-16 pt-6 md:overflow-y-auto">
+<div class="w-[calc(100vw_-_2rem)] md:w-full h-full pt-6 md:overflow-y-auto">
 	<slot />
 </div>
