@@ -135,5 +135,10 @@ export const BOOKS = [
 			"The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Business",
 		author: 'Eric Ries',
 		url: 'http://theleanstartup.com/'
+	},
+	{
+		title: 'Crafting Interpreters',
+		author: 'Robert Nystrom',
+		url: 'https://craftinginterpreters.com/'
 	}
 ];
