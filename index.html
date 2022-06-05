@@ -4,47 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="./normalize.css" />
     <link rel="stylesheet" href="./style.css" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <title>Ryan Martin</title>
   </head>
   <body>
     <div id="app" >
-      <h1 style="margin: 0">Ryan Martin</h1>
+      <h2 style="margin: 0">Ryan Martin</h2>
       <em>Software Developer</em>
       <hr>
       
-      <h3>About</h3>
+      <h3>👋 About</h3>
+      <p>Hi there!</p>
       <p>
-        Hi there 👋!
-        I'm a software developer wanting to transition into product management. 
-        I'm passionate about open-source tech and startups. Currently I'm pursuing
-        a CS degree in <a href="https://apu.edu.my" target="_blank">Asia Pacific University</a>.
+        I'm a software developer & aspiring product manager with passion in 
+        sustainability and open-source technology, currently based in Kuala
+        Lumpur, Malaysia. In my free time I like to exlore new products, read 
+        books, or watch movies. 
       </p>
       <p>
-        This site contains my resume, portfolio, blog, contact information; Kind
-        of similiar to Linktree, but with extra stuff. Feel free to reach out 
-        for any inquiries!
+        This site acts as my online cv, with some random stuff thrown in. Feel
+        free to reach out about anything, you can find my contact information
+        <a href="#contact">here</a>.
       </p>
       
-      <h3>Work</h3>
+      <h3>💼 Work</h3>
+      <p>
+        I'm currently a part-time frontend developer at CTI, APU, where I build
+        & maintain application frontends. For more details, checkout my resume
+        <a href="/resume.pdf" target="_blank">here</a>.
+      </p>
       <ul>
         <li><strong>Frontend Developer (R&D Assistant)</strong>
-          <p>CTI @ APU</p>
+          <p>
+            <abbr title="Centre of Technology & Innovation">CTI</abbr>,
+            <abbr title="Asia Pacific University of Technology & Innovation">APU</abbr>
+          </p>
           <small>Feb 2022 - now</small>
         </li>
       </ul>
       
-      <h3>Projects</h3>
+      <h3>💻 Projects</h3>
       <p>
-        Nowadays I mostly work on web applications, but I used to do systems 
-        programming and data science. Checkout my GitHub for more. There's stuff
-        on compilers, linux, data, and other random experiments.
+        Nowadays I mostly work on web applications, but I used to also do 
+        systems programming and data science. Checkout my
+        <a href="https://github.com/rmrt1n" target="_blank">GitHub</a>
+        for more. There's stuff on compilers, linux, data, etc.
       </p>
-      <p>
-        Here are some of my more notable projects for those in a hurry:
-      </p>
+      <p>Below are links to some of my more interesting projects:</p>
       <ul>
         <li><a href="https://github.com/rmrt1n/seacucumber" target="_blank">Seacucumber</a>
           <p>Interpreter for a custom programming language written in C.</p>
@@ -60,20 +67,22 @@
         </li>
       </ul>
       
-      <h3>Blog</h3>
+      <h3>✍️ Blog</h3>
       <p>
-        I also have a blog where I write about guides/tips I've picked up from 
-        learning and fixing bugs over the years. Might contain useful stuff to 
-        some. I used to host it myself, now I moved it to Hashnode because it's 
-        more convenient. Anyways, here's the 
-        <a href="https://blog.ryanmartin.rocks" target="_blank"><strong>BLOG</strong></a>.
+        I keep a blog about the things I find interesting, and might be useful
+        to some people. I don't update it frequently though, which I think I
+        should. Anyways, you can find it <strong>
+          <a href="https://blog.ryanmartin.rocks" target=_blank>HERE</a>
+        </strong>
       </p>
       
-      <h3>Skills</h3>
+      <h3>✨ Skills</h3>
       <p>
         Most of the skills here are generalized, just to keep it short. For more
-        details on my tech stack or a more complete list, checkout my GitHub or
-        my LinkedIn profile.
+        details on my tech stack or a more complete list, checkout my 
+        <a href="https://github.com/rmrt1n" target="_blank">GitHub</a> or my
+        <a href="https://linkedin.com/in/ryanmrt1n" target="_blank">LinkedIn</a>
+        profile.
       </p>
       <ul>
         <li><strong>Technical Skills</strong>
@@ -89,8 +98,21 @@
           <p>Googling, Listening, Drawing.</p>
         </li>
       </ul>
+
+      <h3>🎓 Education</h3>
+      <ul>
+        <li>
+          <strong>Asia Pasific University of Technology & Innovation</strong>
+          <p>Bsc. (hons) in Computer Science</p>
+          <small>Sep 2022</small>
+        </li>
+      </ul>
       
-      <h3>Awards</h3>
+      <h3>🏆 Awards</h3>
+      <p>
+        Here are some of the notable hackathons & 
+        <abbr title="capture the flag">CTF</abbr>s I've participated in.
+      </p>
       <ul>
         <li>Hack.Asia 2022 finalist for topic: Social Inclusion</li>
         <li>Hilti ITC 2022 top 19 semifinalist</li>
@@ -100,10 +122,11 @@
         <li>F-Secure Cybersecurity Competition Malaysia 2021 3rd place</li>
       </ul>
       
-      <h3>Bookshelf</h3>
+      <h3>📖 Bookshelf</h3>
       <p>
-        I've been reading more books recently so I thought I'd put them here. 
-        Any book reccomendations are appreciated 😉!
+        I've been reading more books recently so I thought I'd put them here. I
+        mostly read non-fiction, but would like to try fiction some time in the
+        future. This section might get its own page once it gets too long. 
       </p>
       <ul>
         <li>
@@ -133,31 +156,14 @@
         </li>
       </ul>
 
-      <h3>About the Site</h3>
+      <h3 id="contact">📞 Contact</h3>
       <p>
-        This site probably looks like some fossil from the web 1.0 era to some; no 
-        JavaScript, no interaction, no colors. I could've made an animated sidebar, 
-        or used fancy scrolling effects, but lately I'm just bored of 
-        the current web designs. 
+        You can reach me via email at 
+        <a href="mailto:ryan.mrtinn@gmail.com">ryan.mrtinn@gmail.com</a>, I'd be
+        happy to write back. Otherwise, you can hit me up on
+        <a href="https://linkedin.com/in/ryanmrt1n" target="_blank">LinkedIn</a>
+        or <a href="https://github.com/rmrt1n" target="_blank">GitHub</a>.
       </p>
-      <p>
-        Even though I also like those modern, fancy sites such as the 
-        <a href="https://www.apple.com/ipad-air/" target="_blank">this</a>,
-        recently I've been really into brutalist-style websites, especially 
-        <a href="http://bettermotherfuckingwebsite.com/">this</a>. 
-        I might stick with this style for a while, only for my personal sites of 
-        course. 
-      </p>
-      
-      <footer>
-        <h3>Contact</h3>
-        <ul>
-          <li><a href="mailto:ryan.mrtinn@gmail.com">Email</a></li>
-          <li><a href="https://linkedin.com/in/ryanmrt1n" target="_blank">LinkedIn</a></li>
-          <li><a href="https://github.com/rmrt1n" target="_blank">GitHub</a></li>
-          <li><a href="https://blog.ryanmartin.rocks" target="_blank">Blog</a></li>
-        </ul>
-      </footer>
       <br>
     </div>
   </body>
