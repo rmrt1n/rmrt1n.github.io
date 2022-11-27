@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/png" sizes="32x32" href={{ '/assets/favicon.png' | url }}>
+    <link rel="stylesheet" href={{ '/styles/normalize.css' | url }}>
+    <link rel="stylesheet" href={{ '/styles/style.css' | url }}>
+    <script>
+      console.log('======================================')
+      console.log('Good luck finding those flags! 🚩🚩🚩')
+      console.log('======================================')
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Hi there <span id="wave">👋</span></h1>
+    </header>
+    <main>
+      {{ content }}
+    </main>
+    <footer>
+      <hr>
+      <div id="resume">
+        <a href="/resume.pdf" target="_blank">Resume</a>
+        <p>Last updated: {{ '2022-11-27' | dateFmt }}</p>
+      </div>
+      <p>Made with 💖 by Ryan Martin &copy; {% year %}</p>
+    </footer>
+  </body>
+</html>
+
+
+
+

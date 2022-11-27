@@ -1,13 +1,27 @@
 {
-  "name": "vite-project",
-  "private": true,
-  "version": "0.0.0",
+  "name": "ryanmartin.me",
+  "version": "4.0.0",
+  "description": "",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "npx @11ty/eleventy --serve --port 3000",
+    "build": "npx @11ty/eleventy",
+    "prepare": "husky install",
+    "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
+    "pre-commit": "lint-staged"
   },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "vite": "^2.9.5"
+    "@11ty/eleventy": "^1.0.2",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.4",
+    "markdown-it-attrs": "^4.1.4",
+    "prettier": "^2.8.0"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": [
+      "npm run format"
+    ]
   }
 }
