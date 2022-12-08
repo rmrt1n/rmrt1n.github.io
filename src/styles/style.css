@@ -1,20 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap");
 
 body {
   min-height: 100vh;
-  font-family: "Lora", serif;
+  font-family: "Hanken Grotesk", Arial, sans-serif;
   font-weight: 500;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1.75rem;
-  background-color: #fafaf9;
-  color: #292524;
+  background-color: #fff;
+  color: #000;
   padding: 2rem 0;
 }
 
 main,
 header,
 footer {
-  max-width: 48rem;
+  max-width: 56rem;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -48,6 +48,10 @@ h1 {
   line-height: 2.5rem;
 }
 
+li {
+  margin-bottom: 1rem;
+}
+
 footer p {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -61,8 +65,8 @@ footer p {
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #1c1917;
-    color: #e7e5e4;
+    background-color: #000;
+    color: #fff;
   }
 
   a {
@@ -78,8 +82,13 @@ footer p {
 
 @media (min-width: 640px) {
   body {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    line-height: 1;
   }
 
   footer p {
