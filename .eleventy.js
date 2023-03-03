@@ -2,7 +2,7 @@ const markdownIt = require("markdown-it");
 const markdownItAttrs = require("markdown-it-attrs");
 
 module.exports = function (eleventyConfig) {
-  const markdownLib = markdownIt().use(markdownItAttrs).disable("code");
+  const markdownLib = markdownIt({ html: true }).use(markdownItAttrs);
   eleventyConfig.setLibrary("md", markdownLib);
 
   eleventyConfig.addPassthroughCopy("./src/styles");
