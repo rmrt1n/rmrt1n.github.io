@@ -3,7 +3,7 @@ title: Ryan Martin
 layout: base.liquid
 ---
 
-Hi 👋, I'm Ryan Martin  
+Hi 👋, I'm Ryan Martin.  
 I build impactful products through design and development.
 ===
 
@@ -39,16 +39,24 @@ link](https://beru.ryanmartin.me){target=\_blank}.
   <img src="/assets/beru-3.jpg" width="100%"/>
 </div>
 
+<small style="display: block; text-align: center; margin-top: 1rem;">
+  Click on the images to enlarge them
+</small>
+
 ### PKPM E-ticketing system
 
 Event e-ticketing and partcipant check-in system that streamlined the event flow
 up to 400% for 600+ participants. [GitHub](https://github.com/rmrt1n/e-ticket/).
 
 <div class="screenshots">
-  <img src="/assets/unavailable.jpg" width="100%"/>
-  <img src="/assets/unavailable.jpg" width="100%"/>
-  <img src="/assets/unavailable.jpg" width="100%"/>
+  <img src="/assets/eticket-1.jpg" width="100%"/>
+  <img src="/assets/eticket-2.jpg" width="100%"/>
+  <img src="/assets/eticket-3.jpg" width="100%"/>
 </div>
+
+<small style="display: block; text-align: center; margin-top: 1rem;">
+  Data in the images has been modified for privacy reasons
+</small>
 
 ### PalmConnect Superapp
 
