@@ -20,7 +20,7 @@ You can also find me on:
 [🐦 Twitter](https://twitter.com/gud_mornign){target=\_blank},
 [🐙 GitHub](https://github.com/rmrt1n){target=\_blank},
 [🚀 Product Hunt](https://producthunt.com/@rmrt1n){target=\_blank},
-and here's my [resume](https://producthunt.com/@rmrt1n){target=\_blank}
+and here's my [resume](/resume.pdf){target=\_blank}.
 
 <br>
 
