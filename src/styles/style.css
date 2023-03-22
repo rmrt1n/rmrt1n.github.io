@@ -120,8 +120,7 @@ img {
   cursor: pointer;
 }
 
-img {
-  width: 100%;
+.overlay img {
   max-width: 72rem;
   margin: 0 auto;
 }
@@ -144,6 +143,10 @@ img {
     background-color: #93c5fd;
     outline: 2px solid #93c5fd;
     color: #1c1917;
+  }
+
+  img {
+    border: 2px solid #fff;
   }
 }
 

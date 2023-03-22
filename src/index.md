@@ -7,8 +7,8 @@ Hi 👋, I'm Ryan Martin.
 I build impactful products through design and development.
 ===
 
-I'm a 💻 software engineer + 🎨 product designer based in Kuala Lumpur, Malaysia. I specialize
-in bringing 💡 innovative ideas to life through the entire product development
+I'm a software engineer + product designer based in Kuala Lumpur, Malaysia. I specialize
+in bringing innovative ideas to life through the entire product development
 process - from 🔍 discovery to 🚀 launch. I'm particularly interested in leveraging technology to drive positive change, especially in the field of 🌍 climate tech.
 Currently I'm studying for the final year of my 🎓 bachelor's degree at
 [APU](https://new.apu.edu.my/){target=\_blank}.
@@ -73,8 +73,8 @@ traceability and social inclusion of smallholder farmers.
 
 I build side projects for fun or to learn a new technology. Nowadays I
 usually work on web applications, such as this
-[NFT explorer](https://github.com/rmrt1n/starknet-data-aggregator){target=\_blank}
-or this [cybersecurity learning platform](https://github.com/rmrt1n/cybernaut-2){target=\_blank},
+[🔍 NFT explorer](https://github.com/rmrt1n/starknet-data-aggregator){target=\_blank}
+or this [👾 cybersecurity learning platform](https://github.com/rmrt1n/cybernaut-2){target=\_blank},
 but previously I used to (and still do) like building system programs such as
 [compilers](https://github.com/rmrt1n/seacucumber){target=\_blank},
 [VMs](https://github.com/rmrt1n/govm){target=\_blank}, and
@@ -87,9 +87,9 @@ of my projects as well as my tech stack on my
 ## Blog
 
 Every once in a while I write articles for
-[my blog](https://blog.ryanmartin.me){target=\_blank}. Most of them are about
-things I'm interested in or solutions to some of the problems I've encountered
-before. Have a look at some of my more notable posts:
+[my blog](https://blog.ryanmartin.me){target=\_blank}. My posts cover topics
+I'm passionate about and share solutions to problems I've encountered. Check out
+some of my most noteworthy articles:
 
 - [Container Volumes on Selinux
   Systems](https://blog.ryanmartin.me/selinux-containers){target=\_blank}
@@ -101,13 +101,13 @@ before. Have a look at some of my more notable posts:
 
 ## Fun Facts
 
-I spend most of my time staring at screens, either building side projects or
-exploring new products and technologies. Other than that I usually listen to
-music and try to finish my reading list.
+I spend most of my time staring at screens, either 🏗️ building side projects or
+🔍 exploring new products and technologies. When I'm not doing that, I like to
+listen to 🎧 music and try to finish my 📚 reading list.
 
-I love CTFs, and I've joined a lot of them in the past few years, so I thought
-I'd hide some flags in this website just for fun. I've hidden 3 flags for now,
-but I might add more in the future. If you have no experience in CTFs, this
-should be a exercise to get to know the field!
+I'm a big fan of 🚩 CTFs and have participated in many over the past few years.
+As a fun challenge, I've hidden three flags on this website. You don't need any
+prior experience with CTFs to give it a shot - it could be a great way to get
+familiar with the field!
 
 <br>
