@@ -1,0 +1,62 @@
+/* extra resets */
+/* src: https://www.youtube.com/watch?v=cCAtD_BAHNw */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark light;
+  hanging-punctuation: first last;
+}
+
+body {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+  /* max-width: 65ch; */
+}
+
+button,
+input,
+optgroup,
+select,
+textarea,
+legend {
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+/* src: https://www.youtube.com/watch?v=345V2MU3E_w */
+img,
+picture,
+svg,
+video {
+  /* display: block; */
+  max-width: 100%;
+  vertical-align: middle;
+  height: auto;
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 1rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :has(:target) {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+}
