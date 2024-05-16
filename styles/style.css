@@ -74,6 +74,20 @@ main > article {
     line-height: 1.25;
     margin-top: 0.5rem;
   }
+
+  > ol {
+    margin-left: 1rem;
+
+    > * + * {
+      margin-top: 0.5rem;
+    }
+
+    li {
+      > * + * {
+        margin-top: 0.5rem;
+      }
+    }
+  }
 }
 
 main > ul {
@@ -139,4 +153,29 @@ p code {
   border-radius: 2px;
   font-size: 0.875rem;
   line-height: 1.25;
+}
+
+small code {
+  background-color: var(--color-code);
+  padding: 1.5px;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.footnotes {
+  padding: 1rem 0;
+
+  > hr {
+    border: 0;
+    border-top: 1px solid var(--color-fg);
+    width: 40%;
+    margin-bottom: 1rem;
+  }
+
+  > small {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
 }
