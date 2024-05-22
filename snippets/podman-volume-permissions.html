@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="stylesheet" type="text/css" href="/styles/style.css" />
+    <script src="/scripts/highlight/highlight.min.js"></script>
+    <script src="/scripts/highlight/lang/bash.min.js"></script>
+    <script>
+      hljs.highlightAll()
+    </script>
+    <title>Fixing Podman Volume Permission Issues</title>
+  </head>
+  <body>
+    <header>
+      <a href="/">Ryan Martin</a>
+      <nav>
+        <a href="/articles">Articles</a>
+        <a href="/snippets">Snippets</a>
+        <a href="/projects">Projects</a>
+        <a href="/">About</a>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h1>Fixing Podman Volume Permission Issues</h1>
+        <time>last updated: 2024-05-22</time>
+        <p>
+          If you use <a href="https://podman.io/">Podman</a> to run containers on a system with
+          <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled,
+          you&#39;ve probably encountered some permission errors when trying to mount volumes like:
+        </p>
+        <pre><code class="language-bash">podman run --rm -it -v .:/root steghide info favicon.png
+# error, the container process can't find the file
+steghide: could not open the file "favicon.png".
+</code></pre>
+        <p id="fnref-1">
+          This happens because by default, rootless containers are not given write access to
+          the host machine&#39;s volume bind directory. To fix this, you just have to add
+          a <code>:z</code> or a <code>:Z</code> suffix to the volume
+          mounts.<a href="#fn-1"><sup>[1]</sup></a>
+        </p>
+        <pre><code class="language-bash">podman run --rm -it -v .:/root:z steghide info favicon.png
+# it works now
+"favicon.png":
+  format: png
+  ...
+</code></pre>
+        <p id="fnref-2">
+          The <code>:z</code> and <code>:Z</code> suffixes tell Podman to set the required
+          labels to the volume mount directory &amp; files. Without these labels, SELinux will
+          prevent any processes inside the container from using the contents of the volume
+          mount.<a href="#fn-2"><sup>[2]</sup></a>
+        </p>
+        <p>
+          The difference between <code>:z</code> and <code>:Z</code> is that <code>:z</code>
+          tells Podman that more than one container will access the volume, while <code>:Z</code>
+          means that only the current container can use it. In general, I recommend to just use
+          the <code>:z</code> label unless you know that only 1 container will be using the volume.
+        </p>
+        <section class="footnotes">
+          <hr />
+          <small id="fn-1">
+            <a href="#fnref-1">[1]</a>
+            <span>
+              The other options is to set SELinux to permissive mode: <code>setenforce 0</code>,
+              but you probably shouldn&#39;t do this, especially if you&#39;re running on a server.
+            </span>
+          </small>
+          <small id="fn-2">
+            <a href="#fnref-2">[2]</a>
+            <span>
+              Read the full explanation in
+              <a href="https://docs.podman.io/en/latest/markdown/podman-run.1.html">
+                <strong><code>man podman-run</code></strong>
+              </a>
+              and <code>Ctrl+F</code> for &quot;labeling volume mounts&quot;.
+            </span>
+          </small>
+        </section>
+      </article>
+    </main>
+    <footer>
+      <div>
+        <a href="https://github.com/rmrt1n">GitHub</a>
+        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
+        <a href="https://twitter.com/gud_mornign">Twitter</a>
+        <a href="/resume.pdf">Resume</a>
+        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+    </footer>
+  </body>
+</html>

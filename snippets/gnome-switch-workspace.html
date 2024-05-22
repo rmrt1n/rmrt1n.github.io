@@ -25,29 +25,23 @@
     <main>
       <article>
         <h1>Configure Keyboard Shortcuts for GNOME Workspace Switching</h1>
-        <time>last updated: 2024-05-16</time>
+        <time>last updated: 2024-05-22</time>
         <p id="fnref-1">
           GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces
           1-4. There are no options to add shortcuts to switch to any other workspaces. It&apos;s
           possible to configure this by editing <code>dconf</code> directly using
-          <code>gsettings</code> from the command line:<a href="#fn-1"><sup>[1]</sup></a>
+          <code>gsettings</code> from the command line:
         </p>
         <pre><code class="language-bash"># replace range with whatever workspaces you want
 for i in {5..6}; do gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-$i &quot;[&apos;&lt;Super&gt;$i&apos;]&quot;; done
 </code></pre>
         <p>
+          <code>dconf</code> is GNOME's configuration system, and <code>gsettings</code> is the
+          frontend for <code>dconf</code>. It's essentially a key-value store of GNOME's config.
           You can also configure the keyboard shortcuts for other settings that are not shown in
           GNOME settings with <code>gsettings</code>.
         </p>
         <section class="footnotes">
-          <hr />
-          <small id="fn-1">
-            <a href="#fnref-1">[1]</a>
-            <span>
-              <code>dconf</code> is GNOME's configuration system, and <code>gsettings</code> is the
-              frontend for <code>dconf</code>. It's essentially a key-value store of GNOME's config.
-            </span>
-          </small>
         </section>
       </article>
     </main>

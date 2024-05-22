@@ -25,7 +25,7 @@
     <main>
       <article>
         <h1>How to Manually Optimise Images for the Web</h1>
-        <time>last updated: 2024-05-20</time>
+        <time>last updated: 2024-05-22</time>
         <p>
           JavaScript frameworks and build tools like <a href="https://nextjs.org/">Next.js</a>,
           <a href="https://astro.build/">Astro</a>, and
@@ -40,7 +40,7 @@
               best formats for images on the web, as they are smaller in size but still have a
               similar image quality to larger formats like <code>.png</code>. In terms of image size,
               <code>.avif</code> is smaller than <code>.webp</code>, but both formats would still
-              work well. Here&apos;s a command you can run to convert formats from the command 
+              work well. Here&apos;s a command you can run to convert formats from the command
               line:<a href="#fn-1"><sup>[1]</sup></a>
             </p>
             <pre><code class="language-bash"># this converts the image format. you can also specify the output file name
@@ -53,13 +53,19 @@ gm convert -quality 75 image.jpg image.webp
           <li>
             <p>
               Set the <code>width</code> and <code>height</code> attributes. Just use the
-              image&apos;s size if you&apos;re not resizing it.<a href="#fn-2"><sup>[2]</sup></a>
+              image&apos;s size if you&apos;re not resizing it. This is needed to prevent
+              <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.
             </p>
           </li>
           <li>
             <p>
               Set <code>loading=&quot;lazy&quot;</code>. This will defer the loading of the image
-              until it is almost scrolled into the viewport.<a href="#fn-3"><sup>[3]</sup></a>
+              until it is almost scrolled into the viewport. There&apos;s an exception to this.
+              For important images, such as the
+              <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set
+              <code>loading=&quot;eager&quot;</code>.
+              <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set
+              <code>fetchpriority=&quot;high&quot;</code> for this.
             </p>
           </li>
           <li>
@@ -76,9 +82,9 @@ gm convert -quality 75 image.jpg image.webp
             </p>
           </li>
         </ol>
-        <p>
+        <p id="fnref-2">
           There are more optimisations you can do, such as using different image sizes depending on
-          the user&apos;s device size,<a href="#fn-4"><sup>[4]</sup></a> but these should be enough 
+          the user&apos;s device size,<a href="#fn-2"><sup>[2]</sup></a> but these should be enough
           for basic use cases.
         </p>
         <section class="footnotes">
@@ -94,27 +100,10 @@ gm convert -quality 75 image.jpg image.webp
           <small id="fn-2">
             <a href="#fnref-2">[2]</a>
             <span>
-              This is needed to prevent 
-              <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.
-            </span>
-          </small>
-          <small id="fn-3">
-            <a href="#fnref-3">[3]</a>
-            <span>
-              There&apos;s an exception to this. For important images, such as the
-              <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set
-              <code>loading=&quot;eager&quot;</code>.
-              <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set
-              <code>fetchpriority=&quot;high&quot;</code> for this.
-            </span>
-          </small>
-          <small id="fn-4">
-            <a href="#fnref-4">[4]</a>
-            <span>
               Here&apos;s a good
               <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">
                 article about implementing responsive images 
-              </a>. JavaScript frameworks have their own ways of doing this, usually through their 
+              </a>. JavaScript frameworks have their own ways of doing this, usually through their
               own <code>Image</code> components.
             </span>
           </small>
