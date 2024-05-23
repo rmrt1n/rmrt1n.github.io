@@ -36,10 +36,9 @@
 steghide: could not open the file "favicon.png".
 </code></pre>
         <p id="fnref-1">
-          This happens because by default, rootless containers are not given write access to
-          the host machine&#39;s volume bind directory. To fix this, you just have to add
-          a <code>:z</code> or a <code>:Z</code> suffix to the volume
-          mounts.<a href="#fn-1"><sup>[1]</sup></a>
+          This happens because by default, rootless containers are not given access to the host 
+          machine&#39;s volume bind directory. To fix this, you just have to add a <code>:z</code> 
+          or a <code>:Z</code> suffix to the volume mounts.<a href="#fn-1"><sup>[1]</sup></a>
         </p>
         <pre><code class="language-bash">podman run --rm -it -v .:/root:z steghide info favicon.png
 # it works now
