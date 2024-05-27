@@ -1,0 +1,21 @@
+---
+layout: base.liquid
+title: Ryan Martin | Snippets
+eleventyImport:
+  collections: ['snippets']
+---
+
+<p>
+  Snippets are random notes, thoughts, or code that I want to remember and 
+  share, but are not long enough to be an article by themselves.
+</p>
+
+<ul class="archive">
+  {% assign snippets = collections.snippets | sort: 'data.published' | reverse %} 
+  {%- for snippet in snippets -%}
+    <li>
+      <a href="{{ snippet.page.url }}">{{ snippet.data.title}}</a>
+      <time>{{ snippet.data.published | toISODateString }}</time>
+    </li>
+  {%- endfor -%}
+</ul>

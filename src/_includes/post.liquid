@@ -1,0 +1,17 @@
+---
+layout: base.liquid
+---
+
+<article>
+  <h1>{{ title }}</h1>
+  <time>last updated: {{ updated | toISODateString }}</time>
+  {{ content }}
+  <section>
+    <p><strong>Tags:</strong></p>
+    <ul class="tags">
+      {%- for tag in tags offset:1 -%}
+        <li><a href="/tags/{{ tag }}">#{{ tag }}</a></li>
+      {%- endfor -%}
+    </ul>
+  </section>
+</article>

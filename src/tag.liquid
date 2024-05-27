@@ -1,0 +1,23 @@
+---
+layout: base.liquid
+title: Ryan Martin | Tags
+pagination:
+  data: collections
+  size: 1
+  alias: tag
+  filter:
+    - articles
+    - snippets
+permalink: /tags/{{ tag }}/
+---
+
+<p>Tagged <strong>#{{ tag }}</strong>:</p>
+
+<ul class="archive">
+  {%- for post in collections[tag] -%}
+    <li>
+      <a href="{{ post.page.url }}">{{ post.data.title }}</a>
+      <time>{{ post.data.published | toISODateString }}</time>
+    </li>
+  {%- endfor -%}
+</ul>

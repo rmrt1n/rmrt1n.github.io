@@ -64,41 +64,46 @@ main {
   }
 }
 
-main > article {
-  > * + * {
-    margin-top: 1rem;
-  }
-
-  > time {
-    font-size: 0.875rem;
-    line-height: 1.25;
-    margin-top: 0.5rem;
-  }
-
-  > ol {
-    margin-left: 1rem;
-
+main {
+  > ul.archive {
     > * + * {
       margin-top: 0.5rem;
     }
 
-    li {
-      > * + * {
-        margin-top: 0.5rem;
-      }
+    > li {
+      list-style-type: none;
+      display: flex;
+      justify-content: space-between;
     }
   }
 }
 
-main > ul {
-  > * + * {
-    margin-top: 0.5rem;
-  }
+main {
+  > article {
+    > * + * {
+      margin-top: 1.25rem !important;
+    }
 
-  > li {
-    list-style-type: none;
-    display: flex;
-    justify-content: space-between;
+    ol,
+    ul {
+      margin-left: 1rem;
+
+      > * + * {
+        margin-top: 0.5rem;
+      }
+
+      > li {
+        > * + * {
+          margin-top: 0.5rem;
+        }
+      }
+    }
+
+    > time {
+      font-size: 0.875rem;
+      line-height: 1.25;
+      margin-top: 0.5rem !important;
+    }
   }
 }
 
@@ -145,6 +150,7 @@ pre {
   border-radius: 4px;
   overflow: clip;
   font-size: 0.875rem;
+  background-color: var(--color-bg) !important;
 }
 
 p code {
@@ -153,6 +159,7 @@ p code {
   border-radius: 2px;
   font-size: 0.875rem;
   line-height: 1.25;
+  white-space: nowrap;
 }
 
 small code {
@@ -163,19 +170,58 @@ small code {
   line-height: 1;
 }
 
-.footnotes {
-  padding: 1rem 0;
+.footnotes-sep {
+  border: 0;
+  border-top: 1px solid var(--color-fg);
+  width: 40%;
+  margin-top: 2rem;
+}
 
-  > hr {
-    border: 0;
-    border-top: 1px solid var(--color-fg);
-    width: 40%;
-    margin-bottom: 1rem;
+.footnotes {
+  /* padding-bottom: 2rem; */
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.tags {
+  display: inline-flex;
+  gap: 0 1rem;
+  flex-wrap: wrap;
+  margin-left: 0;
+
+  > li {
+    list-style-type: none;
+    margin: 0;
+  }
+}
+
+img {
+  border: 1px solid var(--color-fg);
+  border-radius: 4px;
+}
+
+table {
+  min-width: 100%;
+  border: 1px solid var(--color-fg);
+  border-bottom: 0;
+  border-radius: 4px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+
+  th,
+  td {
+    padding: 0.25rem 0.5rem;
+    text-align: left;
+    white-space: nowrap;
   }
 
-  > small {
-    display: flex;
-    gap: 0.25rem;
-    margin-top: 0.5rem;
+  thead th {
+    background-color: var(--color-code);
+    border-bottom: 1px solid var(--color-fg);
+  }
+
+  td {
+    border-bottom: 1px solid var(--color-fg);
   }
 }

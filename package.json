@@ -1,12 +1,16 @@
 {
   "name": "ryanmartin.me",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "scripts": {
-    "dev": "serve",
+    "dev": "eleventy --serve",
+    "build": "eleventy",
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "serve": "^14.2.3"
+    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy-plugin-rss": "^1.2.0",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "prettier": "^3.2.5"
   }
 }

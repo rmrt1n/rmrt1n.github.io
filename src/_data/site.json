@@ -1,0 +1,24 @@
+{
+  "header": [
+    {
+      "text": "Articles",
+      "slug": "/articles/"
+    },
+    {
+      "text": "Snippets",
+      "slug": "/snippets/"
+    },
+    {
+      "text": "Tags",
+      "slug": "/tags/"
+    },
+    {
+      "text": "Projects",
+      "slug": "/projects/"
+    },
+    {
+      "text": "About",
+      "slug": "/"
+    }
+  ]
+}
