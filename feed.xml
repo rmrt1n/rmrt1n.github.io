@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="https://ryanmartin.me/">
+  <title>Ryan Martin&#39;s Blog</title>
+  <subtitle></subtitle>
+  <link href="https://ryanmartin.me/feed.xml" rel="self" />
+  <link href="https://ryanmartin.me/" />
+  <updated>
+    2024-05-27T17:51:04Z
+  </updated>
+  <id>https://ryanmartin.me/</id>
+  <author>
+    <name>Ryan Martin</name>
+    <email>hi@ryanmartin.me</email>
+  </author>
+    <entry>
+      <title>Fixing Podman Volume Permission Issues</title>
+      <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
+      <updated>2024-05-27T17:50:53Z</updated>
+      <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you&#39;ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token function&quot;&gt;podman&lt;/span&gt; run &lt;span class=&quot;token parameter variable&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-v&lt;/span&gt; .:/root steghide info favicon.png
+&lt;span class=&quot;token comment&quot;&gt;# error, the container process can&#39;t find the file&lt;/span&gt;
+steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&gt; the &lt;span class=&quot;token function&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;favicon.png&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This happens because by default, rootless containers are not given access to the host machine&#39;s volume bind directory. To fix this, you just have to add a &lt;code&gt;:z&lt;/code&gt; or a &lt;code&gt;:Z&lt;/code&gt; suffix to the volume mounts.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token function&quot;&gt;podman&lt;/span&gt; run &lt;span class=&quot;token parameter variable&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-v&lt;/span&gt; .:/root:z steghide info favicon.png
+&lt;span class=&quot;token comment&quot;&gt;# it works now&lt;/span&gt;
+&lt;span class=&quot;token string&quot;&gt;&quot;favicon.png&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;:&lt;/span&gt;
+  format: png
+  &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;:z&lt;/code&gt; and &lt;code&gt;:Z&lt;/code&gt; suffixes tell Podman to set the required labels to the volume mount directory &amp;amp; files. Without these labels, SELinux will prevent any processes inside the container from using the contents of the volume mount.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;The difference between &lt;code&gt;:z&lt;/code&gt; and &lt;code&gt;:Z&lt;/code&gt; is that &lt;code&gt;:z&lt;/code&gt; tells Podman that more than one container will access the volume, while &lt;code&gt;:Z&lt;/code&gt; means that only the current container can use it. In general, I recommend to just use the &lt;code&gt;:z&lt;/code&gt; label unless you know that only 1 container will be using the volume.&lt;/p&gt;
+&lt;hr class=&quot;footnotes-sep&quot; /&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
+&lt;ol class=&quot;footnotes-list&quot;&gt;
+&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The other options is to set SELinux to permissive mode: &lt;code&gt;setenforce 0&lt;/code&gt;, but you probably shouldn&#39;t do this, especially if you&#39;re running on a server. &lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Read the full explanation in &lt;a href=&quot;https://docs.podman.io/en/latest/markdown/podman-run.1.html&quot;&gt;&lt;strong&gt;&lt;code&gt;man podman-run&lt;/code&gt;&lt;/strong&gt;&lt;/a&gt; and &lt;code&gt;Ctrl+F&lt;/code&gt; for &amp;quot;labeling volume mounts&amp;quot;. &lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+
+      </content>
+    </entry>
+    <entry>
+      <title>How to Manually Optimise Images for the Web</title>
+      <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
+      <updated>2024-05-27T17:50:53Z</updated>
+      <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you&#39;re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Convert the images to &lt;code&gt;.webp&lt;/code&gt; or &lt;code&gt;.avif&lt;/code&gt; formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like &lt;code&gt;.png&lt;/code&gt;. In terms of image size, &lt;code&gt;.avif&lt;/code&gt; is smaller than &lt;code&gt;.webp&lt;/code&gt;, but both formats would still work well. Here&#39;s a command you can run to convert formats from the command line:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# this converts the image format. you can also specify the output file name&lt;/span&gt;
+gm convert image.jpg image.webp
+
+&lt;span class=&quot;token comment&quot;&gt;# you can shrink the image size even further at the cost of image quality&lt;/span&gt;
+gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;75&lt;/span&gt; image.jpg image.webp&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set the &lt;code&gt;width&lt;/code&gt; and &lt;code&gt;height&lt;/code&gt; attributes. Just use the image&#39;s size if you&#39;re not resizing it. This is needed to prevent &lt;a href=&quot;https://web.dev/articles/cls&quot;&gt;cumulative layout shifts (CLS)&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set &lt;code&gt;loading=&amp;quot;lazy&amp;quot;&lt;/code&gt;. This will defer the loading of the image until it is almost scrolled into the viewport. There&#39;s an exception to this. For important images, such as the &lt;a href=&quot;https://web.dev/articles/lcp&quot;&gt;largest contentful paint (LCP)&lt;/a&gt; image, set &lt;code&gt;loading=&amp;quot;eager&amp;quot;&lt;/code&gt;. &lt;a href=&quot;https://kit.svelte.dev/docs/images&quot;&gt;SvelteKit&lt;/a&gt; also recommends to set &lt;code&gt;fetchpriority=&amp;quot;high&amp;quot;&lt;/code&gt; for this.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set &lt;code&gt;decoding=&amp;quot;async&amp;quot;&lt;/code&gt;. This will defer the decoding of the image until after the other DOM content is loaded.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set the &lt;code&gt;alt&lt;/code&gt; attribute. Images aren&#39;t always loaded. It&#39;s just a good practice to have an &lt;code&gt;alt&lt;/code&gt; text, except if the image is purely for decoration.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are more optimisations you can do, such as using different image sizes depending on the user&#39;s device size,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt; but these should be enough for basic use cases.&lt;/p&gt;
+&lt;hr class=&quot;footnotes-sep&quot; /&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
+&lt;ol class=&quot;footnotes-list&quot;&gt;
+&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I&#39;m using &lt;a href=&quot;http://www.graphicsmagick.org/&quot;&gt;GraphicsMagick&lt;/a&gt; here, but the commands should still work the same if you&#39;re using &lt;a href=&quot;https://imagemagick.org/&quot;&gt;ImageMagick&lt;/a&gt;, as the APIs are compatible. &lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Here&#39;s a good &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images&quot;&gt;article about implementing responsive images&lt;/a&gt;. JavaScript frameworks have their own ways of doing this, usually through their own &lt;code&gt;Image&lt;/code&gt; components. &lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+
+      </content>
+    </entry>
+    <entry>
+      <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
+      <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
+      <updated>2024-05-27T17:50:53Z</updated>
+      <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It&#39;s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# replace range with whatever workspaces you want&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token for-or-select variable&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;do&lt;/span&gt; gsettings &lt;span class=&quot;token builtin class-name&quot;&gt;set&lt;/span&gt; org.gnome.desktop.wm.keybindings switch-to-workspace-&lt;span class=&quot;token variable&quot;&gt;$i&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;[&#39;&amp;lt;Super&gt;&lt;span class=&quot;token variable&quot;&gt;$i&lt;/span&gt;&#39;]&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;done&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;dconf&lt;/code&gt; is GNOME&#39;s configuration system, and &lt;code&gt;gsettings&lt;/code&gt; is the frontend for &lt;code&gt;dconf&lt;/code&gt;. It&#39;s essentially a key-value store of GNOME&#39;s config. You can also configure the keyboard shortcuts for other settings that are not shown in GNOME settings with &lt;code&gt;gsettings&lt;/code&gt;.&lt;/p&gt;
+
+      </content>
+    </entry>
+</feed>
+

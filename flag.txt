@@ -1,2 +1,0 @@
-ah yes, the most obvious place to hide a flag. of course it would be here.
-flag{aa2646a667ee1cd83235786dccef4a26}

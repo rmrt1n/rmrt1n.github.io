@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <title>How to Manually Optimise Images for the Web</title>
+  </head>
+  <body>
+    <header>
+      <a href="/">Ryan Martin</a>
+      <nav>
+            <a href="/articles/">Articles</a>
+          
+            <a href="/snippets/">Snippets</a>
+          
+            <a href="/tags/">Tags</a>
+          
+            <a href="/projects/">Projects</a>
+          
+            <a href="/">About</a>
+          </nav>
+    </header>
+    <main>
+      
+<article>
+  <h1>How to Manually Optimise Images for the Web</h1>
+  <time>last updated: 2024-05-22</time>
+  <p>JavaScript frameworks and build tools like <a href="https://nextjs.org/">Next.js</a>, <a href="https://astro.build/">Astro</a>, and <a href="https://vitejs.dev/">Vite</a> perform optimisations on images to improve the performance of websites. If you're not using any tools that does this automatically, here are some things you can do to optimise the images in your website.</p>
+<ol>
+<li>
+<p>Convert the images to <code>.webp</code> or <code>.avif</code> formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like <code>.png</code>. In terms of image size, <code>.avif</code> is smaller than <code>.webp</code>, but both formats would still work well. Here's a command you can run to convert formats from the command line:<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># this converts the image format. you can also specify the output file name</span>
+gm convert image.jpg image.webp
+
+<span class="token comment"># you can shrink the image size even further at the cost of image quality</span>
+gm convert <span class="token parameter variable">-quality</span> <span class="token number">75</span> image.jpg image.webp</code></pre>
+</li>
+<li>
+<p>Set the <code>width</code> and <code>height</code> attributes. Just use the image's size if you're not resizing it. This is needed to prevent <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.</p>
+</li>
+<li>
+<p>Set <code>loading=&quot;lazy&quot;</code>. This will defer the loading of the image until it is almost scrolled into the viewport. There's an exception to this. For important images, such as the <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set <code>loading=&quot;eager&quot;</code>. <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set <code>fetchpriority=&quot;high&quot;</code> for this.</p>
+</li>
+<li>
+<p>Set <code>decoding=&quot;async&quot;</code>. This will defer the decoding of the image until after the other DOM content is loaded.</p>
+</li>
+<li>
+<p>Set the <code>alt</code> attribute. Images aren't always loaded. It's just a good practice to have an <code>alt</code> text, except if the image is purely for decoration.</p>
+</li>
+</ol>
+<p>There are more optimisations you can do, such as using different image sizes depending on the user's device size,<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> but these should be enough for basic use cases.</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>I'm using <a href="http://www.graphicsmagick.org/">GraphicsMagick</a> here, but the commands should still work the same if you're using <a href="https://imagemagick.org">ImageMagick</a>, as the APIs are compatible. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Here's a good <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">article about implementing responsive images</a>. JavaScript frameworks have their own ways of doing this, usually through their own <code>Image</code> components. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+  <section>
+    <p><strong>Tags:</strong></p>
+    <ul class="tags"><li><a href="/tags/graphics">#graphics</a></li><li><a href="/tags/html">#html</a></li><li><a href="/tags/optimization">#optimization</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </section>
+</article>
+
+    </main>
+    <footer>
+      <div>
+        <a href="https://github.com/rmrt1n">GitHub</a>
+        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
+        <a href="https://twitter.com/gud_mornign">Twitter</a>
+        
+        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+    </footer>
+  </body>
+</html>
