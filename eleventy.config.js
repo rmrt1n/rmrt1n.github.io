@@ -1,7 +1,9 @@
 const syntaxHighlight = require('@11ty/eleventy-plugin-syntaxhighlight')
 const rss = require('@11ty/eleventy-plugin-rss')
+const { eleventyImageTransformPlugin } = require('@11ty/eleventy-img')
 const markdownIt = require('markdown-it')
 const markdownItFootnote = require('markdown-it-footnote')
+const markdownItAnchor = require('markdown-it-anchor')
 
 const opts = {
   html: true,
@@ -9,12 +11,20 @@ const opts = {
 }
 
 module.exports = (eleventyConfig) => {
-  const md = markdownIt(opts).use(markdownItFootnote)
+  const md = markdownIt(opts).use(markdownItFootnote).use(markdownItAnchor)
 
   eleventyConfig.setLibrary('md', md)
 
   eleventyConfig.addPlugin(syntaxHighlight)
   eleventyConfig.addPlugin(rss)
+  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
+    extensions: 'html',
+    formats: ['webp'],
+    defaultAttributes: {
+      loading: "lazy",
+      decoding: "async",
+    },
+  })
 
   eleventyConfig.addPassthroughCopy({
     './public/': '/',
