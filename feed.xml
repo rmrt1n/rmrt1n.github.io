@@ -5,7 +5,7 @@
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
   <updated>
-    2024-05-27T17:51:04Z
+    2024-05-28T10:01:15Z
   </updated>
   <id>https://ryanmartin.me/</id>
   <author>
@@ -13,9 +13,780 @@
     <email>hi@ryanmartin.me</email>
   </author>
     <entry>
+      <title>Writing a Recursive Ascent Parser</title>
+      <link href="https://ryanmartin.me/articles/recursive-ascent/" />
+      <updated>2024-05-28T10:00:59Z</updated>
+      <id>https://ryanmartin.me/articles/recursive-ascent/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It&#39;s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you&#39;re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
+&lt;p&gt;Unfortunately, there isn&#39;t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;I&#39;m writing this post to share what I&#39;ve learned about recursive ascent parsing; how it works and how to implement it. I&#39;ll assume you have some familiarity with recursive descent parsing, as it&#39;s usually the first parsing technique people learn. If not, I recommend reading up on it first.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: I&#39;m not an expert. I didn&#39;t take any classes on compiler theory and I haven&#39;t read &lt;a href=&quot;https://suif.stanford.edu/dragonbook/&quot;&gt;the dragon book&lt;/a&gt;. Please &lt;a href=&quot;mailto:hi@ryanmartin.me&quot;&gt;reach out&lt;/a&gt; If you noticed any mistakes in this post, especially in the first half!&lt;/p&gt;
+&lt;h2 id=&quot;bottom-up-vs-top-down-parsing&quot; tabindex=&quot;-1&quot;&gt;Bottom-Up vs Top-Down Parsing&lt;/h2&gt;
+&lt;p&gt;Parsing techniques can be roughly grouped into 2 types, &lt;a href=&quot;https://en.wikipedia.org/wiki/Top-down_parsing&quot;&gt;top-down&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Bottom-up_parsing&quot;&gt;bottom-up&lt;/a&gt;. Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.&lt;/p&gt;
+&lt;p&gt;A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Polish_notation&quot;&gt;Polish notation&lt;/a&gt;, and bottom-up parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Reverse_Polish_notation&quot;&gt;reversed Polish notation&lt;/a&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn4&quot; id=&quot;fnref4&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt; In Polish notation, the operators come before the operands. In reversed Polish notation, it&#39;s the opposite, the operands come before the operators.&lt;/p&gt;
+&lt;p&gt;Let&#39;s use this math expression &lt;code&gt;1 + 2 * 3&lt;/code&gt; as an example. We can also represent this expression as a tree:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/recursive-ascent-1.png&quot; alt=&quot;Math expression as tree diagram&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you&#39;ll end up with &lt;code&gt;+ 1 * 2 3&lt;/code&gt;, the Polish notation of the previous expression.&lt;/p&gt;
+&lt;p&gt;On the other hand, a bottom-up parser builds the parse tree starting from the leaf nodes up to the root node, aka, post-order traversal. The order the nodes are traversed will form the reversed Polish notation of the original expression: &lt;code&gt;2 3 * 1 +&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;You&#39;re probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?&lt;/p&gt;
+&lt;h2 id=&quot;lr-algorithm&quot; tabindex=&quot;-1&quot;&gt;LR Algorithm&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser&quot;&gt;LR&lt;/a&gt; is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn5&quot; id=&quot;fnref5&quot;&gt;[5]&lt;/a&gt;&lt;/sup&gt; but all of them are based on the same two fundamental actions: &lt;strong&gt;shift&lt;/strong&gt; and &lt;strong&gt;reduce&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Shift means to advance or &lt;em&gt;shift&lt;/em&gt; to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or &lt;em&gt;reduced&lt;/em&gt; into that rule. AN LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let&#39;s use an example to illustrate it.&lt;/p&gt;
+&lt;p&gt;We&#39;ll use this grammar:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;expr -&gt; expr &#39;+&#39; term
+expr -&gt; expr &#39;-&#39; term
+expr -&gt; term
+term -&gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing this input &lt;code&gt;1 + 2 - 3&lt;/code&gt; according to the grammar above:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Parse stack&lt;/th&gt;
+&lt;th&gt;Unparsed&lt;/th&gt;
+&lt;th&gt;Action&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;em&gt;empty&lt;/em&gt;&lt;/td&gt;
+&lt;td&gt;1 + 2 - 3&lt;/td&gt;
+&lt;td&gt;Shift 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;+ 2 - 3&lt;/td&gt;
+&lt;td&gt;Reduce term -&amp;gt; INTEGER&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;term&lt;/td&gt;
+&lt;td&gt;+ 2 - 3&lt;/td&gt;
+&lt;td&gt;Reduce expr -&amp;gt; term&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr&lt;/td&gt;
+&lt;td&gt;+ 2 - 3&lt;/td&gt;
+&lt;td&gt;Shift +&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr +&lt;/td&gt;
+&lt;td&gt;2 - 3&lt;/td&gt;
+&lt;td&gt;Shift 2 (because there are no rules that match expr &#39;+&#39;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr + 2&lt;/td&gt;
+&lt;td&gt;- 3&lt;/td&gt;
+&lt;td&gt;Reduce term -&amp;gt; INTEGER&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr + term&lt;/td&gt;
+&lt;td&gt;- 3&lt;/td&gt;
+&lt;td&gt;Reduce expr -&amp;gt; expr &#39;+&#39; term&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr&lt;/td&gt;
+&lt;td&gt;- 3&lt;/td&gt;
+&lt;td&gt;Shift -&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr -&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Shift 3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr - 3&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Reduce term -&amp;gt; INTEGER&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr - term&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Reduce expr -&amp;gt; expr - term&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;expr&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Accept&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;Here, I used the term &amp;quot;parse stack&amp;quot; for the shifted inputs. That&#39;s because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and push the corresponding rule to the stack.&lt;/p&gt;
+&lt;p&gt;How does the parser know which rule it should reduce to? Most LR parsers construct a &lt;strong&gt;parse table&lt;/strong&gt;, which is a table of parser instructions based on the grammar. Entries in the table tell the parser whether to shift or reduce based on the current token in the input stream. The entire combination of actions a parser can take based on any input fits in this one table. This is possible because there are only a finite number of possible states an LR parser can assume for a given grammar. These are called the &lt;strong&gt;LR states&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Because the number of states is finite, an LR parser is essentially just a &lt;a href=&quot;https://en.wikipedia.org/wiki/Finite-state_machine&quot;&gt;finite state machine (FSM)&lt;/a&gt; modelled after the LR states. The parse table contains the state transitions. The parse stack is used to keep track of the current state. In fact, parser generators are just programs that convert a grammar into a table-based state machine.&lt;/p&gt;
+&lt;p&gt;What about recursive ascent parsers then? A recursive ascent parser is just the &amp;quot;functional&amp;quot; version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!&lt;/p&gt;
+&lt;p&gt;I had an &lt;em&gt;Aha!&lt;/em&gt; moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.&lt;/p&gt;
+&lt;h2 id=&quot;generating-the-parse-table&quot; tabindex=&quot;-1&quot;&gt;Generating the Parse Table&lt;/h2&gt;
+&lt;h3 id=&quot;building-the-state-machine&quot; tabindex=&quot;-1&quot;&gt;Building the State Machine&lt;/h3&gt;
+&lt;p&gt;Before getting into the code, first, we&#39;ll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we&#39;ll use an example grammar to illustrate this.&lt;/p&gt;
+&lt;p&gt;We&#39;ll modify the grammar from the previous section to support multiplications and drop subtractions:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn6&quot; id=&quot;fnref6&quot;&gt;[6]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;S -&gt; expr eof
+expr -&gt; expr &#39;+&#39; term
+expr -&gt; term
+term -&gt; term &#39;*&#39; factor
+term -&gt; factor
+factor -&gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note the extra rule &lt;code&gt;S&lt;/code&gt; (start), which will be used for a reduction when the parser has accepted the whole input. &lt;code&gt;eof&lt;/code&gt; indicates the end of the input stream.&lt;/p&gt;
+&lt;p&gt;Next, we&#39;ll need to construct the &lt;strong&gt;LR(0) items&lt;/strong&gt;, which are grammar rules with a dot (•) to mark the current position of the parser.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn7&quot; id=&quot;fnref7&quot;&gt;[7]&lt;/a&gt;&lt;/sup&gt; E.g., the rule &lt;code&gt;S -&amp;gt; expr eof&lt;/code&gt; contains one LR(0) item: &lt;code&gt;S -&amp;gt; • expr eof&lt;/code&gt;. Everything to the left of the dot has already been parsed or shifted.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn8&quot; id=&quot;fnref8&quot;&gt;[8]&lt;/a&gt;&lt;/sup&gt; For brevity&#39;s sake, I&#39;ll shorten &amp;quot;LR(0) item&amp;quot; to just &amp;quot;item&amp;quot; going forward.&lt;/p&gt;
+&lt;p&gt;For each item, we then need to compute its &lt;strong&gt;closure&lt;/strong&gt;. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here&#39;s how it works:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Start with a set of items. For our grammar, this will be &lt;code&gt;{ S -&amp;gt; • expr eof }&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;For each item, if the symbol on the right of the dot is a &lt;em&gt;non-terminal&lt;/em&gt;, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand &lt;code&gt;expr&lt;/code&gt; into &lt;code&gt;expr -&amp;gt; • expr &#39;+&#39; term&lt;/code&gt; and &lt;code&gt;expr -&amp;gt; • term&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Add the expanded items to the original set. Our set should now look like &lt;code&gt;{ S -&amp;gt; • expr eof, expr -&amp;gt; • expr &#39;+&#39; term, expr -&amp;gt; • term }&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Repeat steps 2 and 3 until no new items can be added to the set.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;A non-terminal is any symbol that represents a grammar rule, e.g. &lt;code&gt;expr&lt;/code&gt;, &lt;code&gt;term&lt;/code&gt;, or &lt;code&gt;factor&lt;/code&gt;. The opposite of this is a terminal, which is an actual value or token that is produced by the lexer, e.g. &lt;code&gt;&#39;+&#39;&lt;/code&gt;, &lt;code&gt;&#39;-&#39;&lt;/code&gt;, and &lt;code&gt;INTEGER&lt;/code&gt;. If we apply closure to the first item in the grammar &lt;code&gt;S -&amp;gt; • expr eof&lt;/code&gt;, we&#39;ll end up with the first LR state:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 0
+S -&gt; • expr eof
+expr -&gt; • expr &#39;+&#39; term
+expr -&gt; • term
+term -&gt; • term &#39;*&#39; factor
+term -&gt; • factor
+factor -&gt; • INTEGER&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can then transition from this state into the other states by accepting different values and advancing the dot. The values that the parser can accept are the terminals and non-terminals on the right side of the dot. So, for state 0, the values it can accept are &lt;code&gt;expr&lt;/code&gt;, &lt;code&gt;term&lt;/code&gt;, &lt;code&gt;factor&lt;/code&gt;, and &lt;code&gt;INTEGER&lt;/code&gt;. Let&#39;s say the parser receives an &lt;code&gt;expr&lt;/code&gt;. This will become our second state:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 1 (State 0 + expr)
+S -&gt; expr • eof (Accept)
+expr -&gt; expr • &#39;+&#39; term&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;When the dot reaches the end of the starting rule, it is called the accept state. It means that the input has been parsed fully and the parsing is complete. If we had instead received a &lt;code&gt;term&lt;/code&gt; in the first state, then we&#39;d end up with this state:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 2 (State 0 + term)
+expr -&gt; term •
+term -&gt; term • &#39;*&#39; factor&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And we just repeat this process until all dots are at the end of each rule. There is an exception to this though, which I&#39;ll get to in a bit. Anyways, here are some more states:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 3 (State 0 + factor)
+term -&gt; factor •
+
+# State 4 (State 0 + INTEGER)
+factor -&gt; INTEGER •
+
+# State 5 (State 1 + &#39;+&#39;)
+expr -&gt; expr &#39;+&#39; • term
+term -&gt; • term &#39;*&#39; factor
+term -&gt; • factor
+factor -&gt; • INTEGER
+
+# State 6 (State 2 + &#39;*&#39;)
+term -&gt; term &#39;*&#39; • factor
+factor -&gt; • INTEGER
+
+# State 7 (State 5 + term)
+expr -&gt; expr &#39;+&#39; term •
+term -&gt; term • &#39;*&#39; factor&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, it might make sense to do this for the next state:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 8 (State 1 + factor)
+term -&gt; factor •&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don&#39;t have to create a new state. Instead, we&#39;ll just jump or &lt;em&gt;goto&lt;/em&gt; the state that we&#39;ve already found before. This will make more sense when we build the actual parse table. Now, let&#39;s finish the last state.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn9&quot; id=&quot;fnref9&quot;&gt;[9]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 8 (State 6 + factor)
+term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And we&#39;re done! Here&#39;s a diagram to help you visualise the state transitions:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/recursive-ascent-2.png&quot; alt=&quot;State transition diagram&quot; /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;the-action-and-goto-table&quot; tabindex=&quot;-1&quot;&gt;The Action and Goto Table&lt;/h3&gt;
+&lt;p&gt;Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here&#39;s what the action and goto table looks like for our grammar:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 0&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt1&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 1&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;Accept&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt7&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 7&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 8&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. &lt;em&gt;sN&lt;/em&gt; means &amp;quot;shift and go to state N&amp;quot;, &lt;em&gt;rN&lt;/em&gt; means &amp;quot;reduce using rule N&amp;quot;, and &lt;em&gt;gtN&lt;/em&gt; means &amp;quot;go to state N&amp;quot;. Unlike shift, goto doesn&#39;t take in a token from the input stream and just transitions to the next state.&lt;/p&gt;
+&lt;p&gt;Here are the grammar rules again for reference, with the rule numbers added for reductions:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;1. S -&gt; expr eof
+2. expr -&gt; expr &#39;+&#39; term
+3. expr -&gt; term
+4. term -&gt; term &#39;*&#39; factor
+5. term -&gt; factor
+6. factor -&gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I&#39;m not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working &lt;em&gt;LR(0)&lt;/em&gt; parse table now.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn10&quot; id=&quot;fnref10&quot;&gt;[10]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we&#39;ll implement this mechanism as mutually recursive functions.&lt;/p&gt;
+&lt;h2 id=&quot;writing-the-parser&quot; tabindex=&quot;-1&quot;&gt;Writing The Parser&lt;/h2&gt;
+&lt;p&gt;At this point, we&#39;re ready to build the actual parser. I&#39;ll be writing the code in Python because it&#39;s easy to read. To make sure our parser is correct, we&#39;ll also implement an interpreter for the expressions we parsed. First, let&#39;s start with the program&#39;s entry point:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# recursive-ascent.py&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; sys
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;usage: {} [STRING]&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt;
+    tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; lex&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; parse&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    result &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;result&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; __name__ &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;__main__&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    main&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This program will receive a string as an argument and print out the evaluated string. Don&#39;t worry about the unimplemented functions for now. We&#39;ll get to them soon.&lt;/p&gt;
+&lt;h3 id=&quot;a-simple-lexer&quot; tabindex=&quot;-1&quot;&gt;A Simple Lexer&lt;/h3&gt;
+&lt;p&gt;Since we don&#39;t have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn11&quot; id=&quot;fnref11&quot;&gt;[11]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;lex&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;string&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; string&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;split&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;representing-the-abstract-syntax-tree-(ast)&quot; tabindex=&quot;-1&quot;&gt;Representing the Abstract Syntax Tree (AST)&lt;/h3&gt;
+&lt;p&gt;We&#39;ll also need a type to represent the AST that will be produced by the parser:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;AST&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;AST | None&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;AST | None&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; value&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; kind&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; left
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; right
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; value
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;kind &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; kind&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you&#39;ve noticed, the &lt;code&gt;AST&lt;/code&gt; class above looks like a binary tree. That&#39;s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;this diagram&lt;/a&gt; from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.&lt;/p&gt;
+&lt;h3 id=&quot;converting-the-parse-table-into-functions&quot; tabindex=&quot;-1&quot;&gt;Converting the Parse Table into Functions&lt;/h3&gt;
+&lt;p&gt;Our &lt;code&gt;parse&lt;/code&gt; function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 0&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt1&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We can translate this to code like so:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# shift token, move dot forwards&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# go to state 4&lt;/span&gt;
+        ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state4&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        panic&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;kind &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;factor&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# go to state 3&lt;/span&gt;
+        ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state3&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;kind &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;term&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# go to state 2&lt;/span&gt;
+        ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state2&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# go to state 1&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state1&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state0&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note, we don&#39;t actually need to check the &lt;code&gt;ast.kind&lt;/code&gt; here because if &lt;code&gt;ast = state4(token)&lt;/code&gt; succeeds, then we&#39;re guaranteed to get a &lt;code&gt;factor&lt;/code&gt;. The same goes for &lt;code&gt;ast = state3(ast)&lt;/code&gt;, which is guaranteed to return a &lt;code&gt;term&lt;/code&gt;. So, we can rewrite &lt;code&gt;state0&lt;/code&gt; like this:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# shift token, move dot forwards&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# go to state 4&lt;/span&gt;
+        ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state4&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        panic&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# go to state 3&lt;/span&gt;
+    ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state3&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# go to state 2&lt;/span&gt;
+    ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state2&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# go to state 1&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state1&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here are the helper function definitions. &lt;code&gt;peek&lt;/code&gt; returns the next token, while &lt;code&gt;panic&lt;/code&gt; prints an error message if an unexpected token is found and terminates the program:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn12&quot; id=&quot;fnref12&quot;&gt;[12]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;peek&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;panic&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;unexpected token: {}&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    exit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As mentioned before, reduce happens when returning from a function:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state3&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# reduce using rule 5: term -&gt; factor&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;term&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state4&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# reduce using rule 6: factor -&gt; INTEGER&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;factor&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now here&#39;s where things get more interesting:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 1&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;accept&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r3&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# loop to handle left recursion&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;while&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# shift token&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# go to state 5&lt;/span&gt;
+        ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state5&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# accept&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; ast
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;while&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state6&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# reduce using rule 3: expr -&gt; term&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;expr&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The grammar we used has rules that contain &lt;a href=&quot;https://en.wikipedia.org/wiki/Left_recursion&quot;&gt;left recursion&lt;/a&gt;. This happens when a rule starts with a symbol that is itself, e.g. &lt;code&gt;expr -&amp;gt; expr &#39;+&#39; term&lt;/code&gt; and &lt;code&gt;term -&amp;gt; term &#39;*&#39; factor&lt;/code&gt;. Top-down parsers can&#39;t handle this type of grammar. If you&#39;ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.&lt;/p&gt;
+&lt;p&gt;When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn&#39;t a problem for us. We can use a loop and a condition to check whether the recursive calls are done.&lt;/p&gt;
+&lt;p&gt;In state 1 and state 2, the parser has parsed the left side of the binary operation. In the next states, the parser will parse the right side of the binary operation:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 5&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt7&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;gt8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state5&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        right &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state4&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        panic&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    right &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state3&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state7&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state6&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        right &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state4&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        panic&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state8&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Once the right side is parsed, we can then reduce these rules in state 7 and state 8:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Action&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;Goto&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;th style=&quot;text-align:center&quot;&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;State&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;+&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;*&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;INTEGER&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;eof&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;expr&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;term&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;factor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 7&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;s6&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r2&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;State 8&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;r4&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;td style=&quot;text-align:center&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state7&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;while&lt;/span&gt; peek&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        right &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; state6&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# reduce using rule 2: expr -&gt; expr &#39;+&#39; term&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;expr&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens
+
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;state8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# reduce using rule 4: term -&gt; term &#39;*&#39; factor&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;term&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And that&#39;s all of the code for the parser! Now we just have to check whether the output is correct. Let&#39;s add a method in the &lt;code&gt;AST&lt;/code&gt; class to pretty-print itself, so that it&#39;s easier to visualise:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;AST&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;pprint&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;( {} &quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; end&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot; {} &quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; end&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;pprint&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;pprint&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot; )&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; end&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I&#39;m printing the AST as s-expressions so that it&#39;s easy to see the expressions follow the correct operator precedence.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn13&quot; id=&quot;fnref13&quot;&gt;[13]&lt;/a&gt;&lt;/sup&gt; Given an input like &lt;code&gt;1 + 2 * 3 + 4&lt;/code&gt;, this method will print out the following: &lt;code&gt;( + ( +  1 ( *  2  3  ) ) 4  )&lt;/code&gt;. This looks right. All that&#39;s left now is to implement the &lt;code&gt;evaluate&lt;/code&gt; function and test if it works as expected.&lt;/p&gt;
+&lt;h3 id=&quot;interpreting-the-ast&quot; tabindex=&quot;-1&quot;&gt;Interpreting the AST&lt;/h3&gt;
+&lt;p&gt;Here&#39;s the &lt;code&gt;evaluate&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;evaluate&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;elif&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It will recursively evaluate all the nodes in the AST. Let&#39;s run the program and check if the output is correct:&lt;/p&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 + 2 * 3 + 4&#39;&lt;/span&gt;
+&lt;span class=&quot;token number&quot;&gt;11&lt;/span&gt;
+
+python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 2 + 3 * 4&#39;&lt;/span&gt;
+&lt;span class=&quot;token number&quot;&gt;14&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Good, it works! Now let&#39;s write some generated tests to have more confidence in the program. Here&#39;s a function that would generate random numbers and combinations of operators (&lt;code&gt;+&lt;/code&gt; and &lt;code&gt;*&lt;/code&gt;), run the &lt;code&gt;evaluate&lt;/code&gt; function on them, and compare the result to Python&#39;s &lt;code&gt;eval&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;tests&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    errors &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; _ &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        k &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; random&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;randint&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        nums &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;i&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; i &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; random&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;sample&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;10_000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; k&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        ops &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;random&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;choice&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; _ &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;k &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        expr &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;i &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; j &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;zip&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;nums&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; ops&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; i &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; j&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;nums&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;join&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;expr&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        res &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;parse&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;lex&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        py_res &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;eval&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; res &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; py_res&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;incorrect output for:&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;got:&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; res&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;expected:&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; py_res&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            errors &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; errors &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;all tests passed!&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;# also some changes to main to allow users to run the tests&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;usage: {} [STRING]&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt;
+    &lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; sys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;argv&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;test&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        tests&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt;
+    tokens &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; lex&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    ast &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; parse&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tokens&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    result &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; evaluate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;result&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;End&lt;/h2&gt;
+&lt;p&gt;And that&#39;s all. You can find the complete code in &lt;a href=&quot;https://gist.github.com/rmrt1n/aa901ce86370d9e28924562770e9cffe&quot;&gt;this GitHub Gist&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won&#39;t ever use this technique when building a real compiler, but at least you learned something new. If you&#39;d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
+&lt;hr class=&quot;footnotes-sep&quot; /&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
+&lt;ol class=&quot;footnotes-list&quot;&gt;
+&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This &lt;a href=&quot;https://www.abubalay.com/blog/2018/04/08/recursive-ascent&quot;&gt;blog post&lt;/a&gt; by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It&#39;s probably the only blog post about recursive ascent on the internet besides this one. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Here are &lt;a href=&quot;https://dl.acm.org/doi/pdf/10.1145/47907.47909&quot;&gt;some&lt;/a&gt; &lt;a href=&quot;https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf&quot;&gt;papers&lt;/a&gt; &lt;a href=&quot;https://ceur-ws.org/Vol-2951/paper2.pdf&quot;&gt;about recursive ascent parsers&lt;/a&gt; that you could read if you&#39;re interested in the theory. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn3&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;&lt;a href=&quot;https://craftinginterpreters.com/&quot;&gt;Crafting Interpreters&lt;/a&gt; is a really good introductory book on writing compilers, and their section on parsing is all about implementing a recursive descent parser. It&#39;s also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you&#39;re in software engineering. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref3&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn4&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I found this analogy from &lt;a href=&quot;https://blog.reverberate.org/2013/07/ll-and-lr-parsing-demystified.html&quot;&gt;this blog post&lt;/a&gt; by Josh Haberman. He went deep into the details of both LL and LR algorithms in his blog post while keeping it easy to read. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref4&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn5&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Here&#39;s a &lt;a href=&quot;https://dev.to/stereobooster/an-overview-of-parsing-algorithms-3lo2&quot;&gt;nice overview of parsing algorithm literature&lt;/a&gt; you can explore if you are interested in the different variants of LR. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref5&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn6&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This is done to show that the parser can handle operator precedence based on the grammar rules. Subtraction is removed to keep the section short and readable. The number of possible states will grow exponentially the more complex your grammar is. This is why it is inconvenient to write a bottom-up parser by hand, and why people create parser generators. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref6&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn7&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;A grammar rule is often called as a &amp;quot;production&amp;quot; in academic literature. I just use the term &amp;quot;grammar rules&amp;quot; because it&#39;s more intuitive. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref7&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn8&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;My explanation of the algorithm for creating the parse table might not click with you, so here are &lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables&quot;&gt;some&lt;/a&gt; &lt;a href=&quot;https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf&quot;&gt;other&lt;/a&gt; &lt;a href=&quot;https://chatgpt.com/&quot;&gt;resources&lt;/a&gt; you can read if you&#39;re still confused. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref8&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn9&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Note that the order of the states doesn&#39;t matter. The parser will still work if the states were created in a different order, e.g. state 1 = state 0 + &lt;code&gt;term&lt;/code&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref9&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn10&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;You can read more about why this is on &lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser#Parse_table_for_the_example_grammar&quot;&gt;this Wikipedia page&lt;/a&gt;. It should be a good starting point to explore the different variants of LR and the types of parse conflicts. For this article, I intentionally chose a grammar that is accepted by LR(0) to keep it simple. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref10&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn11&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;You can read &lt;a href=&quot;https://craftinginterpreters.com/scanning.html&quot;&gt;Crafting Interpreters&lt;/a&gt; for a better idea of what production lexers do. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref11&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn12&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This is a very basic approach to handling parse errors. Production-grade parsers will usually report errors, ignore them, and continue parsing. This is to catch as many errors as it can so that the programmer doesn&#39;t have to recompile to find more errors. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref12&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn13&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;What better way to visualise AST than with s-expressions? When you read a lisp program, you&#39;re looking directly at the program&#39;s AST, which is just a lisp data structures! This is what clojurists often mean when they say &amp;quot;It&#39;s just data&amp;quot;. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref13&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+
+      </content>
+    </entry>
+    <entry>
       <title>Fixing Podman Volume Permission Issues</title>
       <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
-      <updated>2024-05-27T17:50:53Z</updated>
+      <updated>2024-05-28T10:00:59Z</updated>
       <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you&#39;ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
@@ -45,7 +816,7 @@ steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&g
     <entry>
       <title>How to Manually Optimise Images for the Web</title>
       <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
-      <updated>2024-05-27T17:50:53Z</updated>
+      <updated>2024-05-28T10:00:59Z</updated>
       <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you&#39;re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
@@ -87,7 +858,7 @@ gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/s
     <entry>
       <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
       <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
-      <updated>2024-05-27T17:50:53Z</updated>
+      <updated>2024-05-28T10:00:59Z</updated>
       <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It&#39;s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;
