@@ -53,7 +53,7 @@ module.exports = (eleventyConfig) => {
     })
     return Object.keys(tags)
       .map((tag) => ({ tag, count: tags[tag] }))
-      .sort()
+      .sort((a, b) => b.count - a.count)
   })
 
   return {
