@@ -542,7 +542,7 @@ The `eval` function will run any Python expression. Since Python can also evalua
 
 ## End
 
-And that's all. You can find the complete code in [this GitHub Gist](https://gist.github.com/rmrt1n/aa901ce86370d9e28924562770e9cffe). Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won't ever use this technique when building a real compiler, but at least you learned something new. If you'd like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.
+And that's all. You can find the complete code on [this GitHub repo](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent). Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won't ever use this technique when building a real compiler, but at least you learned something new. If you'd like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.
 
 [^1]: This [blog post](https://www.abubalay.com/blog/2018/04/08/recursive-ascent) by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It's probably the only blog post about recursive ascent on the internet besides this one.
 [^2]: Here are [some](https://dl.acm.org/doi/pdf/10.1145/47907.47909) [papers](https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf) [about recursive ascent parsers](https://ceur-ws.org/Vol-2951/paper2.pdf) that you could read if you're interested in the theory.
