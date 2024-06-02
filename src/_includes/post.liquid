@@ -7,7 +7,7 @@ layout: base.liquid
   <time>last updated: {{ updated | toISODateString }}</time>
   {{ content }}
   <section>
-    <p><strong>Tags:</strong></p>
+    <h4>Tags:</h4>
     <ul class="tags">
       {%- for tag in tags offset:1 -%}
         <li><a href="/tags/{{ tag }}">#{{ tag }}</a></li>
