@@ -6,7 +6,7 @@ tags:
   - parsers
   - python
 published: 2024-05-28
-updated: 2024-05-28
+updated: 2024-06-02
 ---
 
 Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like [Bison](https://www.gnu.org/software/bison/) or [ANTLR](https://www.antlr.org/). If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.
@@ -39,7 +39,7 @@ You're probably already familiar with the top-down approach, as that is how recu
 
 [LR](https://en.wikipedia.org/wiki/LR_parser) is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,[^5] but all of them are based on the same two fundamental actions: **shift** and **reduce**.
 
-Shift means to advance or _shift_ to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or _reduced_ into that rule. AN LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.
+Shift means to advance or _shift_ to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or _reduced_ into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.
 
 We'll use this grammar:
 
