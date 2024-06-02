@@ -18,6 +18,14 @@
   }
 }
 
+:target {
+  background-color: #fef08acc;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #44403ccc ;
+  }
+}
+
 html {
   background-color: var(--color-bg);
   color: var(--color-fg);
