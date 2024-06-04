@@ -5,7 +5,7 @@
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
   <updated>
-    2024-06-04T16:18:23Z
+    2024-06-04T18:23:18Z
   </updated>
   <id>https://ryanmartin.me/</id>
   <author>
@@ -15,7 +15,7 @@
     <entry>
       <title>Writing a Recursive Ascent Parser</title>
       <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-      <updated>2024-06-04T16:18:11Z</updated>
+      <updated>2024-06-04T18:22:54Z</updated>
       <id>https://ryanmartin.me/articles/recursive-ascent/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It&#39;s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you&#39;re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -786,7 +786,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
     <entry>
       <title>Fixing Podman Volume Permission Issues</title>
       <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
-      <updated>2024-06-04T16:18:11Z</updated>
+      <updated>2024-06-04T18:22:54Z</updated>
       <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you&#39;ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
@@ -816,7 +816,7 @@ steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&g
     <entry>
       <title>Trick Docker Compose to Use Podman</title>
       <link href="https://ryanmartin.me/snippets/podman-docker-compose/" />
-      <updated>2024-06-04T16:18:11Z</updated>
+      <updated>2024-06-04T18:22:54Z</updated>
       <id>https://ryanmartin.me/snippets/podman-docker-compose/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I recently discovered a way to use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; as the backend for &lt;a href=&quot;https://docs.docker.com/compose/&quot;&gt;Docker Compose&lt;/a&gt;. Docker Compose checks the &lt;code&gt;DOCKER_HOST&lt;/code&gt; environment variable to determine which daemon socket to connect to. Podman doesn&#39;t run a daemon by default, so we need to enable it first:&lt;/p&gt;
@@ -833,9 +833,75 @@ systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span
       </content>
     </entry>
     <entry>
+      <title>My CSS reset</title>
+      <link href="https://ryanmartin.me/snippets/my-css-reset/" />
+      <updated>2024-06-04T18:22:54Z</updated>
+      <id>https://ryanmartin.me/snippets/my-css-reset/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what &lt;a href=&quot;https://mattbrictson.com/blog/css-normalize-and-reset&quot;&gt;normalise stylesheets and CSS resets&lt;/a&gt; are for.&lt;/p&gt;
+&lt;p&gt;Here&#39;s the CSS reset that I use now, it&#39;s a combination of &lt;a href=&quot;https://github.com/sindresorhus/modern-normalize/&quot;&gt;modern-normalize&lt;/a&gt; with resets I found from &lt;a href=&quot;https://www.youtube.com/@KevinPowell&quot;&gt;Kevin Powell&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@import&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;modern-normalize.css&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;/* src: https://www.youtube.com/watch?v=cCAtD_BAHNw */&lt;/span&gt;
+&lt;span class=&quot;token selector&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token selector&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;color-scheme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark light&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;hanging-punctuation&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; first last&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token selector&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;min-height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 100vh&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token selector&quot;&gt;h1, h2, h3, h4, h5, h6&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;text-wrap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; balance&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;text-wrap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; pretty&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 65ch&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;/* this is optional */&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token selector&quot;&gt;button, input, optgroup, select, textarea, legend&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;font&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;line-height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;letter-spacing&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;/* src: https://www.youtube.com/watch?v=345V2MU3E_w */&lt;/span&gt;
+&lt;span class=&quot;token selector&quot;&gt;img, picture, svg, video&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 100%&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;vertical-align&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; middle&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; auto&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;font-style&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; italic&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;background-repeat&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; no-repeat&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;background-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; cover&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;shape-margin&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;prefers-color-scheme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token selector&quot;&gt;img, picture, video&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token property&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;brightness&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;.8&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;contrast&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;1.2&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;prefers-reduced-motion&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; no-preference&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token selector&quot;&gt;:has(:target)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token property&quot;&gt;scroll-behavior&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; smooth&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token property&quot;&gt;scroll-padding-top&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 8rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+
+      </content>
+    </entry>
+    <entry>
       <title>How to Manually Optimise Images for the Web</title>
       <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
-      <updated>2024-06-04T16:18:11Z</updated>
+      <updated>2024-06-04T18:22:54Z</updated>
       <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you&#39;re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
@@ -877,7 +943,7 @@ gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/s
     <entry>
       <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
       <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
-      <updated>2024-06-04T16:18:11Z</updated>
+      <updated>2024-06-04T18:22:54Z</updated>
       <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It&#39;s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;

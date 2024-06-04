@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <title>My CSS reset</title>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="logo">Ryan Martin</a>
+      <nav>
+            <a href="/articles/">Articles</a>
+          
+            <a href="/snippets/">Snippets</a>
+          
+            <a href="/tags/">Tags</a>
+          
+            <a href="/projects/">Projects</a>
+          
+            <a href="/">About</a>
+          </nav>
+    </header>
+    <main>
+      
+<article>
+  <h1>My CSS reset</h1>
+  <time>last updated: 2024-06-05</time>
+  <p>I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what <a href="https://mattbrictson.com/blog/css-normalize-and-reset">normalise stylesheets and CSS resets</a> are for.</p>
+<p>Here's the CSS reset that I use now, it's a combination of <a href="https://github.com/sindresorhus/modern-normalize/">modern-normalize</a> with resets I found from <a href="https://www.youtube.com/@KevinPowell">Kevin Powell</a>:</p>
+<pre class="language-css"><code class="language-css"><span class="token atrule"><span class="token rule">@import</span> <span class="token string">'modern-normalize.css'</span><span class="token punctuation">;</span></span>
+
+<span class="token comment">/* src: https://www.youtube.com/watch?v=cCAtD_BAHNw */</span>
+<span class="token selector">*</span> <span class="token punctuation">{</span>
+  <span class="token property">margin</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+  <span class="token property">padding</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">html</span> <span class="token punctuation">{</span>
+  <span class="token property">color-scheme</span><span class="token punctuation">:</span> dark light<span class="token punctuation">;</span>
+  <span class="token property">hanging-punctuation</span><span class="token punctuation">:</span> first last<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">body</span> <span class="token punctuation">{</span>
+  <span class="token property">min-height</span><span class="token punctuation">:</span> 100vh<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">h1, h2, h3, h4, h5, h6</span> <span class="token punctuation">{</span>
+  <span class="token property">text-wrap</span><span class="token punctuation">:</span> balance<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">p</span> <span class="token punctuation">{</span>
+  <span class="token property">text-wrap</span><span class="token punctuation">:</span> pretty<span class="token punctuation">;</span>
+  <span class="token property">max-width</span><span class="token punctuation">:</span> 65ch<span class="token punctuation">;</span> <span class="token comment">/* this is optional */</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">button, input, optgroup, select, textarea, legend</span> <span class="token punctuation">{</span>
+  <span class="token property">font</span><span class="token punctuation">:</span> inherit<span class="token punctuation">;</span>
+  <span class="token property">line-height</span><span class="token punctuation">:</span> inherit<span class="token punctuation">;</span>
+  <span class="token property">letter-spacing</span><span class="token punctuation">:</span> inherit<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">/* src: https://www.youtube.com/watch?v=345V2MU3E_w */</span>
+<span class="token selector">img, picture, svg, video</span> <span class="token punctuation">{</span>
+  <span class="token property">max-width</span><span class="token punctuation">:</span> 100%<span class="token punctuation">;</span>
+  <span class="token property">vertical-align</span><span class="token punctuation">:</span> middle<span class="token punctuation">;</span>
+  <span class="token property">height</span><span class="token punctuation">:</span> auto<span class="token punctuation">;</span>
+  <span class="token property">font-style</span><span class="token punctuation">:</span> italic<span class="token punctuation">;</span>
+  <span class="token property">background-repeat</span><span class="token punctuation">:</span> no-repeat<span class="token punctuation">;</span>
+  <span class="token property">background-size</span><span class="token punctuation">:</span> cover<span class="token punctuation">;</span>
+  <span class="token property">shape-margin</span><span class="token punctuation">:</span> 1rem<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">prefers-color-scheme</span><span class="token punctuation">:</span> dark<span class="token punctuation">)</span></span> <span class="token punctuation">{</span>
+  <span class="token selector">img, picture, video</span> <span class="token punctuation">{</span>
+    <span class="token property">filter</span><span class="token punctuation">:</span> <span class="token function">brightness</span><span class="token punctuation">(</span>.8<span class="token punctuation">)</span> <span class="token function">contrast</span><span class="token punctuation">(</span>1.2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token atrule"><span class="token rule">@media</span> <span class="token punctuation">(</span><span class="token property">prefers-reduced-motion</span><span class="token punctuation">:</span> no-preference<span class="token punctuation">)</span></span> <span class="token punctuation">{</span>
+  <span class="token selector">:has(:target)</span> <span class="token punctuation">{</span>
+    <span class="token property">scroll-behavior</span><span class="token punctuation">:</span> smooth<span class="token punctuation">;</span>
+    <span class="token property">scroll-padding-top</span><span class="token punctuation">:</span> 8rem<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+  <section>
+    <h4>Tags:</h4>
+    <ul class="tags"><li><a href="/tags/css">#css</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </section>
+</article>
+
+    </main>
+    <footer>
+      <div>
+        <a href="https://github.com/rmrt1n">GitHub</a>
+        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
+        <a href="https://twitter.com/gud_mornign">Twitter</a>
+        
+        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+    </footer>
+  </body>
+</html>
