@@ -18,11 +18,12 @@
   }
 }
 
-:target {
+:target,
+p:has(:target) {
   background-color: #fef08acc;
 
   @media (prefers-color-scheme: dark) {
-    background-color: #44403ccc ;
+    background-color: #44403ccc;
   }
 }
 

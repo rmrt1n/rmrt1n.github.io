@@ -56,7 +56,7 @@ video {
 
 @media (prefers-color-scheme: dark) {
   img {
-    filter: brightness(.8) contrast(1.2);
+    filter: brightness(0.8) contrast(1.2);
   }
 }
 

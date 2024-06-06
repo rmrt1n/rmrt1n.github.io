@@ -21,8 +21,11 @@ module.exports = (eleventyConfig) => {
     extensions: 'html',
     formats: ['webp'],
     defaultAttributes: {
-      loading: "lazy",
-      decoding: "async",
+      loading: 'lazy',
+      decoding: 'async',
+    },
+    sharpOptions: {
+      animated: true,
     },
   })
 
