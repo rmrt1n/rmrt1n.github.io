@@ -6,7 +6,7 @@ tags:
   - parsers
   - python
 published: 2024-05-28
-updated: 2024-06-02
+updated: 2024-06-08
 ---
 
 Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like [Bison](https://www.gnu.org/software/bison/) or [ANTLR](https://www.antlr.org/). If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.
@@ -39,7 +39,7 @@ You're probably already familiar with the top-down approach, as that is how recu
 
 [LR](https://en.wikipedia.org/wiki/LR_parser) is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,[^5] but all of them are based on the same two fundamental actions: **shift** and **reduce**.
 
-Shift means to advance or _shift_ to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or _reduced_ into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.
+Shift means to advance or "shift" to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or "reduced" into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.
 
 We'll use this grammar:
 
@@ -56,7 +56,7 @@ This grammar defines a language that consists only of additions and subtractions
 
 | Parse stack | Unparsed  | Action                                                   |
 | ----------- | --------- | -------------------------------------------------------- |
-| _empty_     | 1 + 2 - 3 | Shift 1                                                  |
+| empty     | 1 + 2 - 3 | Shift 1                                                  |
 | 1           | + 2 - 3   | Reduce term -> INTEGER                                   |
 | term        | + 2 - 3   | Reduce expr -> term                                      |
 | expr        | + 2 - 3   | Shift +                                                  |
@@ -79,11 +79,9 @@ Because the number of states is finite, an LR parser is essentially just a [fini
 
 What about recursive ascent parsers then? A recursive ascent parser is just the "functional" version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!
 
-I had an _Aha!_ moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.
+I had an Aha! moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.
 
-## Generating the Parse Table
-
-### Building the State Machine
+## Building the State Machine
 
 Before getting into the code, first, we'll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we'll use an example grammar to illustrate this.
 
@@ -105,7 +103,7 @@ Next, we'll need to construct the **LR(0) items**, which are grammar rules with 
 For each item, we then need to compute its **closure**. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here's how it works:
 
 1. Start with a set of items. For our grammar, this will be `{ S -> • expr eof }`.
-2. For each item, if the symbol on the right of the dot is a _non-terminal_, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand `expr` into `expr -> • expr '+' term` and `expr -> • term`.
+2. For each item, if the symbol on the right of the dot is a non-terminal, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand `expr` into `expr -> • expr '+' term` and `expr -> • term`.
 3. Add the expanded items to the original set. Our set should now look like `{ S -> • expr eof, expr -> • expr '+' term, expr -> • term }`.
 4. Repeat steps 2 and 3 until no new items can be added to the set.
 
@@ -168,7 +166,7 @@ Now, it might make sense to do this for the next state:
 term -> factor •
 ```
 
-Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don't have to create a new state. Instead, we'll just jump or _goto_ the state that we've already found before. This will make more sense when we build the actual parse table. Now, let's finish the last state.[^9]
+Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don't have to create a new state. Instead, we'll just jump or **goto** the state that we've already found before. This will make more sense when we build the actual parse table. Now, let's finish the last state.[^9]
 
 ```plaintext
 # State 8 (State 6 + factor)
@@ -179,7 +177,7 @@ And we're done! Here's a diagram to help you visualise the state transitions:
 
 ![State transition diagram](/assets/images/recursive-ascent-2.png)
 
-### The Action and Goto Table
+## The Action and Goto Table
 
 Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here's what the action and goto table looks like for our grammar:
 
@@ -200,7 +198,7 @@ Now that we have the state machine, we can translate it into the parse table. A 
 
 {% endtable %}
 
-Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. _sN_ means "shift and go to state N", _rN_ means "reduce using rule N", and _gtN_ means "go to state N". Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.
+Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. **sN** means "shift and go to state N", **rN** means "reduce using rule N", and **gtN** means "go to state N". Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.
 
 Here are the grammar rules again for reference, with the rule numbers added for reductions:
 
@@ -213,7 +211,7 @@ Here are the grammar rules again for reference, with the rule numbers added for 
 6. factor -> INTEGER
 ```
 
-The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I'm not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working _LR(0)_ parse table now.[^10]
+The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I'm not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.[^10]
 
 The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we'll implement this mechanism as mutually recursive functions.
 
