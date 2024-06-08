@@ -26,7 +26,7 @@
       
 <article>
   <h1>Writing a Recursive Ascent Parser</h1>
-  <time>last updated: 2024-06-02</time>
+  <time>last updated: 2024-06-08</time>
   <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
 <p>Unfortunately, there isn't a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>I'm writing this post to share what I've learned about recursive ascent parsing; how it works and how to implement it. I'll assume you have some familiarity with recursive descent parsing, as it's usually the first parsing technique people learn. If not, I recommend reading up on it first.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
@@ -42,7 +42,7 @@
 <p>You're probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?</p>
 <h2 id="lr-algorithm" tabindex="-1">LR Algorithm</h2>
 <p><a href="https://en.wikipedia.org/wiki/LR_parser">LR</a> is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> but all of them are based on the same two fundamental actions: <strong>shift</strong> and <strong>reduce</strong>.</p>
-<p>Shift means to advance or <em>shift</em> to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or <em>reduced</em> into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.</p>
+<p>Shift means to advance or &quot;shift&quot; to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or &quot;reduced&quot; into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.</p>
 <p>We'll use this grammar:</p>
 <pre class="language-plaintext"><code class="language-plaintext">expr -> expr '+' term
 expr -> expr '-' term
@@ -60,7 +60,7 @@ term -> INTEGER</code></pre>
 </thead>
 <tbody>
 <tr>
-<td><em>empty</em></td>
+<td>empty</td>
 <td>1 + 2 - 3</td>
 <td>Shift 1</td>
 </tr>
@@ -126,9 +126,8 @@ term -> INTEGER</code></pre>
 <p>How does the parser know which rule it should reduce to? Most LR parsers construct a <strong>parse table</strong>, which is a table of parser instructions based on the grammar. Entries in the table tell the parser whether to shift or reduce based on the current token in the input stream. The entire combination of actions a parser can take based on any input fits in this one table. This is possible because there are only a finite number of possible states an LR parser can assume for a given grammar. These are called the <strong>LR states</strong>.</p>
 <p>Because the number of states is finite, an LR parser is essentially just a <a href="https://en.wikipedia.org/wiki/Finite-state_machine">finite state machine (FSM)</a> modelled after the LR states. The parse table contains the state transitions. The parse stack is used to keep track of the current state. In fact, parser generators are just programs that convert a grammar into a table-based state machine.</p>
 <p>What about recursive ascent parsers then? A recursive ascent parser is just the &quot;functional&quot; version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!</p>
-<p>I had an <em>Aha!</em> moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.</p>
-<h2 id="generating-the-parse-table" tabindex="-1">Generating the Parse Table</h2>
-<h3 id="building-the-state-machine" tabindex="-1">Building the State Machine</h3>
+<p>I had an Aha! moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.</p>
+<h2 id="building-the-state-machine" tabindex="-1">Building the State Machine</h2>
 <p>Before getting into the code, first, we'll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we'll use an example grammar to illustrate this.</p>
 <p>We'll modify the grammar from the previous section to support multiplications and drop subtractions:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
 <pre class="language-plaintext"><code class="language-plaintext">S -> expr eof
@@ -142,7 +141,7 @@ factor -> INTEGER</code></pre>
 <p>For each item, we then need to compute its <strong>closure</strong>. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here's how it works:</p>
 <ol>
 <li>Start with a set of items. For our grammar, this will be <code>{ S -&gt; • expr eof }</code>.</li>
-<li>For each item, if the symbol on the right of the dot is a <em>non-terminal</em>, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand <code>expr</code> into <code>expr -&gt; • expr '+' term</code> and <code>expr -&gt; • term</code>.</li>
+<li>For each item, if the symbol on the right of the dot is a non-terminal, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand <code>expr</code> into <code>expr -&gt; • expr '+' term</code> and <code>expr -&gt; • term</code>.</li>
 <li>Add the expanded items to the original set. Our set should now look like <code>{ S -&gt; • expr eof, expr -&gt; • expr '+' term, expr -&gt; • term }</code>.</li>
 <li>Repeat steps 2 and 3 until no new items can be added to the set.</li>
 </ol>
@@ -185,12 +184,12 @@ term -> term • '*' factor</code></pre>
 <p>Now, it might make sense to do this for the next state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 1 + factor)
 term -> factor •</code></pre>
-<p>Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don't have to create a new state. Instead, we'll just jump or <em>goto</em> the state that we've already found before. This will make more sense when we build the actual parse table. Now, let's finish the last state.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
+<p>Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don't have to create a new state. Instead, we'll just jump or <strong>goto</strong> the state that we've already found before. This will make more sense when we build the actual parse table. Now, let's finish the last state.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 6 + factor)
 term -> term '*' factor •</code></pre>
 <p>And we're done! Here's a diagram to help you visualise the state transitions:</p>
 <p><img loading="lazy" decoding="async" src="/img/reip9qNHGK-3085.webp" alt="State transition diagram" width="3085" height="1272"></p>
-<h3 id="the-action-and-goto-table" tabindex="-1">The Action and Goto Table</h3>
+<h2 id="the-action-and-goto-table" tabindex="-1">The Action and Goto Table</h2>
 <p>Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here's what the action and goto table looks like for our grammar:</p>
 <div style="overflow-x: auto">
 <table>
@@ -310,7 +309,7 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
-<p>Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. <em>sN</em> means &quot;shift and go to state N&quot;, <em>rN</em> means &quot;reduce using rule N&quot;, and <em>gtN</em> means &quot;go to state N&quot;. Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.</p>
+<p>Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. <strong>sN</strong> means &quot;shift and go to state N&quot;, <strong>rN</strong> means &quot;reduce using rule N&quot;, and <strong>gtN</strong> means &quot;go to state N&quot;. Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.</p>
 <p>Here are the grammar rules again for reference, with the rule numbers added for reductions:</p>
 <pre class="language-plaintext"><code class="language-plaintext">1. S -> expr eof
 2. expr -> expr '+' term
@@ -318,7 +317,7 @@ term -> term '*' factor •</code></pre>
 4. term -> term '*' factor
 5. term -> factor
 6. factor -> INTEGER</code></pre>
-<p>The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I'm not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working <em>LR(0)</em> parse table now.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
+<p>The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I'm not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
 <p>The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we'll implement this mechanism as mutually recursive functions.</p>
 <h2 id="writing-the-parser" tabindex="-1">Writing The Parser</h2>
 <p>At this point, we're ready to build the actual parser. I'll be writing the code in Python because it's easy to read. To make sure our parser is correct, we'll also implement an interpreter for the expressions we parsed. First, let's start with the program's entry point:</p>
