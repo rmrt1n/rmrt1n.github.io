@@ -159,7 +159,7 @@
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
 <span class="token punctuation">}</span></code></pre>
 <p>The exported <code>actions</code> map is <a href="https://kit.svelte.dev/docs/form-actions">SvelteKit's version of form action handlers</a>. You can just focus on the function in the <code>default</code> action.</p>
-<p>If the user record doesn't exist in the database, this function will create a new user and session in the database, set the required cookie in the response header, and redirect the user to the value in the <code>next</code> search param. If <code>next</code> is not specified, it will redirect to the home page instead. If the user is already registered, this function will directly create the session, set the cookie, and redirect the user.</p>
+<p>If the user record doesn't exist in the database, this function will create a new user and session in the database, set the required cookie in the response header, and redirect the user to the value in the <code>next</code> search param. If <code>next</code> is not specified, it will redirect to the home page instead. If the user is already registered, it will directly create the session, set the cookie, and redirect the user.</p>
 <p>We'll also add route protection to the home page. Unauthenticated requests to the home page will be redirected to the login page.</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/routes/+page.server.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">{</span> db <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'$lib/db/db'</span>
@@ -259,7 +259,7 @@
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>This function first checks if the user is logged in using the cookie. The mechanism is the almost same as in the home page, with the only difference being that we're setting the <code>next</code> search parameter to point back to this URL. This will redirect the user back to <code>/cli/login</code> after they have logged in.</p>
-<p>If the user is already logged in, this function will create a CLI session and an access token in the database. Then, it'll render the success message page from before. Note, in SvelteKit, after the <code>load</code> function in <code>+page.server.js</code> is called, the page in <code>+page.svelte</code> will be rendered. That's why we don't have to tell this function to render the page.</p>
+<p>If the user is already logged in,  a CLI session and an access token will be inserted into the database. Then, it'll render the success message page from before. Note, in SvelteKit, after the <code>load</code> function in <code>+page.server.js</code> is called, the page in <code>+page.svelte</code> will be rendered. That's why we don't have to tell this function to render the page.</p>
 <p>Next is the <code>/cli/login/:session</code> route handler:</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/routes/cli/login/[session]/+server.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">{</span> db <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'$lib/db/db'</span>
