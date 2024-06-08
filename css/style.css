@@ -163,6 +163,10 @@ pre {
   font-size: 0.875rem;
 }
 
+code {
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; 
+}
+
 p code {
   background-color: var(--color-code);
   padding: 1.5px;
