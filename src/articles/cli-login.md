@@ -232,8 +232,6 @@ The `load` function is a [function that runs before the page is rendered](https:
 
 ![Login page](/assets/images/cli-login-3.webp)
 
-%% **INSERT GIF HERE** %%
-
 ## The CLI Login Endpoints
 
 Now let's get to the main focus of this article. We'll need to add new tables in our database schema to support this feature:
