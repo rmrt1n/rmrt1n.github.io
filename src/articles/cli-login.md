@@ -200,7 +200,7 @@ export const actions = {
 
 The exported `actions` map is [SvelteKit's version of form action handlers](https://kit.svelte.dev/docs/form-actions). You can just focus on the function in the `default` action.
 
-If the user record doesn't exist in the database, this function will create a new user and session in the database, set the required cookie in the response header, and redirect the user to the value in the `next` search param. If `next` is not specified, it will redirect to the home page instead. If the user is already registered, this function will directly create the session, set the cookie, and redirect the user.
+If the user record doesn't exist in the database, this function will create a new user and session in the database, set the required cookie in the response header, and redirect the user to the value in the `next` search param. If `next` is not specified, it will redirect to the home page instead. If the user is already registered, it will directly create the session, set the cookie, and redirect the user.
 
 We'll also add route protection to the home page. Unauthenticated requests to the home page will be redirected to the login page.
 
@@ -323,7 +323,7 @@ export async function load({ cookies, url }) {
 
 This function first checks if the user is logged in using the cookie. The mechanism is the almost same as in the home page, with the only difference being that we're setting the `next` search parameter to point back to this URL. This will redirect the user back to `/cli/login` after they have logged in.
 
-If the user is already logged in, this function will create a CLI session and an access token in the database. Then, it'll render the success message page from before. Note, in SvelteKit, after the `load` function in `+page.server.js` is called, the page in `+page.svelte` will be rendered. That's why we don't have to tell this function to render the page.
+If the user is already logged in,  a CLI session and an access token will be inserted into the database. Then, it'll render the success message page from before. Note, in SvelteKit, after the `load` function in `+page.server.js` is called, the page in `+page.svelte` will be rendered. That's why we don't have to tell this function to render the page.
 
 Next is the `/cli/login/:session` route handler:
 
