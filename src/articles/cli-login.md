@@ -7,18 +7,15 @@ tags:
   - security
   - sveltekit
   - web-development
-updated: 2024-06-06
-published:
-draft: true
-eleventyExcludeFromCollections: true
-permalink: drafts/19c7f3c6087e566683890010a1a65d08d703dc242e8f8b482b044030bd8b6a70/
+published: 2024-06-10
+updated: 2024-06-10
 ---
 
-I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so that the tool can perform actions on behalf of the user.
+I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.
 
-It usually works like this. When you type a command like `cli login` in your terminal, it will open up a login page in your web browser. After you log in, the page will show a message like "Your CLI is connected now". When you go back to the terminal, it will say that it's connected and you can now perform commands that require authentication.
+It usually works like this. When you type a command like `cli login` in your terminal, a login page will open in your web browser. After you log in, the page will show a message like "Your CLI is connected now". When you go back to the terminal, it will say that it's "connected" and you can now perform commands that require authentication.
 
-The connection here is often in the form of an access token or an API key. This is what allows the CLI to stay logged in and perform authenticated requests to a remote server.
+The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.
 
 You've probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include [Supabase CLI](https://supabase.com/docs/reference/cli/introduction), [GitHub CLI](https://cli.github.com/), [Graphite CLI](https://graphite.dev/features/cli), and Fly.io's [`flyctl`](https://fly.io/docs/flyctl/). It's a UX pattern that I like, as it hides a lot of complexity from the user.
 
