@@ -26,10 +26,10 @@
       
 <article>
   <h1>How to Implement Automatic CLI Login</h1>
-  <time>last updated: 2024-06-06</time>
-  <p>I've recently had the chance to work on an &quot;automatic CLI login&quot; feature for a <a href="https://github.com/Argus-Labs/world-cli">CLI tool</a> at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so that the tool can perform actions on behalf of the user.</p>
-<p>It usually works like this. When you type a command like <code>cli login</code> in your terminal, it will open up a login page in your web browser. After you log in, the page will show a message like &quot;Your CLI is connected now&quot;. When you go back to the terminal, it will say that it's connected and you can now perform commands that require authentication.</p>
-<p>The connection here is often in the form of an access token or an API key. This is what allows the CLI to stay logged in and perform authenticated requests to a remote server.</p>
+  <time>last updated: 2024-06-10</time>
+  <p>I've recently had the chance to work on an &quot;automatic CLI login&quot; feature for a <a href="https://github.com/Argus-Labs/world-cli">CLI tool</a> at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.</p>
+<p>It usually works like this. When you type a command like <code>cli login</code> in your terminal, a login page will open in your web browser. After you log in, the page will show a message like &quot;Your CLI is connected now&quot;. When you go back to the terminal, it will say that it's &quot;connected&quot; and you can now perform commands that require authentication.</p>
+<p>The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.</p>
 <p>You've probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include <a href="https://supabase.com/docs/reference/cli/introduction">Supabase CLI</a>, <a href="https://cli.github.com/">GitHub CLI</a>, <a href="https://graphite.dev/features/cli">Graphite CLI</a>, and <a href="http://Fly.io">Fly.io</a>'s <a href="https://fly.io/docs/flyctl/"><code>flyctl</code></a>. It's a UX pattern that I like, as it hides a lot of complexity from the user.</p>
 <p>There are probably many different ways to implement this, each with different trade-offs. In this post, I'll write about just one way of doing this, which is also the same approach used by Supabase and <a href="http://Fly.io">Fly.io</a>.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
 <h2 id="how-it-works" tabindex="-1">How it Works</h2>
