@@ -150,6 +150,34 @@ small {
 
 a {
   color: var(--color-links);
+
+  &:focus {
+    color: var(--color-bg);
+    background-color: var(--color-links);
+  }
+}
+
+.header-anchor {
+  color: inherit;
+  text-decoration: none;
+
+  &::before {
+    content: '#';
+    font-size: 1em;
+    display: inline-block;
+    width: .75em;
+    margin-left: -.75em;
+    text-decoration: none;
+    visibility: hidden;
+  }
+
+  &:hover {
+    text-decoration: underline;
+
+    &::before {
+      visibility: visible;
+    }
+  }
 }
 
 time {

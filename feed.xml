@@ -5,7 +5,7 @@
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
   <updated>
-    2024-06-10T14:52:12Z
+    2024-06-11T18:31:58Z
   </updated>
   <id>https://ryanmartin.me/</id>
   <author>
@@ -15,7 +15,7 @@
     <entry>
       <title>Writing a Recursive Ascent Parser</title>
       <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/articles/recursive-ascent/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It&#39;s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you&#39;re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -23,7 +23,7 @@
 &lt;p&gt;I&#39;m writing this post to share what I&#39;ve learned about recursive ascent parsing; how it works and how to implement it. I&#39;ll assume you have some familiarity with recursive descent parsing, as it&#39;s usually the first parsing technique people learn. If not, I recommend reading up on it first.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: I&#39;m not an expert. I didn&#39;t take any classes on compiler theory and I haven&#39;t read &lt;a href=&quot;https://suif.stanford.edu/dragonbook/&quot;&gt;the dragon book&lt;/a&gt;. Please &lt;a href=&quot;mailto:hi@ryanmartin.me&quot;&gt;reach out&lt;/a&gt; If you noticed any mistakes in this post, especially in the first half!&lt;/p&gt;
-&lt;h2 id=&quot;bottom-up-vs-top-down-parsing&quot; tabindex=&quot;-1&quot;&gt;Bottom-Up vs Top-Down Parsing&lt;/h2&gt;
+&lt;h2 id=&quot;bottom-up-vs-top-down-parsing&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;Bottom-Up vs Top-Down Parsing&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Parsing techniques can be roughly grouped into 2 types, &lt;a href=&quot;https://en.wikipedia.org/wiki/Top-down_parsing&quot;&gt;top-down&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Bottom-up_parsing&quot;&gt;bottom-up&lt;/a&gt;. Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.&lt;/p&gt;
 &lt;p&gt;A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Polish_notation&quot;&gt;Polish notation&lt;/a&gt;, and bottom-up parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Reverse_Polish_notation&quot;&gt;reversed Polish notation&lt;/a&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn4&quot; id=&quot;fnref4&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt; In Polish notation, the operators come before the operands. In reversed Polish notation, it&#39;s the opposite, the operands come before the operators.&lt;/p&gt;
 &lt;p&gt;Let&#39;s use this math expression &lt;code&gt;1 + 2 * 3&lt;/code&gt; as an example. We can also represent this expression as a tree:&lt;/p&gt;
@@ -31,7 +31,7 @@
 &lt;p&gt;A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you&#39;ll end up with &lt;code&gt;+ 1 * 2 3&lt;/code&gt;, the Polish notation of the previous expression.&lt;/p&gt;
 &lt;p&gt;On the other hand, a bottom-up parser builds the parse tree starting from the leaf nodes up to the root node, aka, post-order traversal. The order the nodes are traversed will form the reversed Polish notation of the original expression: &lt;code&gt;2 3 * 1 +&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;You&#39;re probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?&lt;/p&gt;
-&lt;h2 id=&quot;lr-algorithm&quot; tabindex=&quot;-1&quot;&gt;LR Algorithm&lt;/h2&gt;
+&lt;h2 id=&quot;lr-algorithm&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#lr-algorithm&quot;&gt;LR Algorithm&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser&quot;&gt;LR&lt;/a&gt; is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn5&quot; id=&quot;fnref5&quot;&gt;[5]&lt;/a&gt;&lt;/sup&gt; but all of them are based on the same two fundamental actions: &lt;strong&gt;shift&lt;/strong&gt; and &lt;strong&gt;reduce&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Shift means to advance or &amp;quot;shift&amp;quot; to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or &amp;quot;reduced&amp;quot; into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let&#39;s use an example to illustrate it.&lt;/p&gt;
 &lt;p&gt;We&#39;ll use this grammar:&lt;/p&gt;
@@ -118,7 +118,7 @@ term -&gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Because the number of states is finite, an LR parser is essentially just a &lt;a href=&quot;https://en.wikipedia.org/wiki/Finite-state_machine&quot;&gt;finite state machine (FSM)&lt;/a&gt; modelled after the LR states. The parse table contains the state transitions. The parse stack is used to keep track of the current state. In fact, parser generators are just programs that convert a grammar into a table-based state machine.&lt;/p&gt;
 &lt;p&gt;What about recursive ascent parsers then? A recursive ascent parser is just the &amp;quot;functional&amp;quot; version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!&lt;/p&gt;
 &lt;p&gt;I had an Aha! moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.&lt;/p&gt;
-&lt;h2 id=&quot;building-the-state-machine&quot; tabindex=&quot;-1&quot;&gt;Building the State Machine&lt;/h2&gt;
+&lt;h2 id=&quot;building-the-state-machine&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#building-the-state-machine&quot;&gt;Building the State Machine&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Before getting into the code, first, we&#39;ll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we&#39;ll use an example grammar to illustrate this.&lt;/p&gt;
 &lt;p&gt;We&#39;ll modify the grammar from the previous section to support multiplications and drop subtractions:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn6&quot; id=&quot;fnref6&quot;&gt;[6]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;S -&gt; expr eof
@@ -180,7 +180,7 @@ term -&gt; factor •&lt;/code&gt;&lt;/pre&gt;
 term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And we&#39;re done! Here&#39;s a diagram to help you visualise the state transitions:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/recursive-ascent-2.png&quot; alt=&quot;State transition diagram&quot; /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;the-action-and-goto-table&quot; tabindex=&quot;-1&quot;&gt;The Action and Goto Table&lt;/h2&gt;
+&lt;h2 id=&quot;the-action-and-goto-table&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#the-action-and-goto-table&quot;&gt;The Action and Goto Table&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here&#39;s what the action and goto table looks like for our grammar:&lt;/p&gt;
 &lt;div style=&quot;overflow-x: auto&quot;&gt;
 &lt;table&gt;
@@ -310,7 +310,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 6. factor -&gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I&#39;m not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn10&quot; id=&quot;fnref10&quot;&gt;[10]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we&#39;ll implement this mechanism as mutually recursive functions.&lt;/p&gt;
-&lt;h2 id=&quot;writing-the-parser&quot; tabindex=&quot;-1&quot;&gt;Writing The Parser&lt;/h2&gt;
+&lt;h2 id=&quot;writing-the-parser&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#writing-the-parser&quot;&gt;Writing The Parser&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;At this point, we&#39;re ready to build the actual parser. I&#39;ll be writing the code in Python because it&#39;s easy to read. To make sure our parser is correct, we&#39;ll also implement an interpreter for the expressions we parsed. First, let&#39;s start with the program&#39;s entry point:&lt;/p&gt;
 &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# recursive-ascent.py&lt;/span&gt;
 &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; sys
@@ -329,11 +329,11 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; __name__ &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;__main__&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
     main&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This program will receive a string as an argument and print out the evaluated string. Don&#39;t worry about the unimplemented functions for now. We&#39;ll get to them soon.&lt;/p&gt;
-&lt;h3 id=&quot;a-simple-lexer&quot; tabindex=&quot;-1&quot;&gt;A Simple Lexer&lt;/h3&gt;
+&lt;h3 id=&quot;a-simple-lexer&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#a-simple-lexer&quot;&gt;A Simple Lexer&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Since we don&#39;t have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn11&quot; id=&quot;fnref11&quot;&gt;[11]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;lex&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;string&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; string&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;split&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&quot;representing-the-abstract-syntax-tree-(ast)&quot; tabindex=&quot;-1&quot;&gt;Representing the Abstract Syntax Tree (AST)&lt;/h3&gt;
+&lt;h3 id=&quot;representing-the-abstract-syntax-tree-(ast)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#representing-the-abstract-syntax-tree-(ast)&quot;&gt;Representing the Abstract Syntax Tree (AST)&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;We&#39;ll also need a type to represent the AST that will be produced by the parser:&lt;/p&gt;
 &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;AST&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;AST | None&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;AST | None&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; value&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; kind&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
@@ -342,7 +342,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
         self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; value
         self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;kind &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; kind&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If you&#39;ve noticed, the &lt;code&gt;AST&lt;/code&gt; class above looks like a binary tree. That&#39;s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;this diagram&lt;/a&gt; from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.&lt;/p&gt;
-&lt;h3 id=&quot;converting-the-parse-table-into-functions&quot; tabindex=&quot;-1&quot;&gt;Converting the Parse Table into Functions&lt;/h3&gt;
+&lt;h3 id=&quot;converting-the-parse-table-into-functions&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#converting-the-parse-table-into-functions&quot;&gt;Converting the Parse Table into Functions&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Our &lt;code&gt;parse&lt;/code&gt; function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:&lt;/p&gt;
 &lt;div style=&quot;overflow-x: auto&quot;&gt;
 &lt;table&gt;
@@ -697,7 +697,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
         &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;isdigit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
             &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot; )&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; end&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I&#39;m printing the AST as s-expressions so that it&#39;s easy to see the expressions follow the correct operator precedence.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn13&quot; id=&quot;fnref13&quot;&gt;[13]&lt;/a&gt;&lt;/sup&gt; Given an input like &lt;code&gt;1 + 2 * 3 + 4&lt;/code&gt;, this method will print out the following: &lt;code&gt;( + ( +  1 ( *  2  3  ) ) 4  )&lt;/code&gt;. This looks right. All that&#39;s left now is to implement the &lt;code&gt;evaluate&lt;/code&gt; function and test if it works as expected.&lt;/p&gt;
-&lt;h3 id=&quot;interpreting-the-ast&quot; tabindex=&quot;-1&quot;&gt;Interpreting the AST&lt;/h3&gt;
+&lt;h3 id=&quot;interpreting-the-ast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#interpreting-the-ast&quot;&gt;Interpreting the AST&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here&#39;s the &lt;code&gt;evaluate&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;evaluate&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
@@ -746,7 +746,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
     &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;result&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;End&lt;/h2&gt;
+&lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;And that&#39;s all. You can find the complete code on &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent&quot;&gt;this GitHub repo&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won&#39;t ever use this technique when building a real compiler, but at least you learned something new. If you&#39;d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
 &lt;hr class=&quot;footnotes-sep&quot; /&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
@@ -785,7 +785,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
     <entry>
       <title>How to Implement Automatic CLI Login</title>
       <link href="https://ryanmartin.me/articles/cli-login/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/articles/cli-login/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I&#39;ve recently had the chance to work on an &amp;quot;automatic CLI login&amp;quot; feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -793,7 +793,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;p&gt;The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.&lt;/p&gt;
 &lt;p&gt;You&#39;ve probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include &lt;a href=&quot;https://supabase.com/docs/reference/cli/introduction&quot;&gt;Supabase CLI&lt;/a&gt;, &lt;a href=&quot;https://cli.github.com/&quot;&gt;GitHub CLI&lt;/a&gt;, &lt;a href=&quot;https://graphite.dev/features/cli&quot;&gt;Graphite CLI&lt;/a&gt;, and &lt;a href=&quot;http://fly.io/&quot;&gt;Fly.io&lt;/a&gt;&#39;s &lt;a href=&quot;https://fly.io/docs/flyctl/&quot;&gt;&lt;code&gt;flyctl&lt;/code&gt;&lt;/a&gt;. It&#39;s a UX pattern that I like, as it hides a lot of complexity from the user.&lt;/p&gt;
 &lt;p&gt;There are probably many different ways to implement this, each with different trade-offs. In this post, I&#39;ll write about just one way of doing this, which is also the same approach used by Supabase and &lt;a href=&quot;http://fly.io/&quot;&gt;Fly.io&lt;/a&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; It works for my particular use case and does not require refactoring my existing authentication logic.&lt;/p&gt;
-&lt;h2 id=&quot;how-it-works&quot; tabindex=&quot;-1&quot;&gt;How it Works&lt;/h2&gt;
+&lt;h2 id=&quot;how-it-works&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#how-it-works&quot;&gt;How it Works&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you&#39;ll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-1.png&quot; alt=&quot;Two-way communication scheme&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;This probably works, though I haven&#39;t actually tested it yet. This isn&#39;t the approach that I implemented, but it could be a good area for future experimentation.&lt;/p&gt;
@@ -803,7 +803,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;p&gt;Since this approach uses &lt;a href=&quot;https://javascript.info/long-polling#regular-polling&quot;&gt;regular HTTP polling&lt;/a&gt;, it&#39;s a potential source of &lt;a href=&quot;https://en.wikipedia.org/wiki/Denial-of-service_attack&quot;&gt;DDOS attacks&lt;/a&gt;. In a perfect world, a user needs to login to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it&#39;s not a perfect defence.&lt;/p&gt;
 &lt;p&gt;This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API&quot;&gt;WebSockets&lt;/a&gt; or &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events&quot;&gt;SSE&lt;/a&gt;. This might not work for you depending on your &lt;a href=&quot;https://en.wikipedia.org/wiki/Threat_model&quot;&gt;threat model&lt;/a&gt;. But hey, if it works for Supabase, which has around 450,000 users,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt; it&#39;ll probably work for me too.&lt;/p&gt;
 &lt;p&gt;Now that we know how it works, let&#39;s get into the code implementation. I&#39;ll build a web server and a CLI tool for a fictional developer tools company, ACME Corp. The CLI tool will be called &lt;code&gt;acme&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;project-setup&quot; tabindex=&quot;-1&quot;&gt;Project Setup&lt;/h2&gt;
+&lt;h2 id=&quot;project-setup&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I&#39;ll use &lt;a href=&quot;https://kit.svelte.dev/&quot;&gt;SvelteKit&lt;/a&gt; for this project, but the concepts apply to any web framework. I&#39;ll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.&lt;/p&gt;
 &lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# create a new sveltekit project &amp;amp; install dependencies&lt;/span&gt;
 &lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; create svelte@latest acme
@@ -860,7 +860,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; drizzle-kit push&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This will create the &lt;code&gt;data/database.db&lt;/code&gt; SQLite database with our schema. You should only use &lt;code&gt;drizzle-kit push&lt;/code&gt; for prototyping or local development. If you need database migrations, use &lt;code&gt;drizzle-kit generate&lt;/code&gt; and &lt;code&gt;drizzle-kit migrate&lt;/code&gt;. See the &lt;a href=&quot;https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push&quot;&gt;official documentation&lt;/a&gt; for more info.&lt;/p&gt;
 &lt;p&gt;Finally, start the development server by running &lt;code&gt;pnpm dev&lt;/code&gt;. The server should now be running at &lt;code&gt;http://localhost:5173&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;a-basic-authentication-system&quot; tabindex=&quot;-1&quot;&gt;A Basic Authentication System&lt;/h2&gt;
+&lt;h2 id=&quot;a-basic-authentication-system&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#a-basic-authentication-system&quot;&gt;A Basic Authentication System&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;As the focus of this post is on automatic CLI login, we won&#39;t be doing anything fancy with user authentication. It&#39;ll use a database-backed session-based authentication. I&#39;ll also skip hashing the password and just store it in plaintext. You should never store passwords like this in a production system. Either use a third-party authentication service or follow the &lt;a href=&quot;https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html&quot;&gt;OWASP guide to password storage&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;First, let&#39;s build a login page. For this app, the login page will serve as both the login and the signup page.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn4&quot; id=&quot;fnref4&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;pre class=&quot;language-html&quot;&gt;&lt;code class=&quot;language-html&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;&amp;lt;!-- src/routes/login/+page.svelte --&gt;&lt;/span&gt;
@@ -945,7 +945,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;load&lt;/code&gt; function is a &lt;a href=&quot;https://kit.svelte.dev/docs/load&quot;&gt;function that runs before the page is rendered&lt;/a&gt;. It&#39;s similar to page/route controllers in other web frameworks like &lt;a href=&quot;https://www.djangoproject.com/&quot;&gt;Django&lt;/a&gt; and &lt;a href=&quot;https://rubyonrails.org/&quot;&gt;Ruby on Rails&lt;/a&gt;. If you open &lt;code&gt;http://localhost:5173&lt;/code&gt; in your browser, you should be redirected to the login page.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-3.webp&quot; alt=&quot;Login page&quot; /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;the-cli-login-endpoints&quot; tabindex=&quot;-1&quot;&gt;The CLI Login Endpoints&lt;/h2&gt;
+&lt;h2 id=&quot;the-cli-login-endpoints&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#the-cli-login-endpoints&quot;&gt;The CLI Login Endpoints&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now let&#39;s get to the main focus of this article. We&#39;ll need to add new tables in our database schema to support this feature:&lt;/p&gt;
 &lt;pre class=&quot;language-javascript&quot;&gt;&lt;code class=&quot;language-javascript&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// src/lib/db/schema.js&lt;/span&gt;
 &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
@@ -1043,7 +1043,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
   &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; Response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token literal-property property&quot;&gt;token&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; cliSession&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;tokenId &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This function checks if the session in the URL&#39;s path param is a valid CLI session in the database. If it is, it&#39;ll return the access token in the response body. This token will then be stored by the CLI tool and used in subsequent requests.&lt;/p&gt;
-&lt;h2 id=&quot;writing-the-cli-tool&quot; tabindex=&quot;-1&quot;&gt;Writing the CLI Tool&lt;/h2&gt;
+&lt;h2 id=&quot;writing-the-cli-tool&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#writing-the-cli-tool&quot;&gt;Writing the CLI Tool&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Our &lt;code&gt;acme&lt;/code&gt; CLI tool will just be a single Node.js script. It&#39;ll have only one command, &lt;code&gt;acme login&lt;/code&gt;. As mentioned in the previous section, the CLI will request a login session and poll for the access token:&lt;/p&gt;
 &lt;pre class=&quot;language-javascript&quot;&gt;&lt;code class=&quot;language-javascript&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// acme.js&lt;/span&gt;
 &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; crypto &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;crypto&#39;&lt;/span&gt;
@@ -1085,13 +1085,13 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 
 &lt;span class=&quot;token comment&quot;&gt;# then you can run&lt;/span&gt;
 acme login&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&quot;security-considerations&quot; tabindex=&quot;-1&quot;&gt;Security Considerations&lt;/h2&gt;
+&lt;h2 id=&quot;security-considerations&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#security-considerations&quot;&gt;Security Considerations&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I&#39;ve mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I&#39;ll mention a few more and also explain the ways to mitigate it. This isn&#39;t a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.&lt;/p&gt;
 &lt;p&gt;One type of attack we&#39;re vulnerable to is the &lt;a href=&quot;https://en.wikipedia.org/wiki/Man-in-the-middle_attack&quot;&gt;man-in-the-middle attack&lt;/a&gt;. A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.&lt;/p&gt;
 &lt;p&gt;Another kind of attack is a &lt;a href=&quot;https://en.wikipedia.org/wiki/Brute-force_attack&quot;&gt;brute force attack&lt;/a&gt;. Since the endpoints to poll for the access tokens don&#39;t require authentication, attackers can brute force UUID values until they get an access token. This can be mitigated by expiring the CLI sessions and applying the same strategies as with DDOS attacks.&lt;/p&gt;
 &lt;p&gt;Both of these attacks have one thing in common. If an attacker gets a hold of your access token, you&#39;re hacked. We can increase the security of our application by encrypting the access tokens. This way, even if attackers obtain an encrypted access token, they won&#39;t be able to decrypt it.&lt;/p&gt;
 &lt;p&gt;Encrypting the tokens presents some challenges. How do we ensure that only the CLI can decrypt the token? What encryption scheme should be used? What if an attacker obtained the decryption key?&lt;/p&gt;
-&lt;h2 id=&quot;ecdh-key-exchange-%26-encryption&quot; tabindex=&quot;-1&quot;&gt;ECDH Key Exchange &amp;amp; Encryption&lt;/h2&gt;
+&lt;h2 id=&quot;ecdh-key-exchange-%26-encryption&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#ecdh-key-exchange-%26-encryption&quot;&gt;ECDH Key Exchange &amp;amp; Encryption&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;One possible solution is to use &lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman&quot;&gt;ECDH key exchange&lt;/a&gt;. ECDH (Elliptic Curve Diffie–Hellman Key Exchange) is a method that allows two parties to establish a shared secret over an insecure channel. ECDH is based on &lt;a href=&quot;https://en.wikipedia.org/wiki/Elliptic-curve_cryptography&quot;&gt;ECC&lt;/a&gt; (elliptic curve cryptography), a modern family of public-key cryptography and is considered the modern successor of RSA.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn5&quot; id=&quot;fnref5&quot;&gt;[5]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;Here&#39;s a high-level explanation of how ECDH works:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn6&quot; id=&quot;fnref6&quot;&gt;[6]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -1115,7 +1115,7 @@ acme login&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;Bob decrypts the &lt;strong&gt;ciphertext&lt;/strong&gt; using the &lt;strong&gt;secret&lt;/strong&gt; as the decryption key.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;While the underlying maths might be complex, the encryption scheme is straightforward. Now, let&#39;s implement this in our code. We&#39;ll use the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API&quot;&gt;WebCrypto API&lt;/a&gt; as the cryptography library.&lt;/p&gt;
-&lt;h2 id=&quot;securing-the-endpoints&quot; tabindex=&quot;-1&quot;&gt;Securing the Endpoints&lt;/h2&gt;
+&lt;h2 id=&quot;securing-the-endpoints&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#securing-the-endpoints&quot;&gt;Securing the Endpoints&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First, we need to update our &lt;code&gt;cli_sessions&lt;/code&gt; table definition to store the CLI&#39;s public key.&lt;/p&gt;
 &lt;pre class=&quot;language-javascript&quot;&gt;&lt;code class=&quot;language-javascript&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// src/lib/db/schema.js&lt;/span&gt;
 &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
@@ -1276,7 +1276,7 @@ acme login&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;decrypt&lt;/code&gt; function follows the same steps as the encryption process, just reversed. And that&#39;s it. When we run the script now, we should see that the login flow still works the same:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-5.webp&quot; alt=&quot;Checking the new CLI login flow&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;You can also see the decrypted token is the same as the token in the database.&lt;/p&gt;
-&lt;h2 id=&quot;what&#39;s-next&quot; tabindex=&quot;-1&quot;&gt;What&#39;s Next&lt;/h2&gt;
+&lt;h2 id=&quot;what&#39;s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#what&#39;s-next&quot;&gt;What&#39;s Next&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;You can find the code for this project &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login&quot;&gt;on GitHub&lt;/a&gt;. I&#39;ve only covered the minimum required to implement automatic CLI login with encryption. There&#39;s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!&lt;/p&gt;
 &lt;hr class=&quot;footnotes-sep&quot; /&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
@@ -1303,7 +1303,7 @@ acme login&lt;/code&gt;&lt;/pre&gt;
     <entry>
       <title>Fixing Podman Volume Permission Issues</title>
       <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you&#39;ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
@@ -1333,7 +1333,7 @@ steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&g
     <entry>
       <title>Trick Docker Compose to Use Podman</title>
       <link href="https://ryanmartin.me/snippets/podman-docker-compose/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/snippets/podman-docker-compose/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I recently discovered a way to use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; as the backend for &lt;a href=&quot;https://docs.docker.com/compose/&quot;&gt;Docker Compose&lt;/a&gt;. Docker Compose checks the &lt;code&gt;DOCKER_HOST&lt;/code&gt; environment variable to determine which daemon socket to connect to. Podman doesn&#39;t run a daemon by default, so we need to enable it first:&lt;/p&gt;
@@ -1352,7 +1352,7 @@ systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span
     <entry>
       <title>My CSS reset</title>
       <link href="https://ryanmartin.me/snippets/my-css-reset/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/snippets/my-css-reset/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what &lt;a href=&quot;https://mattbrictson.com/blog/css-normalize-and-reset&quot;&gt;normalise stylesheets and CSS resets&lt;/a&gt; are for.&lt;/p&gt;
@@ -1418,7 +1418,7 @@ systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span
     <entry>
       <title>How to Manually Optimise Images for the Web</title>
       <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you&#39;re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
@@ -1460,7 +1460,7 @@ gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/s
     <entry>
       <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
       <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
-      <updated>2024-06-10T14:52:00Z</updated>
+      <updated>2024-06-11T18:31:45Z</updated>
       <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It&#39;s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;

@@ -32,7 +32,7 @@
 <p>The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.</p>
 <p>You've probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include <a href="https://supabase.com/docs/reference/cli/introduction">Supabase CLI</a>, <a href="https://cli.github.com/">GitHub CLI</a>, <a href="https://graphite.dev/features/cli">Graphite CLI</a>, and <a href="http://Fly.io">Fly.io</a>'s <a href="https://fly.io/docs/flyctl/"><code>flyctl</code></a>. It's a UX pattern that I like, as it hides a lot of complexity from the user.</p>
 <p>There are probably many different ways to implement this, each with different trade-offs. In this post, I'll write about just one way of doing this, which is also the same approach used by Supabase and <a href="http://Fly.io">Fly.io</a>.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
-<h2 id="how-it-works" tabindex="-1">How it Works</h2>
+<h2 id="how-it-works" tabindex="-1"><a class="header-anchor" href="#how-it-works">How it Works</a></h2>
 <p>At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you'll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?</p>
 <p><img loading="lazy" decoding="async" src="/img/8zjhL3f3r0-2146.webp" alt="Two-way communication scheme" width="2146" height="683"></p>
 <p>This probably works, though I haven't actually tested it yet. This isn't the approach that I implemented, but it could be a good area for future experimentation.</p>
@@ -42,7 +42,7 @@
 <p>Since this approach uses <a href="https://javascript.info/long-polling#regular-polling">regular HTTP polling</a>, it's a potential source of <a href="https://en.wikipedia.org/wiki/Denial-of-service_attack">DDOS attacks</a>. In a perfect world, a user needs to login to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it's not a perfect defence.</p>
 <p>This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSockets</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events">SSE</a>. This might not work for you depending on your <a href="https://en.wikipedia.org/wiki/Threat_model">threat model</a>. But hey, if it works for Supabase, which has around 450,000 users,<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> it'll probably work for me too.</p>
 <p>Now that we know how it works, let's get into the code implementation. I'll build a web server and a CLI tool for a fictional developer tools company, ACME Corp. The CLI tool will be called <code>acme</code>.</p>
-<h2 id="project-setup" tabindex="-1">Project Setup</h2>
+<h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>I'll use <a href="https://kit.svelte.dev">SvelteKit</a> for this project, but the concepts apply to any web framework. I'll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># create a new sveltekit project &amp; install dependencies</span>
 <span class="token function">pnpm</span> create svelte@latest acme
@@ -99,7 +99,7 @@
 <span class="token function">pnpm</span> drizzle-kit push</code></pre>
 <p>This will create the <code>data/database.db</code> SQLite database with our schema. You should only use <code>drizzle-kit push</code> for prototyping or local development. If you need database migrations, use <code>drizzle-kit generate</code> and <code>drizzle-kit migrate</code>. See the <a href="https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push">official documentation</a> for more info.</p>
 <p>Finally, start the development server by running <code>pnpm dev</code>. The server should now be running at <code>http://localhost:5173</code>.</p>
-<h2 id="a-basic-authentication-system" tabindex="-1">A Basic Authentication System</h2>
+<h2 id="a-basic-authentication-system" tabindex="-1"><a class="header-anchor" href="#a-basic-authentication-system">A Basic Authentication System</a></h2>
 <p>As the focus of this post is on automatic CLI login, we won't be doing anything fancy with user authentication. It'll use a database-backed session-based authentication. I'll also skip hashing the password and just store it in plaintext. You should never store passwords like this in a production system. Either use a third-party authentication service or follow the <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP guide to password storage</a>.</p>
 <p>First, let's build a login page. For this app, the login page will serve as both the login and the signup page.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup></p>
 <pre class="language-html"><code class="language-html"><span class="token comment">&lt;!-- src/routes/login/+page.svelte --></span>
@@ -184,7 +184,7 @@
 <span class="token punctuation">}</span></code></pre>
 <p>The <code>load</code> function is a <a href="https://kit.svelte.dev/docs/load">function that runs before the page is rendered</a>. It's similar to page/route controllers in other web frameworks like <a href="https://www.djangoproject.com/">Django</a> and <a href="https://rubyonrails.org/">Ruby on Rails</a>. If you open <code>http://localhost:5173</code> in your browser, you should be redirected to the login page.</p>
 <p><img loading="lazy" decoding="async" src="/img/tAQxkDcEjc-800.webp" alt="Login page" width="800" height="485"></p>
-<h2 id="the-cli-login-endpoints" tabindex="-1">The CLI Login Endpoints</h2>
+<h2 id="the-cli-login-endpoints" tabindex="-1"><a class="header-anchor" href="#the-cli-login-endpoints">The CLI Login Endpoints</a></h2>
 <p>Now let's get to the main focus of this article. We'll need to add new tables in our database schema to support this feature:</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/lib/db/schema.js</span>
 <span class="token comment">// ...</span>
@@ -282,7 +282,7 @@
   <span class="token keyword">return</span> Response<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">token</span><span class="token operator">:</span> cliSession<span class="token punctuation">.</span>tokenId <span class="token punctuation">}</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>This function checks if the session in the URL's path param is a valid CLI session in the database. If it is, it'll return the access token in the response body. This token will then be stored by the CLI tool and used in subsequent requests.</p>
-<h2 id="writing-the-cli-tool" tabindex="-1">Writing the CLI Tool</h2>
+<h2 id="writing-the-cli-tool" tabindex="-1"><a class="header-anchor" href="#writing-the-cli-tool">Writing the CLI Tool</a></h2>
 <p>Our <code>acme</code> CLI tool will just be a single Node.js script. It'll have only one command, <code>acme login</code>. As mentioned in the previous section, the CLI will request a login session and poll for the access token:</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// acme.js</span>
 <span class="token keyword">import</span> crypto <span class="token keyword">from</span> <span class="token string">'crypto'</span>
@@ -324,13 +324,13 @@
 
 <span class="token comment"># then you can run</span>
 acme login</code></pre>
-<h2 id="security-considerations" tabindex="-1">Security Considerations</h2>
+<h2 id="security-considerations" tabindex="-1"><a class="header-anchor" href="#security-considerations">Security Considerations</a></h2>
 <p>I've mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I'll mention a few more and also explain the ways to mitigate it. This isn't a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.</p>
 <p>One type of attack we're vulnerable to is the <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle attack</a>. A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.</p>
 <p>Another kind of attack is a <a href="https://en.wikipedia.org/wiki/Brute-force_attack">brute force attack</a>. Since the endpoints to poll for the access tokens don't require authentication, attackers can brute force UUID values until they get an access token. This can be mitigated by expiring the CLI sessions and applying the same strategies as with DDOS attacks.</p>
 <p>Both of these attacks have one thing in common. If an attacker gets a hold of your access token, you're hacked. We can increase the security of our application by encrypting the access tokens. This way, even if attackers obtain an encrypted access token, they won't be able to decrypt it.</p>
 <p>Encrypting the tokens presents some challenges. How do we ensure that only the CLI can decrypt the token? What encryption scheme should be used? What if an attacker obtained the decryption key?</p>
-<h2 id="ecdh-key-exchange-%26-encryption" tabindex="-1">ECDH Key Exchange &amp; Encryption</h2>
+<h2 id="ecdh-key-exchange-%26-encryption" tabindex="-1"><a class="header-anchor" href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></h2>
 <p>One possible solution is to use <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH key exchange</a>. ECDH (Elliptic Curve Diffie–Hellman Key Exchange) is a method that allows two parties to establish a shared secret over an insecure channel. ECDH is based on <a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a> (elliptic curve cryptography), a modern family of public-key cryptography and is considered the modern successor of RSA.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup></p>
 <p>Here's a high-level explanation of how ECDH works:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
 <ol>
@@ -354,7 +354,7 @@ acme login</code></pre>
 <li>Bob decrypts the <strong>ciphertext</strong> using the <strong>secret</strong> as the decryption key.</li>
 </ol>
 <p>While the underlying maths might be complex, the encryption scheme is straightforward. Now, let's implement this in our code. We'll use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">WebCrypto API</a> as the cryptography library.</p>
-<h2 id="securing-the-endpoints" tabindex="-1">Securing the Endpoints</h2>
+<h2 id="securing-the-endpoints" tabindex="-1"><a class="header-anchor" href="#securing-the-endpoints">Securing the Endpoints</a></h2>
 <p>First, we need to update our <code>cli_sessions</code> table definition to store the CLI's public key.</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/lib/db/schema.js</span>
 <span class="token comment">// ...</span>
@@ -515,7 +515,7 @@ acme login</code></pre>
 <p>The <code>decrypt</code> function follows the same steps as the encryption process, just reversed. And that's it. When we run the script now, we should see that the login flow still works the same:</p>
 <p><img loading="lazy" decoding="async" src="/img/V6YTFcZrKa-800.webp" alt="Checking the new CLI login flow" width="800" height="485"></p>
 <p>You can also see the decrypted token is the same as the token in the database.</p>
-<h2 id="what's-next" tabindex="-1">What's Next</h2>
+<h2 id="what's-next" tabindex="-1"><a class="header-anchor" href="#what's-next">What's Next</a></h2>
 <p>You can find the code for this project <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login">on GitHub</a>. I've only covered the minimum required to implement automatic CLI login with encryption. There's always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!</p>
 <hr class="footnotes-sep">
 <section class="footnotes">
