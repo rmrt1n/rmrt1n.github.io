@@ -27,11 +27,11 @@
 <article>
   <h1>Fixing Podman Volume Permission Issues</h1>
   <time>last updated: 2024-05-25</time>
-  <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you've probably encountered some permission errors when trying to mount volumes like:</p>
+  <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root steghide info favicon.png
 <span class="token comment"># error, the container process can't find the file</span>
 steghide: could not <span class="token function">open</span> the <span class="token function">file</span> <span class="token string">"favicon.png"</span><span class="token builtin class-name">.</span></code></pre>
-<p>This happens because by default, rootless containers are not given access to the host machine's volume bind directory. To fix this, you just have to add a <code>:z</code> or a <code>:Z</code> suffix to the volume mounts.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+<p>This happens because by default, rootless containers are not given access to the host machine’s volume bind directory. To fix this, you just have to add a <code>:z</code> or a <code>:Z</code> suffix to the volume mounts.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root:z steghide info favicon.png
 <span class="token comment"># it works now</span>
 <span class="token string">"favicon.png"</span><span class="token builtin class-name">:</span>
@@ -42,9 +42,9 @@ steghide: could not <span class="token function">open</span> the <span class="to
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>The other options is to set SELinux to permissive mode: <code>setenforce 0</code>, but you probably shouldn't do this, especially if you're running on a server. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p>The other options is to set SELinux to permissive mode: <code>setenforce 0</code>, but you probably shouldn’t do this, especially if you’re running on a server. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn2" class="footnote-item"><p>Read the full explanation in <a href="https://docs.podman.io/en/latest/markdown/podman-run.1.html"><strong><code>man podman-run</code></strong></a> and <code>Ctrl+F</code> for &quot;labeling volume mounts&quot;. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+<li id="fn2" class="footnote-item"><p>Read the full explanation in <a href="https://docs.podman.io/en/latest/markdown/podman-run.1.html"><strong><code>man podman-run</code></strong></a> and <code>Ctrl+F</code> for “labeling volume mounts”. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
 </ol>
 </section>

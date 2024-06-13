@@ -27,23 +27,23 @@
 <article>
   <h1>Writing a Recursive Ascent Parser</h1>
   <time>last updated: 2024-06-08</time>
-  <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
-<p>Unfortunately, there isn't a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
-<p>I'm writing this post to share what I've learned about recursive ascent parsing; how it works and how to implement it. I'll assume you have some familiarity with recursive descent parsing, as it's usually the first parsing technique people learn. If not, I recommend reading up on it first.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
+  <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
+<p>Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+<p>I’m writing this post to share what I’ve learned about recursive ascent parsing; how it works and how to implement it. I’ll assume you have some familiarity with recursive descent parsing, as it’s usually the first parsing technique people learn. If not, I recommend reading up on it first.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
 <p>The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.</p>
-<p><strong>Disclaimer</strong>: I'm not an expert. I didn't take any classes on compiler theory and I haven't read <a href="https://suif.stanford.edu/dragonbook/">the dragon book</a>. Please <a href="mailto:hi@ryanmartin.me">reach out</a> If you noticed any mistakes in this post, especially in the first half!</p>
+<p><strong>Disclaimer</strong>: I’m not an expert. I didn’t take any classes on compiler theory and I haven’t read <a href="https://suif.stanford.edu/dragonbook/">the dragon book</a>. Please <a href="mailto:hi@ryanmartin.me">reach out</a> If you noticed any mistakes in this post, especially in the first half!</p>
 <h2 id="bottom-up-vs-top-down-parsing" tabindex="-1"><a class="header-anchor" href="#bottom-up-vs-top-down-parsing">Bottom-Up vs Top-Down Parsing</a></h2>
 <p>Parsing techniques can be roughly grouped into 2 types, <a href="https://en.wikipedia.org/wiki/Top-down_parsing">top-down</a> and <a href="https://en.wikipedia.org/wiki/Bottom-up_parsing">bottom-up</a>. Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.</p>
-<p>A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the <a href="https://en.wikipedia.org/wiki/Polish_notation">Polish notation</a>, and bottom-up parsing with the <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">reversed Polish notation</a>.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup> In Polish notation, the operators come before the operands. In reversed Polish notation, it's the opposite, the operands come before the operators.</p>
-<p>Let's use this math expression <code>1 + 2 * 3</code> as an example. We can also represent this expression as a tree:</p>
+<p>A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the <a href="https://en.wikipedia.org/wiki/Polish_notation">Polish notation</a>, and bottom-up parsing with the <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">reversed Polish notation</a>.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup> In Polish notation, the operators come before the operands. In reversed Polish notation, it’s the opposite, the operands come before the operators.</p>
+<p>Let’s use this math expression <code>1 + 2 * 3</code> as an example. We can also represent this expression as a tree:</p>
 <p><img loading="lazy" decoding="async" src="/img/7p5d1zaWUD-2146.webp" alt="Math expression as tree diagram" width="2146" height="683"></p>
-<p>A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you'll end up with <code>+ 1 * 2 3</code>, the Polish notation of the previous expression.</p>
+<p>A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you’ll end up with <code>+ 1 * 2 3</code>, the Polish notation of the previous expression.</p>
 <p>On the other hand, a bottom-up parser builds the parse tree starting from the leaf nodes up to the root node, aka, post-order traversal. The order the nodes are traversed will form the reversed Polish notation of the original expression: <code>2 3 * 1 +</code>.</p>
-<p>You're probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?</p>
+<p>You’re probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?</p>
 <h2 id="lr-algorithm" tabindex="-1"><a class="header-anchor" href="#lr-algorithm">LR Algorithm</a></h2>
 <p><a href="https://en.wikipedia.org/wiki/LR_parser">LR</a> is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> but all of them are based on the same two fundamental actions: <strong>shift</strong> and <strong>reduce</strong>.</p>
-<p>Shift means to advance or &quot;shift&quot; to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or &quot;reduced&quot; into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.</p>
-<p>We'll use this grammar:</p>
+<p>Shift means to advance or “shift” to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or “reduced” into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let’s use an example to illustrate it.</p>
+<p>We’ll use this grammar:</p>
 <pre class="language-plaintext"><code class="language-plaintext">expr -> expr '+' term
 expr -> expr '-' term
 expr -> term
@@ -82,7 +82,7 @@ term -> INTEGER</code></pre>
 <tr>
 <td>expr +</td>
 <td>2 - 3</td>
-<td>Shift 2 (because there are no rules that match expr '+')</td>
+<td>Shift 2 (because there are no rules that match expr ‘+’)</td>
 </tr>
 <tr>
 <td>expr + 2</td>
@@ -92,7 +92,7 @@ term -> INTEGER</code></pre>
 <tr>
 <td>expr + term</td>
 <td>- 3</td>
-<td>Reduce expr -&gt; expr '+' term</td>
+<td>Reduce expr -&gt; expr ‘+’ term</td>
 </tr>
 <tr>
 <td>expr</td>
@@ -122,14 +122,14 @@ term -> INTEGER</code></pre>
 </tbody>
 </table>
 </div>
-<p>Here, I used the term &quot;parse stack&quot; for the shifted inputs. That's because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and push the corresponding rule to the stack.</p>
+<p>Here, I used the term “parse stack” for the shifted inputs. That’s because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and push the corresponding rule to the stack.</p>
 <p>How does the parser know which rule it should reduce to? Most LR parsers construct a <strong>parse table</strong>, which is a table of parser instructions based on the grammar. Entries in the table tell the parser whether to shift or reduce based on the current token in the input stream. The entire combination of actions a parser can take based on any input fits in this one table. This is possible because there are only a finite number of possible states an LR parser can assume for a given grammar. These are called the <strong>LR states</strong>.</p>
 <p>Because the number of states is finite, an LR parser is essentially just a <a href="https://en.wikipedia.org/wiki/Finite-state_machine">finite state machine (FSM)</a> modelled after the LR states. The parse table contains the state transitions. The parse stack is used to keep track of the current state. In fact, parser generators are just programs that convert a grammar into a table-based state machine.</p>
-<p>What about recursive ascent parsers then? A recursive ascent parser is just the &quot;functional&quot; version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!</p>
+<p>What about recursive ascent parsers then? A recursive ascent parser is just the “functional” version of a traditional LR table-based state machine. Instead of rows in a table, state transitions are encoded as functions. A function call is a shift action, and a reduce action happens when the function returns. The parse stack is the function call stack!!</p>
 <p>I had an Aha! moment when I first realised this about recursive ascent parsers. This might not make sense now, but once we get to the code implementation, it will hopefully make this more clear.</p>
 <h2 id="building-the-state-machine" tabindex="-1"><a class="header-anchor" href="#building-the-state-machine">Building the State Machine</a></h2>
-<p>Before getting into the code, first, we'll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we'll use an example grammar to illustrate this.</p>
-<p>We'll modify the grammar from the previous section to support multiplications and drop subtractions:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
+<p>Before getting into the code, first, we’ll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we’ll use an example grammar to illustrate this.</p>
+<p>We’ll modify the grammar from the previous section to support multiplications and drop subtractions:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
 <pre class="language-plaintext"><code class="language-plaintext">S -> expr eof
 expr -> expr '+' term
 expr -> term
@@ -137,15 +137,15 @@ term -> term '*' factor
 term -> factor
 factor -> INTEGER</code></pre>
 <p>Note the extra rule <code>S</code> (start), which will be used for a reduction when the parser has accepted the whole input. <code>eof</code> indicates the end of the input stream.</p>
-<p>Next, we'll need to construct the <strong>LR(0) items</strong>, which are grammar rules with a dot (•) to mark the current position of the parser.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup> E.g., the rule <code>S -&gt; expr eof</code> contains one LR(0) item: <code>S -&gt; • expr eof</code>. Everything to the left of the dot has already been parsed or shifted.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> For brevity's sake, I'll shorten &quot;LR(0) item&quot; to just &quot;item&quot; going forward.</p>
-<p>For each item, we then need to compute its <strong>closure</strong>. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here's how it works:</p>
+<p>Next, we’ll need to construct the <strong>LR(0) items</strong>, which are grammar rules with a dot (•) to mark the current position of the parser.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup> E.g., the rule <code>S -&gt; expr eof</code> contains one LR(0) item: <code>S -&gt; • expr eof</code>. Everything to the left of the dot has already been parsed or shifted.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> For brevity’s sake, I’ll shorten “LR(0) item” to just “item” going forward.</p>
+<p>For each item, we then need to compute its <strong>closure</strong>. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here’s how it works:</p>
 <ol>
 <li>Start with a set of items. For our grammar, this will be <code>{ S -&gt; • expr eof }</code>.</li>
 <li>For each item, if the symbol on the right of the dot is a non-terminal, expand its rules based on the grammar and turn the expanded rules into items by adding a dot. From our first item, we expand <code>expr</code> into <code>expr -&gt; • expr '+' term</code> and <code>expr -&gt; • term</code>.</li>
 <li>Add the expanded items to the original set. Our set should now look like <code>{ S -&gt; • expr eof, expr -&gt; • expr '+' term, expr -&gt; • term }</code>.</li>
 <li>Repeat steps 2 and 3 until no new items can be added to the set.</li>
 </ol>
-<p>A non-terminal is any symbol that represents a grammar rule, e.g. <code>expr</code>, <code>term</code>, or <code>factor</code>. The opposite of this is a terminal, which is an actual value or token that is produced by the lexer, e.g. <code>'+'</code>, <code>'-'</code>, and <code>INTEGER</code>. If we apply closure to the first item in the grammar <code>S -&gt; • expr eof</code>, we'll end up with the first LR state:</p>
+<p>A non-terminal is any symbol that represents a grammar rule, e.g. <code>expr</code>, <code>term</code>, or <code>factor</code>. The opposite of this is a terminal, which is an actual value or token that is produced by the lexer, e.g. <code>'+'</code>, <code>'-'</code>, and <code>INTEGER</code>. If we apply closure to the first item in the grammar <code>S -&gt; • expr eof</code>, we’ll end up with the first LR state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 0
 S -> • expr eof
 expr -> • expr '+' term
@@ -153,15 +153,15 @@ expr -> • term
 term -> • term '*' factor
 term -> • factor
 factor -> • INTEGER</code></pre>
-<p>We can then transition from this state into the other states by accepting different values and advancing the dot. The values that the parser can accept are the terminals and non-terminals on the right side of the dot. So, for state 0, the values it can accept are <code>expr</code>, <code>term</code>, <code>factor</code>, and <code>INTEGER</code>. Let's say the parser receives an <code>expr</code>. This will become our second state:</p>
+<p>We can then transition from this state into the other states by accepting different values and advancing the dot. The values that the parser can accept are the terminals and non-terminals on the right side of the dot. So, for state 0, the values it can accept are <code>expr</code>, <code>term</code>, <code>factor</code>, and <code>INTEGER</code>. Let’s say the parser receives an <code>expr</code>. This will become our second state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 1 (State 0 + expr)
 S -> expr • eof (Accept)
 expr -> expr • '+' term</code></pre>
-<p>When the dot reaches the end of the starting rule, it is called the accept state. It means that the input has been parsed fully and the parsing is complete. If we had instead received a <code>term</code> in the first state, then we'd end up with this state:</p>
+<p>When the dot reaches the end of the starting rule, it is called the accept state. It means that the input has been parsed fully and the parsing is complete. If we had instead received a <code>term</code> in the first state, then we’d end up with this state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 2 (State 0 + term)
 expr -> term •
 term -> term • '*' factor</code></pre>
-<p>And we just repeat this process until all dots are at the end of each rule. There is an exception to this though, which I'll get to in a bit. Anyways, here are some more states:</p>
+<p>And we just repeat this process until all dots are at the end of each rule. There is an exception to this though, which I’ll get to in a bit. Anyways, here are some more states:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 3 (State 0 + factor)
 term -> factor •
 
@@ -184,13 +184,13 @@ term -> term • '*' factor</code></pre>
 <p>Now, it might make sense to do this for the next state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 1 + factor)
 term -> factor •</code></pre>
-<p>Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don't have to create a new state. Instead, we'll just jump or <strong>goto</strong> the state that we've already found before. This will make more sense when we build the actual parse table. Now, let's finish the last state.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
+<p>Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don’t have to create a new state. Instead, we’ll just jump or <strong>goto</strong> the state that we’ve already found before. This will make more sense when we build the actual parse table. Now, let’s finish the last state.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 6 + factor)
 term -> term '*' factor •</code></pre>
-<p>And we're done! Here's a diagram to help you visualise the state transitions:</p>
+<p>And we’re done! Here’s a diagram to help you visualise the state transitions:</p>
 <p><img loading="lazy" decoding="async" src="/img/reip9qNHGK-3085.webp" alt="State transition diagram" width="3085" height="1272"></p>
 <h2 id="the-action-and-goto-table" tabindex="-1"><a class="header-anchor" href="#the-action-and-goto-table">The Action and Goto Table</a></h2>
-<p>Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here's what the action and goto table looks like for our grammar:</p>
+<p>Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here’s what the action and goto table looks like for our grammar:</p>
 <div style="overflow-x: auto">
 <table>
 <thead>
@@ -309,7 +309,7 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
-<p>Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. <strong>sN</strong> means &quot;shift and go to state N&quot;, <strong>rN</strong> means &quot;reduce using rule N&quot;, and <strong>gtN</strong> means &quot;go to state N&quot;. Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.</p>
+<p>Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. <strong>sN</strong> means “shift and go to state N”, <strong>rN</strong> means “reduce using rule N”, and <strong>gtN</strong> means “go to state N”. Unlike shift, goto doesn’t take in a token from the input stream and just transitions to the next state.</p>
 <p>Here are the grammar rules again for reference, with the rule numbers added for reductions:</p>
 <pre class="language-plaintext"><code class="language-plaintext">1. S -> expr eof
 2. expr -> expr '+' term
@@ -317,10 +317,10 @@ term -> term '*' factor •</code></pre>
 4. term -> term '*' factor
 5. term -> factor
 6. factor -> INTEGER</code></pre>
-<p>The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I'm not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
-<p>The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we'll implement this mechanism as mutually recursive functions.</p>
+<p>The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I’m not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
+<p>The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we’ll implement this mechanism as mutually recursive functions.</p>
 <h2 id="writing-the-parser" tabindex="-1"><a class="header-anchor" href="#writing-the-parser">Writing The Parser</a></h2>
-<p>At this point, we're ready to build the actual parser. I'll be writing the code in Python because it's easy to read. To make sure our parser is correct, we'll also implement an interpreter for the expressions we parsed. First, let's start with the program's entry point:</p>
+<p>At this point, we’re ready to build the actual parser. I’ll be writing the code in Python because it’s easy to read. To make sure our parser is correct, we’ll also implement an interpreter for the expressions we parsed. First, let’s start with the program’s entry point:</p>
 <pre class="language-python"><code class="language-python"><span class="token comment"># recursive-ascent.py</span>
 <span class="token keyword">import</span> sys
 
@@ -337,20 +337,20 @@ term -> term '*' factor •</code></pre>
 
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
     main<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>This program will receive a string as an argument and print out the evaluated string. Don't worry about the unimplemented functions for now. We'll get to them soon.</p>
+<p>This program will receive a string as an argument and print out the evaluated string. Don’t worry about the unimplemented functions for now. We’ll get to them soon.</p>
 <h3 id="a-simple-lexer" tabindex="-1"><a class="header-anchor" href="#a-simple-lexer">A Simple Lexer</a></h3>
-<p>Since we don't have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup></p>
+<p>Since we don’t have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup></p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lex</span><span class="token punctuation">(</span>string<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> string<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <h3 id="representing-the-abstract-syntax-tree-(ast)" tabindex="-1"><a class="header-anchor" href="#representing-the-abstract-syntax-tree-(ast)">Representing the Abstract Syntax Tree (AST)</a></h3>
-<p>We'll also need a type to represent the AST that will be produced by the parser:</p>
+<p>We’ll also need a type to represent the AST that will be produced by the parser:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">AST</span><span class="token punctuation">:</span>
     <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> left<span class="token punctuation">:</span> <span class="token string">"AST | None"</span><span class="token punctuation">,</span> right<span class="token punctuation">:</span> <span class="token string">"AST | None"</span><span class="token punctuation">,</span> value<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> kind<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
         self<span class="token punctuation">.</span>left <span class="token operator">=</span> left
         self<span class="token punctuation">.</span>right <span class="token operator">=</span> right
         self<span class="token punctuation">.</span>value <span class="token operator">=</span> value
         self<span class="token punctuation">.</span>kind <span class="token operator">=</span> kind</code></pre>
-<p>If you've noticed, the <code>AST</code> class above looks like a binary tree. That's because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like <a href="#bottom-up-vs-top-down-parsing">this diagram</a> from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.</p>
+<p>If you’ve noticed, the <code>AST</code> class above looks like a binary tree. That’s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like <a href="#bottom-up-vs-top-down-parsing">this diagram</a> from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.</p>
 <h3 id="converting-the-parse-table-into-functions" tabindex="-1"><a class="header-anchor" href="#converting-the-parse-table-into-functions">Converting the Parse Table into Functions</a></h3>
 <p>Our <code>parse</code> function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:</p>
 <div style="overflow-x: auto">
@@ -413,7 +413,7 @@ term -> term '*' factor •</code></pre>
 
 <span class="token keyword">def</span> <span class="token function">parse</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> state0<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span></code></pre>
-<p>Note, we don't actually need to check the <code>ast.kind</code> here because if <code>ast = state4(token)</code> succeeds, then we're guaranteed to get a <code>factor</code>. The same goes for <code>ast = state3(ast)</code>, which is guaranteed to return a <code>term</code>. So, we can rewrite <code>state0</code> like this:</p>
+<p>Note, we don’t actually need to check the <code>ast.kind</code> here because if <code>ast = state4(token)</code> succeeds, then we’re guaranteed to get a <code>factor</code>. The same goes for <code>ast = state3(ast)</code>, which is guaranteed to return a <code>term</code>. So, we can rewrite <code>state0</code> like this:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state0</span><span class="token punctuation">(</span>tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     token <span class="token operator">=</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     <span class="token keyword">if</span> token<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -494,7 +494,7 @@ term -> term '*' factor •</code></pre>
 <span class="token keyword">def</span> <span class="token function">state4</span><span class="token punctuation">(</span>token<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># reduce using rule 6: factor -> INTEGER</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> <span class="token string">"factor"</span><span class="token punctuation">)</span></code></pre>
-<p>Now here's where things get more interesting:</p>
+<p>Now here’s where things get more interesting:</p>
 <div style="overflow-x: auto">
 <table>
 <thead>
@@ -560,8 +560,8 @@ term -> term '*' factor •</code></pre>
         ast<span class="token punctuation">,</span> tokens <span class="token operator">=</span> state6<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
     <span class="token comment"># reduce using rule 3: expr -> term</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>right<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token string">"expr"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tokens</code></pre>
-<p>The grammar we used has rules that contain <a href="https://en.wikipedia.org/wiki/Left_recursion">left recursion</a>. This happens when a rule starts with a symbol that is itself, e.g. <code>expr -&gt; expr '+' term</code> and <code>term -&gt; term '*' factor</code>. Top-down parsers can't handle this type of grammar. If you've implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.</p>
-<p>When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn't a problem for us. We can use a loop and a condition to check whether the recursive calls are done.</p>
+<p>The grammar we used has rules that contain <a href="https://en.wikipedia.org/wiki/Left_recursion">left recursion</a>. This happens when a rule starts with a symbol that is itself, e.g. <code>expr -&gt; expr '+' term</code> and <code>term -&gt; term '*' factor</code>. Top-down parsers can’t handle this type of grammar. If you’ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.</p>
+<p>When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn’t a problem for us. We can use a loop and a condition to check whether the recursive calls are done.</p>
 <p>In state 1 and state 2, the parser has parsed the left side of the binary operation. In the next states, the parser will parse the right side of the binary operation:</p>
 <div style="overflow-x: auto">
 <table>
@@ -690,7 +690,7 @@ term -> term '*' factor •</code></pre>
 <span class="token keyword">def</span> <span class="token function">state8</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> right<span class="token punctuation">:</span> AST<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># reduce using rule 4: term -> term '*' factor</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> <span class="token string">"*"</span><span class="token punctuation">,</span> <span class="token string">"term"</span><span class="token punctuation">)</span></code></pre>
-<p>And that's all of the code for the parser! Now we just have to check whether the output is correct. Let's add a method in the <code>AST</code> class to pretty-print itself, so that it's easier to visualise:</p>
+<p>And that’s all of the code for the parser! Now we just have to check whether the output is correct. Let’s add a method in the <code>AST</code> class to pretty-print itself, so that it’s easier to visualise:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">AST</span><span class="token punctuation">:</span>
     <span class="token comment"># ...</span>
 
@@ -705,9 +705,9 @@ term -> term '*' factor •</code></pre>
             self<span class="token punctuation">.</span>right<span class="token punctuation">.</span>pprint<span class="token punctuation">(</span><span class="token punctuation">)</span>
         <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>value<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
             <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" )"</span><span class="token punctuation">,</span> end<span class="token operator">=</span><span class="token string">""</span><span class="token punctuation">)</span></code></pre>
-<p>I'm printing the AST as s-expressions so that it's easy to see the expressions follow the correct operator precedence.<sup class="footnote-ref"><a href="#fn13" id="fnref13">[13]</a></sup> Given an input like <code>1 + 2 * 3 + 4</code>, this method will print out the following: <code>( + ( +  1 ( *  2  3  ) ) 4  )</code>. This looks right. All that's left now is to implement the <code>evaluate</code> function and test if it works as expected.</p>
+<p>I’m printing the AST as s-expressions so that it’s easy to see the expressions follow the correct operator precedence.<sup class="footnote-ref"><a href="#fn13" id="fnref13">[13]</a></sup> Given an input like <code>1 + 2 * 3 + 4</code>, this method will print out the following: <code>( + ( +  1 ( *  2  3  ) ) 4  )</code>. This looks right. All that’s left now is to implement the <code>evaluate</code> function and test if it works as expected.</p>
 <h3 id="interpreting-the-ast" tabindex="-1"><a class="header-anchor" href="#interpreting-the-ast">Interpreting the AST</a></h3>
-<p>Here's the <code>evaluate</code> function:</p>
+<p>Here’s the <code>evaluate</code> function:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">evaluate</span><span class="token punctuation">(</span>ast<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">if</span> ast<span class="token punctuation">.</span>value <span class="token operator">==</span> <span class="token string">"+"</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">+</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
@@ -715,13 +715,13 @@ term -> term '*' factor •</code></pre>
         <span class="token keyword">return</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">*</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
     <span class="token keyword">else</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> <span class="token builtin">int</span><span class="token punctuation">(</span>ast<span class="token punctuation">.</span>value<span class="token punctuation">)</span></code></pre>
-<p>It will recursively evaluate all the nodes in the AST. Let's run the program and check if the output is correct:</p>
+<p>It will recursively evaluate all the nodes in the AST. Let’s run the program and check if the output is correct:</p>
 <pre class="language-bash"><code class="language-bash">python3 recursive-ascent.py <span class="token string">'1 + 2 * 3 + 4'</span>
 <span class="token number">11</span>
 
 python3 recursive-ascent.py <span class="token string">'1 * 2 + 3 * 4'</span>
 <span class="token number">14</span></code></pre>
-<p>Good, it works! Now let's write some generated tests to have more confidence in the program. Here's a function that would generate random numbers and combinations of operators (<code>+</code> and <code>*</code>), run the <code>evaluate</code> function on them, and compare the result to Python's <code>eval</code> function:</p>
+<p>Good, it works! Now let’s write some generated tests to have more confidence in the program. Here’s a function that would generate random numbers and combinations of operators (<code>+</code> and <code>*</code>), run the <code>evaluate</code> function on them, and compare the result to Python’s <code>eval</code> function:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">tests</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     errors <span class="token operator">=</span> <span class="token number">0</span>
     <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -756,35 +756,35 @@ python3 recursive-ascent.py <span class="token string">'1 * 2 + 3 * 4'</span>
 </code></pre>
 <p>The <code>eval</code> function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our <code>evaluate</code> function. If you run <code>python3 main.py test</code>, you should get this output: <code>all tests passed!</code>.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
-<p>And that's all. You can find the complete code on <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent">this GitHub repo</a>. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won't ever use this technique when building a real compiler, but at least you learned something new. If you'd like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.</p>
+<p>And that’s all. You can find the complete code on <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent">this GitHub repo</a>. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.</p>
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>This <a href="https://www.abubalay.com/blog/2018/04/08/recursive-ascent">blog post</a> by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It's probably the only blog post about recursive ascent on the internet besides this one. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p>This <a href="https://www.abubalay.com/blog/2018/04/08/recursive-ascent">blog post</a> by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn2" class="footnote-item"><p>Here are <a href="https://dl.acm.org/doi/pdf/10.1145/47907.47909">some</a> <a href="https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf">papers</a> <a href="https://ceur-ws.org/Vol-2951/paper2.pdf">about recursive ascent parsers</a> that you could read if you're interested in the theory. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+<li id="fn2" class="footnote-item"><p>Here are <a href="https://dl.acm.org/doi/pdf/10.1145/47907.47909">some</a> <a href="https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf">papers</a> <a href="https://ceur-ws.org/Vol-2951/paper2.pdf">about recursive ascent parsers</a> that you could read if you’re interested in the theory. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn3" class="footnote-item"><p><a href="https://craftinginterpreters.com/">Crafting Interpreters</a> is a really good introductory book on writing compilers, and their section on parsing is all about implementing a recursive descent parser. It's also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you're in software engineering. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+<li id="fn3" class="footnote-item"><p><a href="https://craftinginterpreters.com/">Crafting Interpreters</a> is a really good introductory book on writing compilers, and their section on parsing is all about implementing a recursive descent parser. It’s also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you’re in software engineering. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn4" class="footnote-item"><p>I found this analogy from <a href="https://blog.reverberate.org/2013/07/ll-and-lr-parsing-demystified.html">this blog post</a> by Josh Haberman. He went deep into the details of both LL and LR algorithms in his blog post while keeping it easy to read. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn5" class="footnote-item"><p>Here's a <a href="https://dev.to/stereobooster/an-overview-of-parsing-algorithms-3lo2">nice overview of parsing algorithm literature</a> you can explore if you are interested in the different variants of LR. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+<li id="fn5" class="footnote-item"><p>Here’s a <a href="https://dev.to/stereobooster/an-overview-of-parsing-algorithms-3lo2">nice overview of parsing algorithm literature</a> you can explore if you are interested in the different variants of LR. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn6" class="footnote-item"><p>This is done to show that the parser can handle operator precedence based on the grammar rules. Subtraction is removed to keep the section short and readable. The number of possible states will grow exponentially the more complex your grammar is. This is why it is inconvenient to write a bottom-up parser by hand, and why people create parser generators. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn7" class="footnote-item"><p>A grammar rule is often called as a &quot;production&quot; in academic literature. I just use the term &quot;grammar rules&quot; because it's more intuitive. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+<li id="fn7" class="footnote-item"><p>A grammar rule is often called as a “production” in academic literature. I just use the term “grammar rules” because it’s more intuitive. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn8" class="footnote-item"><p>My explanation of the algorithm for creating the parse table might not click with you, so here are <a href="https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables">some</a> <a href="https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf">other</a> <a href="https://chatgpt.com">resources</a> you can read if you're still confused. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+<li id="fn8" class="footnote-item"><p>My explanation of the algorithm for creating the parse table might not click with you, so here are <a href="https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables">some</a> <a href="https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf">other</a> <a href="https://chatgpt.com">resources</a> you can read if you’re still confused. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn9" class="footnote-item"><p>Note that the order of the states doesn't matter. The parser will still work if the states were created in a different order, e.g. state 1 = state 0 + <code>term</code>. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+<li id="fn9" class="footnote-item"><p>Note that the order of the states doesn’t matter. The parser will still work if the states were created in a different order, e.g. state 1 = state 0 + <code>term</code>. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn10" class="footnote-item"><p>You can read more about why this is on <a href="https://en.wikipedia.org/wiki/LR_parser#Parse_table_for_the_example_grammar">this Wikipedia page</a>. It should be a good starting point to explore the different variants of LR and the types of parse conflicts. For this article, I intentionally chose a grammar that is accepted by LR(0) to keep it simple. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn11" class="footnote-item"><p>You can read <a href="https://craftinginterpreters.com/scanning.html">Crafting Interpreters</a> for a better idea of what production lexers do. <a href="#fnref11" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn12" class="footnote-item"><p>This is a very basic approach to handling parse errors. Production-grade parsers will usually report errors, ignore them, and continue parsing. This is to catch as many errors as it can so that the programmer doesn't have to recompile to find more errors. <a href="#fnref12" class="footnote-backref">↩︎</a></p>
+<li id="fn12" class="footnote-item"><p>This is a very basic approach to handling parse errors. Production-grade parsers will usually report errors, ignore them, and continue parsing. This is to catch as many errors as it can so that the programmer doesn’t have to recompile to find more errors. <a href="#fnref12" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn13" class="footnote-item"><p>What better way to visualise AST than with s-expressions? When you read a lisp program, you're looking directly at the program's AST, which is just a lisp data structures! This is what clojurists often mean when they say &quot;It's just data&quot;. <a href="#fnref13" class="footnote-backref">↩︎</a></p>
+<li id="fn13" class="footnote-item"><p>What better way to visualise AST than with s-expressions? When you read a lisp program, you’re looking directly at the program’s AST, which is just a lisp data structures! This is what clojurists often mean when they say “It’s just data”. <a href="#fnref13" class="footnote-backref">↩︎</a></p>
 </li>
 </ol>
 </section>
