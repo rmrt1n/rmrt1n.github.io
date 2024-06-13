@@ -7,7 +7,7 @@ const anchor = require('markdown-it-anchor')
 
 const markdownItOpts = {
   html: true,
-  linkify: true,
+  typographer: true,
 }
 
 module.exports = (eleventyConfig) => {
