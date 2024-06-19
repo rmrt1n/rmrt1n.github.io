@@ -31,6 +31,7 @@ html {
   background-color: var(--color-bg);
   color: var(--color-fg);
   font-family: Arial, system-ui, sans-serif;
+  font-size: 15px;
 }
 
 body {
