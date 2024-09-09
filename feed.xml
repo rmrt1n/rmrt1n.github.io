@@ -5,7 +5,7 @@
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
   <updated>
-    2024-06-19T11:56:00Z
+    2024-09-09T11:17:27Z
   </updated>
   <id>https://ryanmartin.me/</id>
   <author>
@@ -15,7 +15,7 @@
     <entry>
       <title>Writing a Recursive Ascent Parser</title>
       <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/articles/recursive-ascent/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -785,7 +785,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
     <entry>
       <title>How to Implement Automatic CLI Login</title>
       <link href="https://ryanmartin.me/articles/cli-login/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/articles/cli-login/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -1303,7 +1303,7 @@ acme login&lt;/code&gt;&lt;/pre&gt;
     <entry>
       <title>Fixing Podman Volume Permission Issues</title>
       <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you’ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
@@ -1333,7 +1333,7 @@ steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&g
     <entry>
       <title>Trick Docker Compose to Use Podman</title>
       <link href="https://ryanmartin.me/snippets/podman-docker-compose/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/snippets/podman-docker-compose/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I recently discovered a way to use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; as the backend for &lt;a href=&quot;https://docs.docker.com/compose/&quot;&gt;Docker Compose&lt;/a&gt;. Docker Compose checks the &lt;code&gt;DOCKER_HOST&lt;/code&gt; environment variable to determine which daemon socket to connect to. Podman doesn’t run a daemon by default, so we need to enable it first:&lt;/p&gt;
@@ -1352,7 +1352,7 @@ systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span
     <entry>
       <title>My CSS reset</title>
       <link href="https://ryanmartin.me/snippets/my-css-reset/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/snippets/my-css-reset/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what &lt;a href=&quot;https://mattbrictson.com/blog/css-normalize-and-reset&quot;&gt;normalise stylesheets and CSS resets&lt;/a&gt; are for.&lt;/p&gt;
@@ -1418,7 +1418,7 @@ systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span
     <entry>
       <title>How to Manually Optimise Images for the Web</title>
       <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you’re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
@@ -1458,9 +1458,37 @@ gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/s
       </content>
     </entry>
     <entry>
+      <title>A Better Shell Script Wrapper for JAR Files</title>
+      <link href="https://ryanmartin.me/snippets/jar-shell-script/" />
+      <updated>2024-09-09T11:17:16Z</updated>
+      <id>https://ryanmartin.me/snippets/jar-shell-script/</id>
+      <content xml:lang="en" type="html">
+        &lt;p&gt;To run a JAR file, usually you would do:&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token function&quot;&gt;java&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-jar&lt;/span&gt; /path/to/jar&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s a bit long to type, so some people (me included) would wrap it in a shell script:&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# run-jar&lt;/span&gt;
+&lt;span class=&quot;token comment&quot;&gt;#!/usr/bin/bash&lt;/span&gt;
+&lt;span class=&quot;token function&quot;&gt;java&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-jar&lt;/span&gt; /path/to/jar&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This way, you only have to type &lt;code&gt;./run-jar&lt;/code&gt;, or &lt;code&gt;run-jar&lt;/code&gt; if you have the script somewhere in your shell’s &lt;code&gt;PATH&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;A problem with this approach is that you now have two files, the shell script and the JAR file. If you move or delete the JAR file, the script breaks. A better way to do this is to “include” the JAR file directly in the shell script:&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# Add the shebang (#!) line to specify the script&#39;s interpreter&lt;/span&gt;
+&lt;span class=&quot;token comment&quot;&gt;# This will tell the shell to run the script using java -jar instead of the&lt;/span&gt;
+&lt;span class=&quot;token comment&quot;&gt;# usual bash or sh&lt;/span&gt;
+&lt;span class=&quot;token builtin class-name&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;#!/usr/bin/java -jar&#39;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; run-jar
+
+&lt;span class=&quot;token comment&quot;&gt;# Append the JAR file to the script&lt;/span&gt;
+&lt;span class=&quot;token function&quot;&gt;cat&lt;/span&gt; /path/to/jar &lt;span class=&quot;token operator&quot;&gt;&gt;&gt;&lt;/span&gt; run-jar
+
+&lt;span class=&quot;token comment&quot;&gt;# Set the file permission to be executable&lt;/span&gt;
+&lt;span class=&quot;token function&quot;&gt;chmod&lt;/span&gt; +x run-jar&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This way, everything you need to run the program is in a single file, making it simpler to manage.&lt;/p&gt;
+
+      </content>
+    </entry>
+    <entry>
       <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
       <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
-      <updated>2024-06-19T11:55:48Z</updated>
+      <updated>2024-09-09T11:17:16Z</updated>
       <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
       <content xml:lang="en" type="html">
         &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It’s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;
