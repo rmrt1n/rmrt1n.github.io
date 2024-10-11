@@ -14,8 +14,8 @@ eleventyImport:
   {% assign snippets = collections.snippets | sort: 'data.published' | reverse %} 
   {%- for snippet in snippets -%}
     <li>
-      <a href="{{ snippet.page.url }}">{{ snippet.data.title}}</a>
       <time>{{ snippet.data.published | toISODateString }}</time>
+      <a href="{{ snippet.page.url }}">{{ snippet.data.title}}</a>
     </li>
   {%- endfor -%}
 </ul>
