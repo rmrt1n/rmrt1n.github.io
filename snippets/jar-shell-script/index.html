@@ -26,25 +26,28 @@
       
 <article>
   <h1>A Better Shell Script Wrapper for JAR Files</h1>
-  <time>last updated: 2024-09-09</time>
+  <time>last updated: 2024-10-14</time>
   <p>To run a JAR file, usually you would do:</p>
-<pre class="language-shell"><code class="language-shell"><span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
 <p>It’s a bit long to type, so some people (me included) would wrap it in a shell script:</p>
-<pre class="language-shell"><code class="language-shell"><span class="token comment"># run-jar</span>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># run-jar</span>
 <span class="token comment">#!/usr/bin/bash</span>
 <span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
 <p>This way, you only have to type <code>./run-jar</code>, or <code>run-jar</code> if you have the script somewhere in your shell’s <code>PATH</code>.</p>
 <p>A problem with this approach is that you now have two files, the shell script and the JAR file. If you move or delete the JAR file, the script breaks. A better way to do this is to “include” the JAR file directly in the shell script:</p>
-<pre class="language-shell"><code class="language-shell"><span class="token comment"># Add the shebang (#!) line to specify the script's interpreter</span>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># Add the shebang (#!) line to specify the script's interpreter</span>
 <span class="token comment"># This will tell the shell to run the script using java -jar instead of the</span>
 <span class="token comment"># usual bash or sh</span>
-<span class="token builtin class-name">echo</span> <span class="token string">'#!/usr/bin/java -jar'</span> <span class="token operator">></span> run-jar
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">echo</span> <span class="token string">'#!/usr/bin/java -jar'</span> <span class="token operator">></span> run-jar
 
 <span class="token comment"># Append the JAR file to the script</span>
-<span class="token function">cat</span> /path/to/jar <span class="token operator">>></span> run-jar
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">cat</span> /path/to/jar <span class="token operator">>></span> run-jar
 
 <span class="token comment"># Set the file permission to be executable</span>
-<span class="token function">chmod</span> +x run-jar</code></pre>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">chmod</span> +x run-jar
+
+<span class="token comment"># Run the jar file</span>
+<code style="user-select:none;color:var(--color-links)">$ </code>./run-jar</code></pre>
 <p>This way, everything you need to run the program is in a single file, making it simpler to manage.</p>
 
   <section>

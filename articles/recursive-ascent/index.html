@@ -716,10 +716,10 @@ term -> term '*' factor •</code></pre>
     <span class="token keyword">else</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> <span class="token builtin">int</span><span class="token punctuation">(</span>ast<span class="token punctuation">.</span>value<span class="token punctuation">)</span></code></pre>
 <p>It will recursively evaluate all the nodes in the AST. Let’s run the program and check if the output is correct:</p>
-<pre class="language-bash"><code class="language-bash">python3 recursive-ascent.py <span class="token string">'1 + 2 * 3 + 4'</span>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>python3 recursive-ascent.py <span class="token string">'1 + 2 * 3 + 4'</span>
 <span class="token number">11</span>
 
-python3 recursive-ascent.py <span class="token string">'1 * 2 + 3 * 4'</span>
+<code style="user-select:none;color:var(--color-links)">$ </code>python3 recursive-ascent.py <span class="token string">'1 * 2 + 3 * 4'</span>
 <span class="token number">14</span></code></pre>
 <p>Good, it works! Now let’s write some generated tests to have more confidence in the program. Here’s a function that would generate random numbers and combinations of operators (<code>+</code> and <code>*</code>), run the <code>evaluate</code> function on them, and compare the result to Python’s <code>eval</code> function:</p>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">tests</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>

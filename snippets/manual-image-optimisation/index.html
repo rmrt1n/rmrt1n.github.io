@@ -29,26 +29,18 @@
   <time>last updated: 2024-05-22</time>
   <p>JavaScript frameworks and build tools like <a href="https://nextjs.org/">Next.js</a>, <a href="https://astro.build/">Astro</a>, and <a href="https://vitejs.dev/">Vite</a> perform optimisations on images to improve the performance of websites. If you’re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.</p>
 <ol>
-<li>
-<p>Convert the images to <code>.webp</code> or <code>.avif</code> formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like <code>.png</code>. In terms of image size, <code>.avif</code> is smaller than <code>.webp</code>, but both formats would still work well. Here’s a command you can run to convert formats from the command line:<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+<li>Convert the images to <code>.webp</code> or <code>.avif</code> formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like <code>.png</code>. In terms of image size, <code>.avif</code> is smaller than <code>.webp</code>, but both formats would still work well. Here’s a command you can run to convert formats from the command line:<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></li>
+</ol>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># this converts the image format. you can also specify the output file name</span>
-gm convert image.jpg image.webp
+<code style="user-select:none;color:var(--color-links)">$ </code>gm convert image.jpg image.webp
 
 <span class="token comment"># you can shrink the image size even further at the cost of image quality</span>
-gm convert <span class="token parameter variable">-quality</span> <span class="token number">75</span> image.jpg image.webp</code></pre>
-</li>
-<li>
-<p>Set the <code>width</code> and <code>height</code> attributes. Just use the image’s size if you’re not resizing it. This is needed to prevent <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.</p>
-</li>
-<li>
-<p>Set <code>loading=&quot;lazy&quot;</code>. This will defer the loading of the image until it is almost scrolled into the viewport. There’s an exception to this. For important images, such as the <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set <code>loading=&quot;eager&quot;</code>. <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set <code>fetchpriority=&quot;high&quot;</code> for this.</p>
-</li>
-<li>
-<p>Set <code>decoding=&quot;async&quot;</code>. This will defer the decoding of the image until after the other DOM content is loaded.</p>
-</li>
-<li>
-<p>Set the <code>alt</code> attribute. Images aren’t always loaded. It’s just a good practice to have an <code>alt</code> text, except if the image is purely for decoration.</p>
-</li>
+<code style="user-select:none;color:var(--color-links)">$ </code>gm convert <span class="token parameter variable">-quality</span> <span class="token number">75</span> image.jpg image.webp</code></pre>
+<ol start="2">
+<li>Set the <code>width</code> and <code>height</code> attributes. Just use the image’s size if you’re not resizing it. This is needed to prevent <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.</li>
+<li>Set <code>loading=&quot;lazy&quot;</code>. This will defer the loading of the image until it is almost scrolled into the viewport. There’s an exception to this. For important images, such as the <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set <code>loading=&quot;eager&quot;</code>. <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set <code>fetchpriority=&quot;high&quot;</code> for this.</li>
+<li>Set <code>decoding=&quot;async&quot;</code>. This will defer the decoding of the image until after the other DOM content is loaded.</li>
+<li>Set the <code>alt</code> attribute. Images aren’t always loaded. It’s just a good practice to have an <code>alt</code> text, except if the image is purely for decoration.</li>
 </ol>
 <p>There are more optimisations you can do, such as using different image sizes depending on the user’s device size,<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> but these should be enough for basic use cases.</p>
 <hr class="footnotes-sep">

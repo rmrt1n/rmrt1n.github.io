@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:base="https://ryanmartin.me/">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <title>Ryan Martin&#39;s Blog</title>
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>
-    2024-10-11T08:53:48Z
-  </updated>
+  <updated>2024-10-13T17:56:09Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
     <email>hi@ryanmartin.me</email>
   </author>
-    <entry>
-      <title>Writing a Recursive Ascent Parser</title>
-      <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/articles/recursive-ascent/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
+  <entry>
+    <title>Writing a Recursive Ascent Parser</title>
+    <link href="https://ryanmartin.me/articles/recursive-ascent/" />
+    <updated>2024-10-13T17:56:09Z</updated>
+    <id>https://ryanmartin.me/articles/recursive-ascent/</id>
+    <content type="html">&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
 &lt;p&gt;Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;I’m writing this post to share what I’ve learned about recursive ascent parsing; how it works and how to implement it. I’ll assume you have some familiarity with recursive descent parsing, as it’s usually the first parsing technique people learn. If not, I recommend reading up on it first.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.&lt;/p&gt;
@@ -27,7 +24,7 @@
 &lt;p&gt;Parsing techniques can be roughly grouped into 2 types, &lt;a href=&quot;https://en.wikipedia.org/wiki/Top-down_parsing&quot;&gt;top-down&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Bottom-up_parsing&quot;&gt;bottom-up&lt;/a&gt;. Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.&lt;/p&gt;
 &lt;p&gt;A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Polish_notation&quot;&gt;Polish notation&lt;/a&gt;, and bottom-up parsing with the &lt;a href=&quot;https://en.wikipedia.org/wiki/Reverse_Polish_notation&quot;&gt;reversed Polish notation&lt;/a&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn4&quot; id=&quot;fnref4&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt; In Polish notation, the operators come before the operands. In reversed Polish notation, it’s the opposite, the operands come before the operators.&lt;/p&gt;
 &lt;p&gt;Let’s use this math expression &lt;code&gt;1 + 2 * 3&lt;/code&gt; as an example. We can also represent this expression as a tree:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/recursive-ascent-1.png&quot; alt=&quot;Math expression as tree diagram&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/7p5d1zaWUD-2146.webp&quot; alt=&quot;Math expression as tree diagram&quot; width=&quot;2146&quot; height=&quot;683&quot;&gt;&lt;/p&gt;
 &lt;p&gt;A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you’ll end up with &lt;code&gt;+ 1 * 2 3&lt;/code&gt;, the Polish notation of the previous expression.&lt;/p&gt;
 &lt;p&gt;On the other hand, a bottom-up parser builds the parse tree starting from the leaf nodes up to the root node, aka, post-order traversal. The order the nodes are traversed will form the reversed Polish notation of the original expression: &lt;code&gt;2 3 * 1 +&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;You’re probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?&lt;/p&gt;
@@ -179,7 +176,7 @@ term -&gt; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;# State 8 (State 6 + factor)
 term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And we’re done! Here’s a diagram to help you visualise the state transitions:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/recursive-ascent-2.png&quot; alt=&quot;State transition diagram&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/reip9qNHGK-3085.webp&quot; alt=&quot;State transition diagram&quot; width=&quot;3085&quot; height=&quot;1272&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;the-action-and-goto-table&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#the-action-and-goto-table&quot;&gt;The Action and Goto Table&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here’s what the action and goto table looks like for our grammar:&lt;/p&gt;
 &lt;div style=&quot;overflow-x: auto&quot;&gt;
@@ -707,10 +704,10 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
     &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;ast&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;value&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It will recursively evaluate all the nodes in the AST. Let’s run the program and check if the output is correct:&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 + 2 * 3 + 4&#39;&lt;/span&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 + 2 * 3 + 4&#39;&lt;/span&gt;
 &lt;span class=&quot;token number&quot;&gt;11&lt;/span&gt;
 
-python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 2 + 3 * 4&#39;&lt;/span&gt;
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 2 + 3 * 4&#39;&lt;/span&gt;
 &lt;span class=&quot;token number&quot;&gt;14&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Good, it works! Now let’s write some generated tests to have more confidence in the program. Here’s a function that would generate random numbers and combinations of operators (&lt;code&gt;+&lt;/code&gt; and &lt;code&gt;*&lt;/code&gt;), run the &lt;code&gt;evaluate&lt;/code&gt; function on them, and compare the result to Python’s &lt;code&gt;eval&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;tests&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
@@ -748,7 +745,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;And that’s all. You can find the complete code on &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent&quot;&gt;this GitHub repo&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot; /&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This &lt;a href=&quot;https://www.abubalay.com/blog/2018/04/08/recursive-ascent&quot;&gt;blog post&lt;/a&gt; by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -765,7 +762,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;/li&gt;
 &lt;li id=&quot;fn7&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;A grammar rule is often called as a “production” in academic literature. I just use the term “grammar rules” because it’s more intuitive. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref7&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id=&quot;fn8&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;My explanation of the algorithm for creating the parse table might not click with you, so here are &lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables&quot;&gt;some&lt;/a&gt; &lt;a href=&quot;https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf&quot;&gt;other&lt;/a&gt; &lt;a href=&quot;https://chatgpt.com/&quot;&gt;resources&lt;/a&gt; you can read if you’re still confused. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref8&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;li id=&quot;fn8&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;My explanation of the algorithm for creating the parse table might not click with you, so here are &lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables&quot;&gt;some&lt;/a&gt; &lt;a href=&quot;https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf&quot;&gt;other&lt;/a&gt; &lt;a href=&quot;https://chatgpt.com&quot;&gt;resources&lt;/a&gt; you can read if you’re still confused. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref8&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li id=&quot;fn9&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Note that the order of the states doesn’t matter. The parser will still work if the states were created in a different order, e.g. state 1 = state 0 + &lt;code&gt;term&lt;/code&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref9&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -779,39 +776,37 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;/section&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>How to Implement Automatic CLI Login</title>
-      <link href="https://ryanmartin.me/articles/cli-login/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/articles/cli-login/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>How to Implement Automatic CLI Login</title>
+    <link href="https://ryanmartin.me/articles/cli-login/" />
+    <updated>2024-10-13T17:56:09Z</updated>
+    <id>https://ryanmartin.me/articles/cli-login/</id>
+    <content type="html">&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
 &lt;p&gt;It usually works like this. When you type a command like &lt;code&gt;cli login&lt;/code&gt; in your terminal, a login page will open in your web browser. After you log in, the page will show a message like “Your CLI is connected now”. When you go back to the terminal, it will say that it’s “connected” and you can now perform commands that require authentication.&lt;/p&gt;
 &lt;p&gt;The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.&lt;/p&gt;
 &lt;p&gt;You’ve probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include &lt;a href=&quot;https://supabase.com/docs/reference/cli/introduction&quot;&gt;Supabase CLI&lt;/a&gt;, &lt;a href=&quot;https://cli.github.com/&quot;&gt;GitHub CLI&lt;/a&gt;, &lt;a href=&quot;https://graphite.dev/features/cli&quot;&gt;Graphite CLI&lt;/a&gt;, and Fly.io’s &lt;a href=&quot;https://fly.io/docs/flyctl/&quot;&gt;&lt;code&gt;flyctl&lt;/code&gt;&lt;/a&gt;. It’s a UX pattern that I like, as it hides a lot of complexity from the user.&lt;/p&gt;
 &lt;p&gt;There are probably many different ways to implement this, each with different trade-offs. In this post, I’ll write about just one way of doing this, which is also the same approach used by Supabase and Fly.io.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; It works for my particular use case and does not require refactoring my existing authentication logic.&lt;/p&gt;
 &lt;h2 id=&quot;how-it-works&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#how-it-works&quot;&gt;How it Works&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you’ll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-1.png&quot; alt=&quot;Two-way communication scheme&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/8zjhL3f3r0-2146.webp&quot; alt=&quot;Two-way communication scheme&quot; width=&quot;2146&quot; height=&quot;683&quot;&gt;&lt;/p&gt;
 &lt;p&gt;This probably works, though I haven’t actually tested it yet. This isn’t the approach that I implemented, but it could be a good area for future experimentation.&lt;/p&gt;
 &lt;p&gt;How it works in Supabase CLI and &lt;code&gt;flyctl&lt;/code&gt; is that it uses a “one-way” communication scheme instead of a two-way one.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt; Instead of the remote server sending the access token after the user has logged in, the CLI will keep polling for the access token in the background. At a high level, the flow should look like this diagram:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-2.png&quot; alt=&quot;One-way communication scheme&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/stdV4wS9zs-2146.webp&quot; alt=&quot;One-way communication scheme&quot; width=&quot;2146&quot; height=&quot;683&quot;&gt;&lt;/p&gt;
 &lt;p&gt;The CLI will provide a session ID and ask the server to create a “CLI login session” when the user logs in successfully. An access token will be created for this specific session. Then, the CLI will request this access token from the server and store it for future requests.&lt;/p&gt;
 &lt;p&gt;Since this approach uses &lt;a href=&quot;https://javascript.info/long-polling#regular-polling&quot;&gt;regular HTTP polling&lt;/a&gt;, it’s a potential source of &lt;a href=&quot;https://en.wikipedia.org/wiki/Denial-of-service_attack&quot;&gt;DDOS attacks&lt;/a&gt;. In a perfect world, a user needs to login to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it’s not a perfect defence.&lt;/p&gt;
 &lt;p&gt;This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API&quot;&gt;WebSockets&lt;/a&gt; or &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events&quot;&gt;SSE&lt;/a&gt;. This might not work for you depending on your &lt;a href=&quot;https://en.wikipedia.org/wiki/Threat_model&quot;&gt;threat model&lt;/a&gt;. But hey, if it works for Supabase, which has around 450,000 users,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt; it’ll probably work for me too.&lt;/p&gt;
 &lt;p&gt;Now that we know how it works, let’s get into the code implementation. I’ll build a web server and a CLI tool for a fictional developer tools company, ACME Corp. The CLI tool will be called &lt;code&gt;acme&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;project-setup&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I’ll use &lt;a href=&quot;https://kit.svelte.dev/&quot;&gt;SvelteKit&lt;/a&gt; for this project, but the concepts apply to any web framework. I’ll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.&lt;/p&gt;
+&lt;p&gt;I’ll use &lt;a href=&quot;https://kit.svelte.dev&quot;&gt;SvelteKit&lt;/a&gt; for this project, but the concepts apply to any web framework. I’ll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.&lt;/p&gt;
 &lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# create a new sveltekit project &amp;amp; install dependencies&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; create svelte@latest acme
-&lt;span class=&quot;token builtin class-name&quot;&gt;cd&lt;/span&gt; acme
-&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; create svelte@latest acme
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;cd&lt;/span&gt; acme
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I’ve heard good things about &lt;a href=&quot;https://orm.drizzle.team/&quot;&gt;Drizzle ORM&lt;/a&gt;, so I’ll also use it as the ORM for this project. The database will be &lt;a href=&quot;https://www.sqlite.org/&quot;&gt;SQLite&lt;/a&gt; using the &lt;a href=&quot;https://github.com/WiseLibs/better-sqlite3/&quot;&gt;&lt;code&gt;better-sqlite3&lt;/code&gt;&lt;/a&gt; library. We’ll need to install these too.&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;add&lt;/span&gt; drizzle-orm better-sqlite3
-&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;add&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-D&lt;/span&gt; drizzle-kit&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;add&lt;/span&gt; drizzle-orm better-sqlite3
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;add&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-D&lt;/span&gt; drizzle-kit&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Drizzle requires some setup steps before we can use it. First, we’ll create a Drizzle client:&lt;/p&gt;
 &lt;pre class=&quot;language-javascript&quot;&gt;&lt;code class=&quot;language-javascript&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// src/lib/db/db.js&lt;/span&gt;
 &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; Database &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;better-sqlite3&#39;&lt;/span&gt;
@@ -854,10 +849,10 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To apply the changes to the database, run:&lt;/p&gt;
 &lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# create database directory&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;mkdir&lt;/span&gt; data
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;mkdir&lt;/span&gt; data
 
 &lt;span class=&quot;token comment&quot;&gt;# apply changes to database&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; drizzle-kit push&lt;/code&gt;&lt;/pre&gt;
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token function&quot;&gt;pnpm&lt;/span&gt; drizzle-kit push&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This will create the &lt;code&gt;data/database.db&lt;/code&gt; SQLite database with our schema. You should only use &lt;code&gt;drizzle-kit push&lt;/code&gt; for prototyping or local development. If you need database migrations, use &lt;code&gt;drizzle-kit generate&lt;/code&gt; and &lt;code&gt;drizzle-kit migrate&lt;/code&gt;. See the &lt;a href=&quot;https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push&quot;&gt;official documentation&lt;/a&gt; for more info.&lt;/p&gt;
 &lt;p&gt;Finally, start the development server by running &lt;code&gt;pnpm dev&lt;/code&gt;. The server should now be running at &lt;code&gt;http://localhost:5173&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;a-basic-authentication-system&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#a-basic-authentication-system&quot;&gt;A Basic Authentication System&lt;/a&gt;&lt;/h2&gt;
@@ -944,7 +939,7 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
   &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;load&lt;/code&gt; function is a &lt;a href=&quot;https://kit.svelte.dev/docs/load&quot;&gt;function that runs before the page is rendered&lt;/a&gt;. It’s similar to page/route controllers in other web frameworks like &lt;a href=&quot;https://www.djangoproject.com/&quot;&gt;Django&lt;/a&gt; and &lt;a href=&quot;https://rubyonrails.org/&quot;&gt;Ruby on Rails&lt;/a&gt;. If you open &lt;code&gt;http://localhost:5173&lt;/code&gt; in your browser, you should be redirected to the login page.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-3.webp&quot; alt=&quot;Login page&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/tAQxkDcEjc-800.webp&quot; alt=&quot;Login page&quot; width=&quot;800&quot; height=&quot;485&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;the-cli-login-endpoints&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#the-cli-login-endpoints&quot;&gt;The CLI Login Endpoints&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now let’s get to the main focus of this article. We’ll need to add new tables in our database schema to support this feature:&lt;/p&gt;
 &lt;pre class=&quot;language-javascript&quot;&gt;&lt;code class=&quot;language-javascript&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// src/lib/db/schema.js&lt;/span&gt;
@@ -1078,13 +1073,13 @@ python3 recursive-ascent.py &lt;span class=&quot;token string&quot;&gt;&#39;1 * 
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;acme&lt;/code&gt; CLI will generate a random UUID for the session ID and include it as a search parameter in a URL to &lt;code&gt;/cli/login&lt;/code&gt;. Then, it’ll call &lt;code&gt;exec&lt;/code&gt;, which will run an OS process. In my case, it uses &lt;code&gt;xdg-open&lt;/code&gt;, a Linux program that opens a file or URL with the user’s default application. If you’re using a Mac, replace this with &lt;code&gt;open&lt;/code&gt;, and if you’re on Windows, replace it with &lt;code&gt;start&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;If you’re not already logged in, you will be redirected to the login page. Once you’ve logged in and seen the success message, the CLI should have already received the access token from the &lt;code&gt;/cli/login/:session&lt;/code&gt; endpoint. If you run this script, you should get something like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-4.webp&quot; alt=&quot;The CLI login flow&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/zkfVaed1b4-800.webp&quot; alt=&quot;The CLI login flow&quot; width=&quot;800&quot; height=&quot;485&quot;&gt;&lt;/p&gt;
 &lt;p&gt;Nice! We now have a working automatic CLI login system. Note, I cleared the cookies in the video above so that I can log in again. If you didn’t do this, you’ll go straight to the success message as you’re already logged in. I also created a shell alias to make the script look like a “proper” CLI tool:&lt;/p&gt;
 &lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# create the alias&lt;/span&gt;
-&lt;span class=&quot;token builtin class-name&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;acme&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;node acme.js&#39;&lt;/span&gt;
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;acme&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;node acme.js&#39;&lt;/span&gt;
 
 &lt;span class=&quot;token comment&quot;&gt;# then you can run&lt;/span&gt;
-acme login&lt;/code&gt;&lt;/pre&gt;
+&lt;code style=&quot;user-select:none;color:var(--color-links)&quot;&gt;$ &lt;/code&gt;acme login&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&quot;security-considerations&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#security-considerations&quot;&gt;Security Considerations&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I’ve mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I’ll mention a few more and also explain the ways to mitigate it. This isn’t a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.&lt;/p&gt;
 &lt;p&gt;One type of attack we’re vulnerable to is the &lt;a href=&quot;https://en.wikipedia.org/wiki/Man-in-the-middle_attack&quot;&gt;man-in-the-middle attack&lt;/a&gt;. A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.&lt;/p&gt;
@@ -1274,11 +1269,11 @@ acme login&lt;/code&gt;&lt;/pre&gt;
 
 &lt;span class=&quot;token function&quot;&gt;login&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;decrypt&lt;/code&gt; function follows the same steps as the encryption process, just reversed. And that’s it. When we run the script now, we should see that the login flow still works the same:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://ryanmartin.me/assets/images/cli-login-5.webp&quot; alt=&quot;Checking the new CLI login flow&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/img/V6YTFcZrKa-800.webp&quot; alt=&quot;Checking the new CLI login flow&quot; width=&quot;800&quot; height=&quot;485&quot;&gt;&lt;/p&gt;
 &lt;p&gt;You can also see the decrypted token is the same as the token in the database.&lt;/p&gt;
 &lt;h2 id=&quot;what%E2%80%99s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;You can find the code for this project &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login&quot;&gt;on GitHub&lt;/a&gt;. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot; /&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I learned about how this works mostly by digging into the &lt;a href=&quot;https://github.com/supabase/cli&quot;&gt;Supabase CLI code&lt;/a&gt;, so I’m biased toward this approach. You can also see &lt;a href=&quot;https://supabase.com/blog/automatic-cli-login&quot;&gt;Supabase’s blog post about this&lt;/a&gt; and &lt;a href=&quot;https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/&quot;&gt;Fly’s guide on implementing this in Laravel&lt;/a&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -1297,206 +1292,6 @@ acme login&lt;/code&gt;&lt;/pre&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;/section&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>Fixing Podman Volume Permission Issues</title>
-      <link href="https://ryanmartin.me/snippets/podman-volume-permissions/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/podman-volume-permissions/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;If you use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; to run containers on a system with &lt;a href=&quot;https://www.redhat.com/en/topics/linux/what-is-selinux&quot;&gt;SELinux&lt;/a&gt; enabled, you’ve probably encountered some permission errors when trying to mount volumes like:&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token function&quot;&gt;podman&lt;/span&gt; run &lt;span class=&quot;token parameter variable&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-v&lt;/span&gt; .:/root steghide info favicon.png
-&lt;span class=&quot;token comment&quot;&gt;# error, the container process can&#39;t find the file&lt;/span&gt;
-steghide: could not &lt;span class=&quot;token function&quot;&gt;open&lt;/span&gt; the &lt;span class=&quot;token function&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;favicon.png&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This happens because by default, rootless containers are not given access to the host machine’s volume bind directory. To fix this, you just have to add a &lt;code&gt;:z&lt;/code&gt; or a &lt;code&gt;:Z&lt;/code&gt; suffix to the volume mounts.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token function&quot;&gt;podman&lt;/span&gt; run &lt;span class=&quot;token parameter variable&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-v&lt;/span&gt; .:/root:z steghide info favicon.png
-&lt;span class=&quot;token comment&quot;&gt;# it works now&lt;/span&gt;
-&lt;span class=&quot;token string&quot;&gt;&quot;favicon.png&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;:&lt;/span&gt;
-  format: png
-  &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;code&gt;:z&lt;/code&gt; and &lt;code&gt;:Z&lt;/code&gt; suffixes tell Podman to set the required labels to the volume mount directory &amp;amp; files. Without these labels, SELinux will prevent any processes inside the container from using the contents of the volume mount.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-&lt;p&gt;The difference between &lt;code&gt;:z&lt;/code&gt; and &lt;code&gt;:Z&lt;/code&gt; is that &lt;code&gt;:z&lt;/code&gt; tells Podman that more than one container will access the volume, while &lt;code&gt;:Z&lt;/code&gt; means that only the current container can use it. In general, I recommend to just use the &lt;code&gt;:z&lt;/code&gt; label unless you know that only 1 container will be using the volume.&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot; /&gt;
-&lt;section class=&quot;footnotes&quot;&gt;
-&lt;ol class=&quot;footnotes-list&quot;&gt;
-&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The other options is to set SELinux to permissive mode: &lt;code&gt;setenforce 0&lt;/code&gt;, but you probably shouldn’t do this, especially if you’re running on a server. &lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Read the full explanation in &lt;a href=&quot;https://docs.podman.io/en/latest/markdown/podman-run.1.html&quot;&gt;&lt;strong&gt;&lt;code&gt;man podman-run&lt;/code&gt;&lt;/strong&gt;&lt;/a&gt; and &lt;code&gt;Ctrl+F&lt;/code&gt; for “labeling volume mounts”. &lt;a href=&quot;https://ryanmartin.me/snippets/podman-volume-permissions/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>Trick Docker Compose to Use Podman</title>
-      <link href="https://ryanmartin.me/snippets/podman-docker-compose/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/podman-docker-compose/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;I recently discovered a way to use &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; as the backend for &lt;a href=&quot;https://docs.docker.com/compose/&quot;&gt;Docker Compose&lt;/a&gt;. Docker Compose checks the &lt;code&gt;DOCKER_HOST&lt;/code&gt; environment variable to determine which daemon socket to connect to. Podman doesn’t run a daemon by default, so we need to enable it first:&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# starts the podman socket as a non-root user&lt;/span&gt;
-systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span&gt; &lt;span class=&quot;token builtin class-name&quot;&gt;enable&lt;/span&gt; podman.socket
-systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span&gt; start podman.socket
-systemctl &lt;span class=&quot;token parameter variable&quot;&gt;--user&lt;/span&gt; status podman.socket&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This will create the socket at &lt;code&gt;/run/user/$UID/podman/podman.sock&lt;/code&gt;, which we’ll need to set as the value of &lt;code&gt;DOCKER_HOST&lt;/code&gt;.&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;DOCKER_HOST&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;unix:///run/user/&lt;span class=&quot;token variable&quot;&gt;&lt;span class=&quot;token variable&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-u&lt;/span&gt;&lt;span class=&quot;token variable&quot;&gt;)&lt;/span&gt;&lt;/span&gt;/podman/podman.sock&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;And that’s it. Docker Compose should use Podman as the container engine now.&lt;/p&gt;
-&lt;p&gt;This works for tools that use Docker as a library, like the &lt;a href=&quot;https://github.com/supabase/cli/&quot;&gt;Supabase CLI&lt;/a&gt;, but it won’t work for tools that call your system’s &lt;code&gt;docker&lt;/code&gt; binary directly. You can read more about using Podman with Docker Compose in &lt;a href=&quot;https://fedoramagazine.org/use-docker-compose-with-podman-to-orchestrate-containers-on-fedora/&quot;&gt;this Fedora Magazine post&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Props to &lt;a href=&quot;https://github.com/GZGavinZhao&quot;&gt;@GZGavinZhao&lt;/a&gt; for sharing the &lt;a href=&quot;https://github.com/supabase/cli/issues/265#issuecomment-1331492583&quot;&gt;original solution&lt;/a&gt; to this issue.&lt;/p&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>My CSS reset</title>
-      <link href="https://ryanmartin.me/snippets/my-css-reset/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/my-css-reset/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what &lt;a href=&quot;https://mattbrictson.com/blog/css-normalize-and-reset&quot;&gt;normalise stylesheets and CSS resets&lt;/a&gt; are for.&lt;/p&gt;
-&lt;p&gt;Here’s the CSS reset that I use now, it’s a combination of &lt;a href=&quot;https://github.com/sindresorhus/modern-normalize/&quot;&gt;modern-normalize&lt;/a&gt; with resets I found from &lt;a href=&quot;https://www.youtube.com/@KevinPowell&quot;&gt;Kevin Powell&lt;/a&gt;:&lt;/p&gt;
-&lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@import&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;modern-normalize.css&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
-
-&lt;span class=&quot;token comment&quot;&gt;/* src: https://www.youtube.com/watch?v=cCAtD_BAHNw */&lt;/span&gt;
-&lt;span class=&quot;token selector&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token selector&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;color-scheme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark light&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;hanging-punctuation&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; first last&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token selector&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;min-height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 100vh&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token selector&quot;&gt;h1, h2, h3, h4, h5, h6&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;text-wrap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; balance&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;text-wrap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; pretty&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 65ch&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;/* this is optional */&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token selector&quot;&gt;button, input, optgroup, select, textarea, legend&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;font&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;line-height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;letter-spacing&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; inherit&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token comment&quot;&gt;/* src: https://www.youtube.com/watch?v=345V2MU3E_w */&lt;/span&gt;
-&lt;span class=&quot;token selector&quot;&gt;img, picture, svg, video&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 100%&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;vertical-align&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; middle&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; auto&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;font-style&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; italic&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;background-repeat&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; no-repeat&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;background-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; cover&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token property&quot;&gt;shape-margin&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;prefers-color-scheme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token selector&quot;&gt;img, picture, video&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;token property&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;brightness&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;.8&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;contrast&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;1.2&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;prefers-reduced-motion&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; no-preference&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;token selector&quot;&gt;:has(:target)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;token property&quot;&gt;scroll-behavior&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; smooth&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;token property&quot;&gt;scroll-padding-top&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 8rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>How to Manually Optimise Images for the Web</title>
-      <link href="https://ryanmartin.me/snippets/manual-image-optimisation/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/manual-image-optimisation/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;JavaScript frameworks and build tools like &lt;a href=&quot;https://nextjs.org/&quot;&gt;Next.js&lt;/a&gt;, &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, and &lt;a href=&quot;https://vitejs.dev/&quot;&gt;Vite&lt;/a&gt; perform optimisations on images to improve the performance of websites. If you’re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Convert the images to &lt;code&gt;.webp&lt;/code&gt; or &lt;code&gt;.avif&lt;/code&gt; formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like &lt;code&gt;.png&lt;/code&gt;. In terms of image size, &lt;code&gt;.avif&lt;/code&gt; is smaller than &lt;code&gt;.webp&lt;/code&gt;, but both formats would still work well. Here’s a command you can run to convert formats from the command line:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-&lt;pre class=&quot;language-bash&quot;&gt;&lt;code class=&quot;language-bash&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# this converts the image format. you can also specify the output file name&lt;/span&gt;
-gm convert image.jpg image.webp
-
-&lt;span class=&quot;token comment&quot;&gt;# you can shrink the image size even further at the cost of image quality&lt;/span&gt;
-gm convert &lt;span class=&quot;token parameter variable&quot;&gt;-quality&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;75&lt;/span&gt; image.jpg image.webp&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Set the &lt;code&gt;width&lt;/code&gt; and &lt;code&gt;height&lt;/code&gt; attributes. Just use the image’s size if you’re not resizing it. This is needed to prevent &lt;a href=&quot;https://web.dev/articles/cls&quot;&gt;cumulative layout shifts (CLS)&lt;/a&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Set &lt;code&gt;loading=&amp;quot;lazy&amp;quot;&lt;/code&gt;. This will defer the loading of the image until it is almost scrolled into the viewport. There’s an exception to this. For important images, such as the &lt;a href=&quot;https://web.dev/articles/lcp&quot;&gt;largest contentful paint (LCP)&lt;/a&gt; image, set &lt;code&gt;loading=&amp;quot;eager&amp;quot;&lt;/code&gt;. &lt;a href=&quot;https://kit.svelte.dev/docs/images&quot;&gt;SvelteKit&lt;/a&gt; also recommends to set &lt;code&gt;fetchpriority=&amp;quot;high&amp;quot;&lt;/code&gt; for this.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Set &lt;code&gt;decoding=&amp;quot;async&amp;quot;&lt;/code&gt;. This will defer the decoding of the image until after the other DOM content is loaded.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Set the &lt;code&gt;alt&lt;/code&gt; attribute. Images aren’t always loaded. It’s just a good practice to have an &lt;code&gt;alt&lt;/code&gt; text, except if the image is purely for decoration.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;There are more optimisations you can do, such as using different image sizes depending on the user’s device size,&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt; but these should be enough for basic use cases.&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot; /&gt;
-&lt;section class=&quot;footnotes&quot;&gt;
-&lt;ol class=&quot;footnotes-list&quot;&gt;
-&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I’m using &lt;a href=&quot;http://www.graphicsmagick.org/&quot;&gt;GraphicsMagick&lt;/a&gt; here, but the commands should still work the same if you’re using &lt;a href=&quot;https://imagemagick.org/&quot;&gt;ImageMagick&lt;/a&gt;, as the APIs are compatible. &lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Here’s a good &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images&quot;&gt;article about implementing responsive images&lt;/a&gt;. JavaScript frameworks have their own ways of doing this, usually through their own &lt;code&gt;Image&lt;/code&gt; components. &lt;a href=&quot;https://ryanmartin.me/snippets/manual-image-optimisation/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>A Better Shell Script Wrapper for JAR Files</title>
-      <link href="https://ryanmartin.me/snippets/jar-shell-script/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/jar-shell-script/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;To run a JAR file, usually you would do:&lt;/p&gt;
-&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token function&quot;&gt;java&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-jar&lt;/span&gt; /path/to/jar&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It’s a bit long to type, so some people (me included) would wrap it in a shell script:&lt;/p&gt;
-&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# run-jar&lt;/span&gt;
-&lt;span class=&quot;token comment&quot;&gt;#!/usr/bin/bash&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;java&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-jar&lt;/span&gt; /path/to/jar&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This way, you only have to type &lt;code&gt;./run-jar&lt;/code&gt;, or &lt;code&gt;run-jar&lt;/code&gt; if you have the script somewhere in your shell’s &lt;code&gt;PATH&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;A problem with this approach is that you now have two files, the shell script and the JAR file. If you move or delete the JAR file, the script breaks. A better way to do this is to “include” the JAR file directly in the shell script:&lt;/p&gt;
-&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# Add the shebang (#!) line to specify the script&#39;s interpreter&lt;/span&gt;
-&lt;span class=&quot;token comment&quot;&gt;# This will tell the shell to run the script using java -jar instead of the&lt;/span&gt;
-&lt;span class=&quot;token comment&quot;&gt;# usual bash or sh&lt;/span&gt;
-&lt;span class=&quot;token builtin class-name&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;#!/usr/bin/java -jar&#39;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; run-jar
-
-&lt;span class=&quot;token comment&quot;&gt;# Append the JAR file to the script&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;cat&lt;/span&gt; /path/to/jar &lt;span class=&quot;token operator&quot;&gt;&gt;&gt;&lt;/span&gt; run-jar
-
-&lt;span class=&quot;token comment&quot;&gt;# Set the file permission to be executable&lt;/span&gt;
-&lt;span class=&quot;token function&quot;&gt;chmod&lt;/span&gt; +x run-jar&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This way, everything you need to run the program is in a single file, making it simpler to manage.&lt;/p&gt;
-
-      </content>
-    </entry>
-    <entry>
-      <title>Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
-      <link href="https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/" />
-      <updated>2024-10-11T08:53:33Z</updated>
-      <id>https://ryanmartin.me/snippets/gnome-keyboard-shortcuts/</id>
-      <content xml:lang="en" type="html">
-        &lt;p&gt;GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It’s possible to configure this by editing &lt;code&gt;dconf&lt;/code&gt; directly using &lt;code&gt;gsettings&lt;/code&gt; from the command line:&lt;/p&gt;
-&lt;pre class=&quot;language-shell&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# replace range with whatever workspaces you want&lt;/span&gt;
-&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token for-or-select variable&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;do&lt;/span&gt; gsettings &lt;span class=&quot;token builtin class-name&quot;&gt;set&lt;/span&gt; org.gnome.desktop.wm.keybindings switch-to-workspace-&lt;span class=&quot;token variable&quot;&gt;$i&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;[&#39;&amp;lt;Super&gt;&lt;span class=&quot;token variable&quot;&gt;$i&lt;/span&gt;&#39;]&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;done&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;code&gt;dconf&lt;/code&gt; is GNOME’s configuration system, and &lt;code&gt;gsettings&lt;/code&gt; is the frontend for &lt;code&gt;dconf&lt;/code&gt;. It’s essentially a key-value store of GNOME’s config. You can also configure the keyboard shortcuts for other settings that are not shown in GNOME settings with &lt;code&gt;gsettings&lt;/code&gt;.&lt;/p&gt;
-
-      </content>
-    </entry>
+</content>
+  </entry>
 </feed>
-

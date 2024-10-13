@@ -45,12 +45,12 @@
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>I’ll use <a href="https://kit.svelte.dev">SvelteKit</a> for this project, but the concepts apply to any web framework. I’ll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># create a new sveltekit project &amp; install dependencies</span>
-<span class="token function">pnpm</span> create svelte@latest acme
-<span class="token builtin class-name">cd</span> acme
-<span class="token function">pnpm</span> <span class="token function">install</span></code></pre>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">pnpm</span> create svelte@latest acme
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">cd</span> acme
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">pnpm</span> <span class="token function">install</span></code></pre>
 <p>I’ve heard good things about <a href="https://orm.drizzle.team/">Drizzle ORM</a>, so I’ll also use it as the ORM for this project. The database will be <a href="https://www.sqlite.org/">SQLite</a> using the <a href="https://github.com/WiseLibs/better-sqlite3/"><code>better-sqlite3</code></a> library. We’ll need to install these too.</p>
-<pre class="language-bash"><code class="language-bash"><span class="token function">pnpm</span> <span class="token function">add</span> drizzle-orm better-sqlite3
-<span class="token function">pnpm</span> <span class="token function">add</span> <span class="token parameter variable">-D</span> drizzle-kit</code></pre>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">pnpm</span> <span class="token function">add</span> drizzle-orm better-sqlite3
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">pnpm</span> <span class="token function">add</span> <span class="token parameter variable">-D</span> drizzle-kit</code></pre>
 <p>Drizzle requires some setup steps before we can use it. First, we’ll create a Drizzle client:</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/lib/db/db.js</span>
 <span class="token keyword">import</span> Database <span class="token keyword">from</span> <span class="token string">'better-sqlite3'</span>
@@ -93,10 +93,10 @@
 <span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
 <p>To apply the changes to the database, run:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># create database directory</span>
-<span class="token function">mkdir</span> data
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">mkdir</span> data
 
 <span class="token comment"># apply changes to database</span>
-<span class="token function">pnpm</span> drizzle-kit push</code></pre>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">pnpm</span> drizzle-kit push</code></pre>
 <p>This will create the <code>data/database.db</code> SQLite database with our schema. You should only use <code>drizzle-kit push</code> for prototyping or local development. If you need database migrations, use <code>drizzle-kit generate</code> and <code>drizzle-kit migrate</code>. See the <a href="https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push">official documentation</a> for more info.</p>
 <p>Finally, start the development server by running <code>pnpm dev</code>. The server should now be running at <code>http://localhost:5173</code>.</p>
 <h2 id="a-basic-authentication-system" tabindex="-1"><a class="header-anchor" href="#a-basic-authentication-system">A Basic Authentication System</a></h2>
@@ -320,10 +320,10 @@
 <p><img loading="lazy" decoding="async" src="/img/zkfVaed1b4-800.webp" alt="The CLI login flow" width="800" height="485"></p>
 <p>Nice! We now have a working automatic CLI login system. Note, I cleared the cookies in the video above so that I can log in again. If you didn’t do this, you’ll go straight to the success message as you’re already logged in. I also created a shell alias to make the script look like a “proper” CLI tool:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># create the alias</span>
-<span class="token builtin class-name">alias</span> <span class="token assign-left variable">acme</span><span class="token operator">=</span><span class="token string">'node acme.js'</span>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">alias</span> <span class="token assign-left variable">acme</span><span class="token operator">=</span><span class="token string">'node acme.js'</span>
 
 <span class="token comment"># then you can run</span>
-acme login</code></pre>
+<code style="user-select:none;color:var(--color-links)">$ </code>acme login</code></pre>
 <h2 id="security-considerations" tabindex="-1"><a class="header-anchor" href="#security-considerations">Security Considerations</a></h2>
 <p>I’ve mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I’ll mention a few more and also explain the ways to mitigate it. This isn’t a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.</p>
 <p>One type of attack we’re vulnerable to is the <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle attack</a>. A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.</p>
