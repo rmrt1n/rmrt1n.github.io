@@ -492,10 +492,10 @@ def evaluate(ast):
 It will recursively evaluate all the nodes in the AST. Let's run the program and check if the output is correct:
 
 ```bash
-python3 recursive-ascent.py '1 + 2 * 3 + 4'
+__$ python3 recursive-ascent.py '1 + 2 * 3 + 4'
 11
 
-python3 recursive-ascent.py '1 * 2 + 3 * 4'
+__$ python3 recursive-ascent.py '1 * 2 + 3 * 4'
 14
 ```
 

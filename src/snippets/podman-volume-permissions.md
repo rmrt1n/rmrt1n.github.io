@@ -13,7 +13,7 @@ updated: 2024-05-25
 If you use [Podman](https://podman.io/) to run containers on a system with [SELinux](https://www.redhat.com/en/topics/linux/what-is-selinux) enabled, you've probably encountered some permission errors when trying to mount volumes like:
 
 ```bash
-podman run --rm -it -v .:/root steghide info favicon.png
+__$ podman run --rm -it -v .:/root steghide info favicon.png
 # error, the container process can't find the file
 steghide: could not open the file "favicon.png".
 ```
@@ -21,7 +21,7 @@ steghide: could not open the file "favicon.png".
 This happens because by default, rootless containers are not given access to the host machine's volume bind directory. To fix this, you just have to add a `:z` or a `:Z` suffix to the volume mounts.[^1]
 
 ```bash
-podman run --rm -it -v .:/root:z steghide info favicon.png
+__$ podman run --rm -it -v .:/root:z steghide info favicon.png
 # it works now
 "favicon.png":
   format: png

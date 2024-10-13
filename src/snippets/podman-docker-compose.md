@@ -13,15 +13,15 @@ I recently discovered a way to use [Podman](https://podman.io/) as the backend f
 
 ```bash
 # starts the podman socket as a non-root user
-systemctl --user enable podman.socket
-systemctl --user start podman.socket
-systemctl --user status podman.socket
+__$ systemctl --user enable podman.socket
+__$ systemctl --user start podman.socket
+__$ systemctl --user status podman.socket
 ```
 
 This will create the socket at `/run/user/$UID/podman/podman.sock`, which we'll need to set as the value of `DOCKER_HOST`.
 
 ```bash
-export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
+__$ export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
 ```
 
 And that's it. Docker Compose should use Podman as the container engine now.

@@ -1,26 +1,39 @@
-const syntaxHighlight = require('@11ty/eleventy-plugin-syntaxhighlight')
-const rss = require('@11ty/eleventy-plugin-rss')
-const { eleventyImageTransformPlugin } = require('@11ty/eleventy-img')
-const markdownIt = require('markdown-it')
-const footnote = require('markdown-it-footnote')
-const anchor = require('markdown-it-anchor')
+import { feedPlugin } from '@11ty/eleventy-plugin-rss'
+import { eleventyImageTransformPlugin } from '@11ty/eleventy-img'
+import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight'
+import markdownIt from 'markdown-it'
+import footnote from 'markdown-it-footnote'
+import anchor from 'markdown-it-anchor'
 
-const markdownItOpts = {
-  html: true,
-  typographer: true,
-}
-
-module.exports = (eleventyConfig) => {
-  const md = markdownIt(markdownItOpts)
-    .use(footnote)
-    .use(anchor, {
-      permalink: anchor.permalink.headerLink()
-    })
-
-  eleventyConfig.setLibrary('md', md)
+export default function (eleventyConfig) {
+  eleventyConfig.setLibrary('md', markdownIt({
+    html: true,
+    typographer: true
+  }))
+  eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
+  eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
+    permalink: anchor.permalink.headerLink()
+  }))
 
   eleventyConfig.addPlugin(syntaxHighlight)
-  eleventyConfig.addPlugin(rss)
+  eleventyConfig.addPlugin(feedPlugin, {
+    type: 'atom',
+    outputPath: '/feed.xml',
+    collection: {
+      name: 'articles',
+      limit: 0,
+    },
+    metadata: {
+      language: 'en',
+      title: 'Ryan Martin\'s Blog',
+      subtitle: '',
+      base: 'https://ryanmartin.me/',
+      author: {
+        name: 'Ryan Martin',
+        email: 'hi@ryanmartin.me'
+      }
+    }
+  })
   eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
     extensions: 'html',
     formats: ['webp'],
@@ -61,6 +74,12 @@ module.exports = (eleventyConfig) => {
     return Object.keys(tags)
       .map((tag) => ({ tag, count: tags[tag] }))
       .sort((a, b) => b.count - a.count)
+  })
+
+  eleventyConfig.addTransform('ps1', (content) => {
+    return content.replaceAll('__$ ',
+      `<code style="user-select:none;color:var(--color-links)">$ </code>`
+    );
   })
 
   return {

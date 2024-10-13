@@ -96,7 +96,7 @@ main {
 main {
   > article {
     > * + * {
-      margin-top: 1.25rem !important;
+      margin-top: 1rem !important;
     }
 
     ol,
@@ -225,7 +225,6 @@ small code {
 }
 
 .footnotes {
-  /* padding-bottom: 2rem; */
   font-size: 0.875rem;
   line-height: 1.25;
 }

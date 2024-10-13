@@ -47,16 +47,16 @@ I'll use [SvelteKit](https://kit.svelte.dev) for this project, but the concepts 
 
 ```bash
 # create a new sveltekit project & install dependencies
-pnpm create svelte@latest acme
-cd acme
-pnpm install
+__$ pnpm create svelte@latest acme
+__$ cd acme
+__$ pnpm install
 ```
 
 I've heard good things about [Drizzle ORM](https://orm.drizzle.team/), so I'll also use it as the ORM for this project. The database will be [SQLite](https://www.sqlite.org/) using the [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3/) library. We'll need to install these too.
 
 ```bash
-pnpm add drizzle-orm better-sqlite3
-pnpm add -D drizzle-kit
+__$ pnpm add drizzle-orm better-sqlite3
+__$ pnpm add -D drizzle-kit
 ```
 
 Drizzle requires some setup steps before we can use it. First, we'll create a Drizzle client:
@@ -116,10 +116,10 @@ To apply the changes to the database, run:
 
 ```bash
 # create database directory
-mkdir data
+__$ mkdir data
 
 # apply changes to database
-pnpm drizzle-kit push
+__$ pnpm drizzle-kit push
 ```
 
 This will create the `data/database.db` SQLite database with our schema. You should only use `drizzle-kit push` for prototyping or local development. If you need database migrations, use `drizzle-kit generate` and `drizzle-kit migrate`. See the [official documentation](https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push) for more info.
@@ -397,10 +397,10 @@ Nice! We now have a working automatic CLI login system. Note, I cleared the cook
 
 ```bash
 # create the alias
-alias acme='node acme.js'
+__$ alias acme='node acme.js'
 
 # then you can run
-acme login
+__$ acme login
 ```
 
 ## Security Considerations
