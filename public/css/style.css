@@ -5,6 +5,9 @@
 @import 'github-dark.css' screen and (prefers-color-scheme: dark);
 
 :root {
+  --font-serif: Cambria, Charter, 'Bitstream Charter', 'Sitka Text', serif;
+  --font-sans: Arial, system-ui, sans-serif;
+
   --color-bg: #fafaf9;
   --color-fg: #292524;
   --color-links: blue;
@@ -30,7 +33,7 @@ p:has(:target) {
 html {
   background-color: var(--color-bg);
   color: var(--color-fg);
-  font-family: Arial, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
 }
 
@@ -41,18 +44,18 @@ body {
 }
 
 header {
-  max-width: 40rem;
+  max-width: 42rem;
   margin-inline: auto;
 
   > nav {
     display: flex;
     gap: 0.25rem 1.25rem;
     flex-wrap: wrap;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
   }
 
   > a:first-child {
-    font-family: Cambria, Charter, 'Bitstream Charter', 'Sitka Text', serif;
+    font-family: var(--font-serif);
     font-size: 1.125rem;
     line-height: 1.25;
     font-weight: bold;
@@ -66,7 +69,7 @@ header {
 }
 
 main {
-  max-width: 40rem;
+  max-width: 42rem;
   margin-inline: auto;
   padding: 1rem 0;
 
@@ -115,25 +118,23 @@ main {
     }
 
     > time {
-      font-size: 0.875rem;
-      line-height: 1.25;
-      margin-top: 0.5rem !important;
+      font-family: var(--font-serif);
+      margin-top: 0.25rem !important;
     }
   }
 }
 
 footer {
-  max-width: 40rem;
+  max-width: 42rem;
   margin-inline: auto;
   border-top: 1px solid var(--color-fg);
-
-  > * {
-    margin-top: 0.5rem;
-  }
+  padding-top: .25rem;
 
   > div {
     display: flex;
-    gap: 0.25rem 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
     flex-wrap: wrap;
   }
 }
@@ -142,10 +143,21 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: Cambria, Charter, 'Bitstream Charter', 'Sitka Text', serif;
-  font-size: 1.25rem;
+  font-family: var(--font-serif);
   line-height: 1.25;
   font-weight: bold;
+}
+
+h1 {
+  font-size: 1.375rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+h3 {
+  font-size: 1.125rem;
 }
 
 small {

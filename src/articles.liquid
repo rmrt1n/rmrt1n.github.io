@@ -5,10 +5,6 @@ eleventyImport:
   collections: ['articles']
 ---
 
-<p>
-  You can subscribe to updates via <a href="/feed.xml">Atom</a>.
-</p>
-
 <ul class="archive">
   {% assign articles = collections.articles | sort: 'data.published' | reverse %} 
   {%- for article in articles -%}

@@ -4,7 +4,7 @@ layout: base.liquid
 
 <article>
   <h1>{{ title }}</h1>
-  <time>last updated: {{ updated | toISODateString }}</time>
+  <time>{{ published | date: "%d %B %Y" }}</time>
   {{ content }}
   <section>
     <h4>Tags:</h4>
