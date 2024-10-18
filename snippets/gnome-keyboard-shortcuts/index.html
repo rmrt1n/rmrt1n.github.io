@@ -26,7 +26,7 @@
       
 <article>
   <h1>Configure Keyboard Shortcuts for GNOME Workspace Switching</h1>
-  <time>last updated: 2024-05-22</time>
+  <time>14 May 2024</time>
   <p>GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It’s possible to configure this by editing <code>dconf</code> directly using <code>gsettings</code> from the command line:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># replace range with whatever workspaces you want</span>
 <code style="user-select:none;color:var(--color-links)">$ </code><span class="token keyword">for</span> <span class="token for-or-select variable">i</span> <span class="token keyword">in</span> <span class="token punctuation">{</span><span class="token number">5</span><span class="token punctuation">..</span><span class="token number">6</span><span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token keyword">do</span> gsettings <span class="token builtin class-name">set</span> org.gnome.desktop.wm.keybindings switch-to-workspace-<span class="token variable">$i</span> <span class="token string">"['&lt;Super><span class="token variable">$i</span>']"</span><span class="token punctuation">;</span> <span class="token keyword">done</span></code></pre>
@@ -41,13 +41,9 @@
     </main>
     <footer>
       <div>
-        <a href="https://github.com/rmrt1n">GitHub</a>
-        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
-        <a href="https://twitter.com/gud_mornign">Twitter</a>
-        
-        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+        <a href="/feed.xml">RSS</a>
       </div>
-      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
     </footer>
   </body>
 </html>

@@ -26,7 +26,7 @@
       
 <article>
   <h1>Writing a Recursive Ascent Parser</h1>
-  <time>last updated: 2024-06-08</time>
+  <time>28 May 2024</time>
   <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
 <p>Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>I’m writing this post to share what I’ve learned about recursive ascent parsing; how it works and how to implement it. I’ll assume you have some familiarity with recursive descent parsing, as it’s usually the first parsing technique people learn. If not, I recommend reading up on it first.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
@@ -798,13 +798,9 @@ term -> term '*' factor •</code></pre>
     </main>
     <footer>
       <div>
-        <a href="https://github.com/rmrt1n">GitHub</a>
-        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
-        <a href="https://twitter.com/gud_mornign">Twitter</a>
-        
-        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+        <a href="/feed.xml">RSS</a>
       </div>
-      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
     </footer>
   </body>
 </html>

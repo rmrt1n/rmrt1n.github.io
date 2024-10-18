@@ -26,7 +26,7 @@
       
 <article>
   <h1>Fixing Podman Volume Permission Issues</h1>
-  <time>last updated: 2024-05-25</time>
+  <time>22 May 2024</time>
   <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root steghide info favicon.png
 <span class="token comment"># error, the container process can't find the file</span>
@@ -58,13 +58,9 @@ steghide: could not <span class="token function">open</span> the <span class="to
     </main>
     <footer>
       <div>
-        <a href="https://github.com/rmrt1n">GitHub</a>
-        <a href="https://linkedin.com/in/ryanmrt1n">LinkedIn</a>
-        <a href="https://twitter.com/gud_mornign">Twitter</a>
-        
-        <a href="mailto:hi@ryanmartin.me">hi@ryanmartin.me</a>
+        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+        <a href="/feed.xml">RSS</a>
       </div>
-      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
     </footer>
   </body>
 </html>
