@@ -7,6 +7,7 @@
 :root {
   --font-serif: Cambria, Charter, 'Bitstream Charter', 'Sitka Text', serif;
   --font-sans: Arial, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 
   --color-bg: #fafaf9;
   --color-fg: #292524;
@@ -209,7 +210,7 @@ pre {
 }
 
 code {
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; 
+  font-family: var(--font-mono) !important;
 }
 
 p code {
