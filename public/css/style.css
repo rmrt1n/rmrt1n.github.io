@@ -108,13 +108,7 @@ main {
       margin-left: 1rem;
 
       > * + * {
-        margin-top: 0.5rem;
-      }
-
-      > li {
-        > * + * {
-          margin-top: 0.5rem;
-        }
+        margin-top: 0.25rem;
       }
     }
 
@@ -129,7 +123,7 @@ footer {
   max-width: 42rem;
   margin-inline: auto;
   border-top: 1px solid var(--color-fg);
-  padding-top: .25rem;
+  padding-top: 1rem;
 
   > div {
     display: flex;
@@ -213,7 +207,7 @@ code {
   font-family: var(--font-mono) !important;
 }
 
-p code {
+p code, li code {
   background-color: var(--color-code);
   padding: 1.5px;
   border-radius: 2px;
@@ -240,6 +234,7 @@ small code {
 .footnotes {
   font-size: 0.875rem;
   line-height: 1.25;
+  margin-bottom: 1.5rem;
 }
 
 .tags {
@@ -247,6 +242,7 @@ small code {
   gap: 0 1rem;
   flex-wrap: wrap;
   margin-left: 0;
+  padding-top: .25rem;
 
   > li {
     list-style-type: none;
