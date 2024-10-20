@@ -17,8 +17,8 @@ permalink: /tags/{{ tag }}/
   {% assign posts = collections[tag] | sort: 'data.published' | reverse %} 
   {%- for post in posts -%}
     <li>
-      <a href="{{ post.page.url }}">{{ post.data.title }}</a>
       <time>{{ post.data.published | toISODateString }}</time>
+      <a href="{{ post.page.url }}">{{ post.data.title }}</a>
     </li>
   {%- endfor -%}
 </ul>
