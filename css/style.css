@@ -254,14 +254,15 @@ small code {
 
 .toc {
   > details {
-    h2 {
-      display: inline;
-    }
-
     &[open] {
       summary {
         margin-bottom: .25rem;
       }
+    }
+
+    h2 {
+      display: inline;
+      font-size: 1.125rem;
     }
     ol {
       padding-left: .75rem;
@@ -279,10 +280,9 @@ small code {
     right: -24rem;
     height: 100%;
 
-    > div {
+    > details {
       position: sticky;
       top: 1rem;
-
     }
   }
 }

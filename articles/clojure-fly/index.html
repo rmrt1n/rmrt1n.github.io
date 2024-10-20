@@ -27,13 +27,13 @@
       
 <article>
   <h1>Fast Clojure Deployments with Fly.io</h1>
-  <time>01 January 1970</time>
+  <time>20 October 2024</time>
   <aside class="toc">
       <details><summary><h2>Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-application">Packaging the Application</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
 <p>I’ve been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.</p>
 <p>After some consideration, I went with <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy applications packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> In my experience it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but since I don’t plan on leaving the app deployed, it barely costs me anything.</p>
 <p>I found some helpful tips while trying to deploy my app, so I thought I’d share them here.</p>
-<p>Personally, I like technical articles that cover a project from start to finish, so this post will also include the development (of a demo app) in addition to the deployment process. If you just want to read about the deployment, feel free to <a href="#packaging-the-application">skip ahead</a>. This is not a “from zero” tutorial though. I’ll assume you have some familiarity with Clojure<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> and some of its libraries.</p>
+<p>Personally, I like technical articles that cover a project from start to finish, so this post will also include the development (of a demo app) in addition to the deployment process. If you just want to read about the deployment, feel free to <a href="#packaging-the-application">skip ahead</a>. I’ll also assume you have some familiarity with Clojure and some of its libraries.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>In this post, we’ll be building a barebones bookmarks manager for the demo app. Users can log in using <a href="https://roadmap.sh/guides/http-basic-authentication">basic authentication</a>, view all bookmarks, and create a new bookmark. It’ll be a traditional multi-page web app and the data will be stored in a <a href="https://sqlite.org">SQLite</a> database.</p>
 <p>Here’s an overview of the project’s starting directory structure:</p>
@@ -84,7 +84,7 @@
   <span class="token punctuation">(</span><span class="token function">reset</span><span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token function">reset-all</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <h2 id="systems-and-configuration" tabindex="-1"><a class="header-anchor" href="#systems-and-configuration">Systems and Configuration</a></h2>
-<p>If you’re new to Integrant or other dependency injection libraries like <a href="https://github.com/stuartsierra/component">Component</a>, I’d suggest reading <a href="https://mccue.dev/pages/12-7-22-clojure-web-primer">this article explaining why they’re needed</a>. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a <code>.edn</code> file. I usually name mine as <code>resources/config.edn</code>. Here’s what it looks like:</p>
+<p>If you’re new to Integrant or other dependency injection libraries like <a href="https://github.com/stuartsierra/component">Component</a>, I’d suggest reading <a href="https://mccue.dev/pages/12-7-22-clojure-web-primer">“How to Structure a Clojure Web”</a>. It’s a great explanation about the reasoning behind these libraries. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a <code>.edn</code> file. I usually name mine as <code>resources/config.edn</code>. Here’s what it looks like:</p>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; resources/config.edn</span>
 <span class="token punctuation">{</span><span class="token symbol">:server</span>
  <span class="token punctuation">{</span><span class="token symbol">:port</span> <span class="token operator">#</span>long <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env PORT <span class="token number">8080</span><span class="token punctuation">]</span>
@@ -272,7 +272,7 @@ hi world</code></pre>
 <h3 id="implementing-the-route-handlers" tabindex="-1"><a class="header-anchor" href="#implementing-the-route-handlers">Implementing the Route Handlers</a></h3>
 <p>We now have everything we need to implement the route handlers or the business logic of the app. First, we’ll implement the <code>index-page</code> function which renders a page that:</p>
 <ol>
-<li>Shows all of the user’s bookmarks in the database</li>
+<li>Shows all of the user’s bookmarks in the database, and</li>
 <li>Shows a form that allows the user to insert new bookmarks into the database</li>
 </ol>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
@@ -411,7 +411,7 @@ hi world</code></pre>
            <span class="token symbol">:class-dir</span> class-dir
            <span class="token symbol">:uber-file</span> <span class="token string">"target/standalone.jar"</span>
            <span class="token symbol">:main</span>      'acme.main<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
-<p>To build the project, run <code>clj -T:build uber</code>. This will create the uberjar <code>standalone.jar</code> in the <code>target</code> directory. The “<code>uber</code>” in “<code>clj -T:build uber</code>” refers to the <code>uber</code> function from <code>build.clj</code>. Since the build system is a Clojure program, you can customise it however you like. If we try to run it using <code>java -jar target/standalone.jar</code>, we’ll get this error:</p>
+<p>To build the project, run <code>clj -T:build uber</code>. This will create the uberjar <code>standalone.jar</code> in the <code>target</code> directory. The <code>uber</code> in <code>clj -T:build uber</code> refers to the <code>uber</code> function from <code>build.clj</code>. Since the build system is a Clojure program, you can customise it however you like. If we try to run the uberjar now, we’ll get an error:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># build the uberjar</span>
 <code style="user-select:none;color:var(--color-links)">$ </code>clj <span class="token parameter variable">-T:build</span> uber
 Cleaning build directory<span class="token punctuation">..</span>.
@@ -423,13 +423,13 @@ Building Uberjar<span class="token punctuation">..</span>.
 <code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">java</span> <span class="token parameter variable">-jar</span> target/standalone.jar
 Error: Could not <span class="token function">find</span> or load main class acme.main
 Caused by: java.lang.ClassNotFoundException: acme.main</code></pre>
-<p>This error occurred because the <code>Main</code> class that is required by Java isn’t built. To fix this, we need to add the <code>:gen-class</code> directive in our main namespace. This will instruct Clojure to create the Main class from the <code>-main</code> function.</p>
+<p>This error occurred because the Main class that is required by Java isn’t built. To fix this, we need to add the <code>:gen-class</code> directive in our main namespace. This will instruct Clojure to create the Main class from the <code>-main</code> function.</p>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
 <span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
   <span class="token comment">;; ...</span>
   <span class="token punctuation">(</span><span class="token symbol">:gen-class</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
-<p>if you rebuild the project and run <code>java -jar target/standalone.jar</code> again, it should work perfectly. Now that we have a working build script, we can write the Dockerfile:</p>
+<p>If you rebuild the project and run <code>java -jar target/standalone.jar</code> again, it should work perfectly. Now that we have a working build script, we can write the Dockerfile:</p>
 <pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
 <span class="token comment"># install additional dependencies here in the base layer</span>
 <span class="token comment"># separate base from build layer so any additional deps installed are cached</span>
@@ -444,7 +444,7 @@ Caused by: java.lang.ClassNotFoundException: acme.main</code></pre>
 <span class="token instruction"><span class="token keyword">COPY</span> <span class="token options"><span class="token property">--from</span><span class="token punctuation">=</span><span class="token string">build</span></span> /opt/target/standalone.jar /</span>
 <span class="token instruction"><span class="token keyword">EXPOSE</span> 8080</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
-<p>It’s a <a href="https://www.docker.com/blog/multi-stage-builds/">multi-stage Dockerfile</a>. We use the official Clojure Docker image as the layer to build the uberjar. Once it’s built, we copy it to a smaller Docker image that only contains the Java runtime.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
+<p>It’s a <a href="https://www.docker.com/blog/multi-stage-builds/">multi-stage Dockerfile</a>. We use the official Clojure Docker image as the layer to build the uberjar. Once it’s built, we copy it to a smaller Docker image that only contains the Java runtime.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.</p>
 <p>That should be all for packaging the app. We can move on to the deployment now.</p>
 <h2 id="deploying-with-fly.io" tabindex="-1"><a class="header-anchor" href="#deploying-with-fly.io">Deploying with Fly.io</a></h2>
 <p>First things first, you’ll need to <a href="https://fly.io/docs/flyctl/install/">install <code>flyctl</code></a>, Fly’s CLI tool for interacting with their platform. Create <a href="https://fly.io/app/sign-up">a Fly.io account</a> if you haven’t already. Then run <code>fly auth login</code> to authenticate <code>flyctl</code> with your account.</p>
@@ -484,7 +484,7 @@ New app created: blue-water-6489</code></pre>
 <p>We’ll need to set the <code>AUTH_USER</code> and <code>AUTH_PASSWORD</code> environment variables too, but not through the <code>fly.toml</code> file as these are sensitive values. To securely set these credentials with Fly, we can set them as <a href="https://fly.io/docs/apps/secrets/">app secrets</a>. They’re stored encrypted and will be automatically injected into the app at boot time.</p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly secrets <span class="token builtin class-name">set</span> <span class="token assign-left variable">AUTH_USER</span><span class="token operator">=</span>hi@ryanmartin.me <span class="token assign-left variable">AUTH_PASSWORD</span><span class="token operator">=</span>not-so-secure-password
 Secrets are staged <span class="token keyword">for</span> the first deployment</code></pre>
-<p>With this, the configuration is done and we can deploy the app using <code>fly deploy</code></p>
+<p>With this, the configuration is done and we can deploy the app using <code>fly deploy</code>:</p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly deploy
 <span class="token comment"># ...</span>
 Checking DNS configuration <span class="token keyword">for</span> blue-water-6489.fly.dev
@@ -494,7 +494,7 @@ Visit your newly deployed app at https://blue-water-6489.fly.dev/</code></pre>
 <p><img loading="lazy" decoding="async" src="/img/-0hDAZFbRj-800.webp" alt="The app in action" width="800" height="488"></p>
 <p>If you made additional changes to the app or <code>fly.toml</code>, you can redeploy the app using the same command, <code>fly deploy</code>. The app is configured to auto stop/start, which helps to cut costs when there’s not a lot of traffic to the site. If you want to take down the deployment, you’ll need to delete the app itself using <code>fly app destroy &lt;your app name&gt;</code>.</p>
 <h2 id="adding-a-production-repl" tabindex="-1"><a class="header-anchor" href="#adding-a-production-repl">Adding a Production REPL</a></h2>
-<p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>
+<p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>
 <p>If you’re brave, you can even restart the app directly without redeploying from the REPL. You can easily go wrong with it, which is why some prefer to not use it.</p>
 <p>For this project, we’re gonna add a <a href="https://clojure.org/reference/repl_and_main#_launching_a_socket_server">socket REPL</a>. It’s very simple to add (you just need to add a JVM option) and it doesn’t require additional dependencies like <a href="https://nrepl.org/">nREPL</a>. Let’s update the Dockerfile:</p>
 <pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
@@ -502,13 +502,13 @@ Visit your newly deployed app at https://blue-water-6489.fly.dev/</code></pre>
 <span class="token instruction"><span class="token keyword">EXPOSE</span> 7888</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-Dclojure.server.repl={:port 7888 :accept clojure.core.server/repl}"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
 <p>The socket REPL will be listening on port 7888. If we redeploy the app now, the REPL will be started but we won’t be able to connect to it. That’s because we haven’t exposed the service through <a href="https://fly.io/docs/reference/fly-proxy/">Fly proxy</a>. We can do this by adding the socket REPL as a service in the <code>[services]</code> section in <code>fly.toml</code>.</p>
-<p>However, doing this will also expose the REPL port to the public. This means that anyone can connect to your REPL and wreck your app. Instead, what we want to do is to configure the socket REPL as a private service.</p>
+<p>However, doing this will also expose the REPL port to the public. This means that anyone can connect to your REPL and possibly mess with your app. Instead, what we want to do is to configure the socket REPL as a private service.</p>
 <p>By default, all Fly apps in your organisation live in the same <a href="https://fly.io/docs/networking/private-networking/">private network</a>. This private network, called 6PN, connects the apps in your organisation through <a href="https://www.wireguard.com/">Wireguard tunnels</a> (a VPN) using IPv6. Fly private services aren’t exposed to the public internet but can be reached from this private network. We can then use Wireguard to connect to this private network to reach our socket REPL.</p>
 <p>Fly VMs are also configured with the hostname <code>fly-local-6pn</code>, which maps to its 6PN address. This is analogous to <code>localhost</code>, which points to your loopback address <code>127.0.0.1</code>. To expose a service to 6PN, all we have to do is bind or serve it to <code>fly-local-6pn</code> instead of the usual <code>0.0.0.0</code>. We have to update the socket REPL options to:</p>
 <pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
 <span class="token comment"># ...</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-Dclojure.server.repl={:port 7888,:address \"fly-local-6pn\",:accept clojure.core.server/repl}"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
-<p>After redeploying, we can use the <code>fly proxy</code> command to forward the port from the remote server to our local machine.<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup></p>
+<p>After redeploying, we can use the <code>fly proxy</code> command to forward the port from the remote server to our local machine.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly proxy <span class="token number">7888</span>:7888
 Proxying <span class="token builtin class-name">local</span> port <span class="token number">7888</span> to remote <span class="token punctuation">[</span>blue-water-6489.internal<span class="token punctuation">]</span>:7888</code></pre>
 <p>In another shell, run:</p>
@@ -558,24 +558,22 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
 </li>
 <li id="fn5" class="footnote-item"><p>There might be some keys that you add or remove, but the structure of the config file stays the same. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn6" class="footnote-item"><p>“assoc” (associate) is a Clojure slang that means to add or update a key-value pair in a map <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+<li id="fn6" class="footnote-item"><p>“assoc” (associate) is a Clojure slang that means to add or update a key-value pair in a map. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn7" class="footnote-item"><p>For more details on how basic authentication works, check out <a href="https://www.rfc-editor.org/rfc/rfc7617.html">the specification</a>. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn8" class="footnote-item"><p>Here’s a cool resource I found when researching Java Dockerfiles: <a href="https://whichjdk.com">WhichJDK</a>. It provides a comprehensive comparison on the different JDKs available and recommendations on which one you should use. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn9" class="footnote-item"><p>If your dependencies don’t change often, the second approach might produce faster builds as you don’t have to reinstall the dependencies again. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+<li id="fn9" class="footnote-item"><p>Another (non-technically important) argument for live/production REPLs is just because it’s cool. Ever since I read the story about <a href="https://news.ycombinator.com/item?id=31234338">NASA’s programmers debugging a spacecraft through a live REPL</a>, I’ve always wanted to try it at least once. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn10" class="footnote-item"><p>Another (non-technically important) argument for live/production REPLs is just because it’s cool. Ever since I read the story about <a href="https://news.ycombinator.com/item?id=31234338">NASA’s programmers debugging a spacecraft through a live REPL</a>, I’ve always wanted to try it at least once. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
-</li>
-<li id="fn11" class="footnote-item"><p>If you encounter errors related to Wireguard when running <code>fly proxy</code>, you can run <code>fly doctor</code> which will hopefully detect issues with your local setup and also suggest fixes for them. <a href="#fnref11" class="footnote-backref">↩︎</a></p>
+<li id="fn10" class="footnote-item"><p>If you encounter errors related to Wireguard when running <code>fly proxy</code>, you can run <code>fly doctor</code> which will hopefully detect issues with your local setup and also suggest fixes for them. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
 </li>
 </ol>
 </section>
 
   <section>
     <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/Clojure">#Clojure</a></li><li><a href="/tags/Deployment">#Deployment</a></li><li><a href="/tags/Java">#Java</a></li><li><a href="/tags/Networking">#Networking</a></li><li><a href="/tags/Web-Development">#Web-Development</a></li></ul>
+    <ul class="tags"><li><a href="/tags/clojure">#clojure</a></li><li><a href="/tags/deployment">#deployment</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/networking">#networking</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </section>
 </article>
 
