@@ -4,6 +4,7 @@ import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight'
 import markdownIt from 'markdown-it'
 import footnote from 'markdown-it-footnote'
 import anchor from 'markdown-it-anchor'
+import toc from 'markdown-it-table-of-contents'
 
 export default function (eleventyConfig) {
   eleventyConfig.setLibrary('md', markdownIt({
@@ -13,6 +14,14 @@ export default function (eleventyConfig) {
   eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
   eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
     permalink: anchor.permalink.headerLink()
+  }))
+  eleventyConfig.amendLibrary('md', (md) => md.use(toc, {
+    includeLevel: [2, 3],
+    containerClass: 'toc',
+    listType: 'ol',
+    transformContainerOpen: () => `<aside class="toc">
+      <details><summary><h2>Contents</h2></summary>`,
+    transformContainerClose: () => `</details></aside>`
   }))
 
   eleventyConfig.addPlugin(syntaxHighlight)
@@ -74,6 +83,11 @@ export default function (eleventyConfig) {
     return Object.keys(tags)
       .map((tag) => ({ tag, count: tags[tag] }))
       .sort((a, b) => b.count - a.count)
+  })
+
+  eleventyConfig.addPreprocessor('toc', 'md', (data, content) => {
+    if (data.tags?.includes('articles')) return '[[toc]]\n' + content
+    return content
   })
 
   eleventyConfig.addTransform('ps1', (content) => {

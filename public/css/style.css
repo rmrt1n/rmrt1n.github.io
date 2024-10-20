@@ -99,6 +99,8 @@ main {
 
 main {
   > article {
+    position: relative; /* for toc */
+
     > * + * {
       margin-top: 1rem !important;
     }
@@ -213,7 +215,6 @@ p code, li code {
   border-radius: 2px;
   font-size: 0.875rem;
   line-height: 1.25;
-  white-space: nowrap;
 }
 
 small code {
@@ -248,6 +249,41 @@ small code {
     list-style-type: none;
     margin: 0;
     text-wrap: nowrap;
+  }
+}
+
+.toc {
+  > details {
+    h2 {
+      display: inline;
+    }
+
+    &[open] {
+      summary {
+        margin-bottom: .25rem;
+      }
+    }
+    ol {
+      padding-left: .75rem;
+
+      ::marker {
+        content: counters(list-item,'.') '. '
+      }
+    }
+  }
+
+  @media (min-width: 1356px) {
+    position: absolute;
+    width: 20rem;
+    top: 0;
+    right: -24rem;
+    height: 100%;
+
+    > div {
+      position: sticky;
+      top: 1rem;
+
+    }
   }
 }
 
