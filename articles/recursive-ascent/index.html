@@ -6,6 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <title>Writing a Recursive Ascent Parser</title>
+    <script src="/js/toc.js" defer=""></script>
   </head>
   <body>
     <header>
@@ -27,7 +28,9 @@
 <article>
   <h1>Writing a Recursive Ascent Parser</h1>
   <time>28 May 2024</time>
-  <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
+  <aside class="toc">
+      <details><summary><h2>Contents</h2></summary><ol><li><a href="#bottom-up-vs-top-down-parsing">Bottom-Up vs Top-Down Parsing</a></li><li><a href="#lr-algorithm">LR Algorithm</a></li><li><a href="#building-the-state-machine">Building the State Machine</a></li><li><a href="#the-action-and-goto-table">The Action and Goto Table</a></li><li><a href="#writing-the-parser">Writing The Parser</a><ol><li><a href="#a-simple-lexer">A Simple Lexer</a></li><li><a href="#representing-the-abstract-syntax-tree-(ast)">Representing the Abstract Syntax Tree (AST)</a></li><li><a href="#converting-the-parse-table-into-functions">Converting the Parse Table into Functions</a></li><li><a href="#interpreting-the-ast">Interpreting the AST</a></li></ol></li><li><a href="#end">End</a></li></ol></details></aside>
+<p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
 <p>Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>I’m writing this post to share what I’ve learned about recursive ascent parsing; how it works and how to implement it. I’ll assume you have some familiarity with recursive descent parsing, as it’s usually the first parsing technique people learn. If not, I recommend reading up on it first.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
 <p>The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.</p>

@@ -6,6 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <title>Fast Clojure Deployments with Fly.io</title>
+    <script src="/js/toc.js" defer=""></script>
   </head>
   <body>
     <header>
@@ -27,7 +28,9 @@
 <article>
   <h1>Fast Clojure Deployments with Fly.io</h1>
   <time>01 January 1970</time>
-  <p>I’ve been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.</p>
+  <aside class="toc">
+      <details><summary><h2>Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-application">Packaging the Application</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
+<p>I’ve been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.</p>
 <p>After some consideration, I went with <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy applications packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> In my experience it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but since I don’t plan on leaving the app deployed, it barely costs me anything.</p>
 <p>I found some helpful tips while trying to deploy my app, so I thought I’d share them here.</p>
 <p>Personally, I like technical articles that cover a project from start to finish, so this post will also include the development (of a demo app) in addition to the deployment process. If you just want to read about the deployment, feel free to <a href="#packaging-the-application">skip ahead</a>. This is not a “from zero” tutorial though. I’ll assume you have some familiarity with Clojure<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> and some of its libraries.</p>
