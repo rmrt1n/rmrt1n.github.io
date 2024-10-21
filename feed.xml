@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2024-10-20T17:01:46Z</updated>
+  <updated>2024-10-21T09:42:50Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Writing a Recursive Ascent Parser</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2024-10-20T17:01:46Z</updated>
+    <updated>2024-10-21T09:42:50Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;Bottom-Up vs Top-Down Parsing&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#lr-algorithm&quot;&gt;LR Algorithm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#building-the-state-machine&quot;&gt;Building the State Machine&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#the-action-and-goto-table&quot;&gt;The Action and Goto Table&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#writing-the-parser&quot;&gt;Writing The Parser&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#a-simple-lexer&quot;&gt;A Simple Lexer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#representing-the-abstract-syntax-tree-(ast)&quot;&gt;Representing the Abstract Syntax Tree (AST)&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#converting-the-parse-table-into-functions&quot;&gt;Converting the Parse Table into Functions&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#interpreting-the-ast&quot;&gt;Interpreting the AST&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
@@ -783,7 +783,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Fast Clojure Deployments with Fly.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2024-10-20T17:01:46Z</updated>
+    <updated>2024-10-21T09:42:50Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#systems-and-configuration&quot;&gt;Systems and Configuration&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#routing%2C-middleware%2C-and-route-handlers&quot;&gt;Routing, Middleware, and Route Handlers&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#implementing-the-middlewares&quot;&gt;Implementing the Middlewares&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#implementing-the-route-handlers&quot;&gt;Implementing the Route Handlers&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#packaging-the-application&quot;&gt;Packaging the Application&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#deploying-with-fly.io&quot;&gt;Deploying with Fly.io&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#adding-a-production-repl&quot;&gt;Adding a Production REPL&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#deploy-with-github-actions&quot;&gt;Deploy with GitHub Actions&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#end&quot;&gt;End&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
@@ -1332,7 +1332,7 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2024-10-20T17:01:46Z</updated>
+    <updated>2024-10-21T09:42:50Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#how-it-works&quot;&gt;How it Works&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#a-basic-authentication-system&quot;&gt;A Basic Authentication System&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#the-cli-login-endpoints&quot;&gt;The CLI Login Endpoints&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#writing-the-cli-tool&quot;&gt;Writing the CLI Tool&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#security-considerations&quot;&gt;Security Considerations&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#ecdh-key-exchange-%26-encryption&quot;&gt;ECDH Key Exchange &amp;amp; Encryption&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#securing-the-endpoints&quot;&gt;Securing the Endpoints&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
