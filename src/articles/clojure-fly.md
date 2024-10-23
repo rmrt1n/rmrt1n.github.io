@@ -683,7 +683,8 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_API_TOKEN: {{ '${{ secrets.FLY_API_TOKEN }}' }}
+
 ```
 
 To get this to work, you'll need to create a [deploy token](https://fly.io/docs/security/tokens/) from your app's dashboard. Then, in your GitHub repo, create a new repository secret called `FLY_API_TOKEN` with the value of your deploy token. Now, whenever you push to the `main` branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the `workflow_dispatch` option.
