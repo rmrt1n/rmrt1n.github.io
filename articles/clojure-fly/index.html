@@ -538,7 +538,8 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
       <span class="token punctuation">-</span> <span class="token key atrule">uses</span><span class="token punctuation">:</span> superfly/flyctl<span class="token punctuation">-</span>actions/setup<span class="token punctuation">-</span>flyctl@master
       <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> flyctl deploy <span class="token punctuation">-</span><span class="token punctuation">-</span>remote<span class="token punctuation">-</span>only
         <span class="token key atrule">env</span><span class="token punctuation">:</span>
-          <span class="token key atrule">FLY_API_TOKEN</span><span class="token punctuation">:</span> $</code></pre>
+          <span class="token key atrule">FLY_API_TOKEN</span><span class="token punctuation">:</span> $<span class="token punctuation">{</span><span class="token punctuation">{</span> secrets.FLY_API_TOKEN <span class="token punctuation">}</span><span class="token punctuation">}</span>
+</code></pre>
 <p>To get this to work, you’ll need to create a <a href="https://fly.io/docs/security/tokens/">deploy token</a> from your app’s dashboard. Then, in your GitHub repo, create a new repository secret called <code>FLY_API_TOKEN</code> with the value of your deploy token. Now, whenever you push to the <code>main</code> branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the <code>workflow_dispatch</code> option.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
 <p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Overall, I like how easy and fast it is to get a Clojure app deployed to Fly.io. It’s a great platform for deploying side projects or hackathon projects. My side projects are never finished so I don’t have any experience yet to share about how well Fly handles real user traffic. Anyway, here is some further reading on deploying Clojure apps:</p>
@@ -584,7 +585,7 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
     <footer>
       <div>
         <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">RSS</a>
+        <a href="/feed.xml">Feed</a>
       </div>
     </footer>
   </body>
