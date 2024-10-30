@@ -3,15 +3,18 @@ layout: base.liquid
 ---
 
 <article>
-  <h1>{{ title }}</h1>
-  <time>{{ published | date: "%d %B %Y" }}</time>
-  {{ content }}
-  <section>
-    <h4>Tags:</h4>
+  <header>
+    <h1>{{ title }}</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>{{ published | date: "%d %B %Y" }}</time>
+    </p>
     <ul class="tags">
       {%- for tag in tags offset:1 -%}
         <li><a href="/tags/{{ tag }}">#{{ tag }}</a></li>
       {%- endfor -%}
     </ul>
+  </header>
+  <section id="content">
+    {{ content }}
   </section>
 </article>

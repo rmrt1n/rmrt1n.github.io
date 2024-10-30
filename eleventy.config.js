@@ -93,7 +93,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addTransform('ps1', (content) => {
     return content.replaceAll('__$ ',
       `<code style="user-select:none;color:var(--color-links)">$ </code>`
-    );
+    )
   })
 
   return {

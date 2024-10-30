@@ -5,6 +5,11 @@ eleventyImport:
   collections: ['articles']
 ---
 
+<p>
+  You can <a href="/tags">filter by tags</a> and subscribe to updates via
+  <a href="/feed.xml">this feed</a>.
+</p>
+
 <ul class="archive">
   {% assign articles = collections.articles | sort: 'data.published' | reverse %} 
   {%- for article in articles -%}
