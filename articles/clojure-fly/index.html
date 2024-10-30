@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>Fast Clojure Deployments with Fly.io</h1>
-  <time>20 October 2024</time>
-  <aside class="toc">
+  <header>
+    <h1>Fast Clojure Deployments with Fly.io</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>20 October 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/clojure">#clojure</a></li><li><a href="/tags/deployment">#deployment</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/networking">#networking</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </header>
+  <section id="content">
+    <aside class="toc">
       <details><summary><h2>Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-application">Packaging the Application</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
 <p>I’ve been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.</p>
 <p>After some consideration, I went with <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy applications packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> In my experience it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but since I don’t plan on leaving the app deployed, it barely costs me anything.</p>
@@ -575,18 +579,13 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
 </ol>
 </section>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/clojure">#clojure</a></li><li><a href="/tags/deployment">#deployment</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/networking">#networking</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>

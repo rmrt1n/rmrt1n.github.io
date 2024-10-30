@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>My CSS reset</h1>
-  <time>05 June 2024</time>
-  <p>I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what <a href="https://mattbrictson.com/blog/css-normalize-and-reset">normalise stylesheets and CSS resets</a> are for.</p>
+  <header>
+    <h1>My CSS reset</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>05 June 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/css">#css</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </header>
+  <section id="content">
+    <p>I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what <a href="https://mattbrictson.com/blog/css-normalize-and-reset">normalise stylesheets and CSS resets</a> are for.</p>
 <p>Here’s the CSS reset that I use now, it’s a combination of <a href="https://github.com/sindresorhus/modern-normalize/">modern-normalize</a> with resets I found from <a href="https://www.youtube.com/@KevinPowell">Kevin Powell</a>:</p>
 <pre class="language-css"><code class="language-css"><span class="token atrule"><span class="token rule">@import</span> <span class="token string">'modern-normalize.css'</span><span class="token punctuation">;</span></span>
 
@@ -89,18 +93,13 @@
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/css">#css</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>

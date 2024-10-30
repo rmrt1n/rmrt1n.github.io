@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>How to Manually Optimise Images for the Web</h1>
-  <time>16 May 2024</time>
-  <p>JavaScript frameworks and build tools like <a href="https://nextjs.org/">Next.js</a>, <a href="https://astro.build/">Astro</a>, and <a href="https://vitejs.dev/">Vite</a> perform optimisations on images to improve the performance of websites. If you’re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.</p>
+  <header>
+    <h1>How to Manually Optimise Images for the Web</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>16 May 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/graphics">#graphics</a></li><li><a href="/tags/html">#html</a></li><li><a href="/tags/optimization">#optimization</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </header>
+  <section id="content">
+    <p>JavaScript frameworks and build tools like <a href="https://nextjs.org/">Next.js</a>, <a href="https://astro.build/">Astro</a>, and <a href="https://vitejs.dev/">Vite</a> perform optimisations on images to improve the performance of websites. If you’re not using any tools that does this automatically, here are some things you can do to optimise the images in your website.</p>
 <ol>
 <li>Convert the images to <code>.webp</code> or <code>.avif</code> formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like <code>.png</code>. In terms of image size, <code>.avif</code> is smaller than <code>.webp</code>, but both formats would still work well. Here’s a command you can run to convert formats from the command line:<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></li>
 </ol>
@@ -57,18 +61,13 @@
 </ol>
 </section>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/graphics">#graphics</a></li><li><a href="/tags/html">#html</a></li><li><a href="/tags/optimization">#optimization</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>

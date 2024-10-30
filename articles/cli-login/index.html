@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>How to Implement Automatic CLI Login</h1>
-  <time>10 June 2024</time>
-  <aside class="toc">
+  <header>
+    <h1>How to Implement Automatic CLI Login</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>10 June 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/authentication">#authentication</a></li><li><a href="/tags/cryptography">#cryptography</a></li><li><a href="/tags/javascript">#javascript</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/sveltekit">#sveltekit</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+  </header>
+  <section id="content">
+    <aside class="toc">
       <details><summary><h2>Contents</h2></summary><ol><li><a href="#how-it-works">How it Works</a></li><li><a href="#project-setup">Project Setup</a></li><li><a href="#a-basic-authentication-system">A Basic Authentication System</a></li><li><a href="#the-cli-login-endpoints">The CLI Login Endpoints</a></li><li><a href="#writing-the-cli-tool">Writing the CLI Tool</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></li><li><a href="#securing-the-endpoints">Securing the Endpoints</a></li><li><a href="#what%E2%80%99s-next">What’s Next</a></li></ol></details></aside>
 <p>I’ve recently had the chance to work on an “automatic CLI login” feature for a <a href="https://github.com/Argus-Labs/world-cli">CLI tool</a> at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.</p>
 <p>It usually works like this. When you type a command like <code>cli login</code> in your terminal, a login page will open in your web browser. After you log in, the page will show a message like “Your CLI is connected now”. When you go back to the terminal, it will say that it’s “connected” and you can now perform commands that require authentication.</p>
@@ -543,18 +547,13 @@
 </ol>
 </section>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/authentication">#authentication</a></li><li><a href="/tags/cryptography">#cryptography</a></li><li><a href="/tags/javascript">#javascript</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/sveltekit">#sveltekit</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>

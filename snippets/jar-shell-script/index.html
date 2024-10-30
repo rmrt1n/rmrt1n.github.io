@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>A Better Shell Script Wrapper for JAR Files</h1>
-  <time>09 September 2024</time>
-  <p>To run a JAR file, usually you would do:</p>
+  <header>
+    <h1>A Better Shell Script Wrapper for JAR Files</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>09 September 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/hack">#hack</a></li></ul>
+  </header>
+  <section id="content">
+    <p>To run a JAR file, usually you would do:</p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
 <p>It’s a bit long to type, so some people (me included) would wrap it in a shell script:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># run-jar</span>
@@ -54,18 +58,13 @@
 <code style="user-select:none;color:var(--color-links)">$ </code>./run-jar</code></pre>
 <p>This way, everything you need to run the program is in a single file, making it simpler to manage.</p>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/hack">#hack</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>

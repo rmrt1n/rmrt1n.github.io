@@ -13,13 +13,11 @@
   </head>
   <body>
     <header>
-      <a href="/">Ryan Martin</a>
+      <a href="/">ryanmartin.me</a>
       <nav>
             <a href="/articles/">Articles</a>
           
             <a href="/snippets/">Snippets</a>
-          
-            <a href="/tags/">Tags</a>
           
             <a href="/projects/">Projects</a>
           
@@ -29,9 +27,15 @@
     <main>
       
 <article>
-  <h1>Fixing Podman Volume Permission Issues</h1>
-  <time>22 May 2024</time>
-  <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
+  <header>
+    <h1>Fixing Podman Volume Permission Issues</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>22 May 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/containers">#containers</a></li><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/permissions">#permissions</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/podman">#podman</a></li></ul>
+  </header>
+  <section id="content">
+    <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root steghide info favicon.png
 <span class="token comment"># error, the container process can't find the file</span>
 steghide: could not <span class="token function">open</span> the <span class="token function">file</span> <span class="token string">"favicon.png"</span><span class="token builtin class-name">.</span></code></pre>
@@ -53,18 +57,13 @@ steghide: could not <span class="token function">open</span> the <span class="to
 </ol>
 </section>
 
-  <section>
-    <h4>Tags:</h4>
-    <ul class="tags"><li><a href="/tags/containers">#containers</a></li><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/permissions">#permissions</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/podman">#podman</a></li></ul>
   </section>
 </article>
 
     </main>
     <footer>
-      <div>
-        <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
-        <a href="/feed.xml">Feed</a>
-      </div>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
     </footer>
   </body>
 </html>
