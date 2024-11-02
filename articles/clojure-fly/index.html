@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <title>Fast Clojure Deployments with Fly.io</title>
+    <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <script src="/js/toc.js" defer=""></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
       
 <article>
   <header>
-    <h1>Fast Clojure Deployments with Fly.io</h1>
+    <h1>Build and Deploy Web Apps With Clojure and FLy.io</h1>
     <p> <!-- wrap with p just to make the line height consistent -->
       <time>20 October 2024</time>
     </p>
@@ -36,11 +36,10 @@
   </header>
   <section id="content">
     <aside class="toc">
-      <details><summary><h2>Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-application">Packaging the Application</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
-<p>I’ve been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.</p>
-<p>After some consideration, I went with <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy applications packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> In my experience it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but since I don’t plan on leaving the app deployed, it barely costs me anything.</p>
-<p>I found some helpful tips while trying to deploy my app, so I thought I’d share them here.</p>
-<p>Personally, I like technical articles that cover a project from start to finish, so this post will also include the development (of a demo app) in addition to the deployment process. If you just want to read about the deployment, feel free to <a href="#packaging-the-application">skip ahead</a>. I’ll also assume you have some familiarity with Clojure and some of its libraries.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+      <details><summary><h2>Table of Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-app">Packaging the App</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
+<p>This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.</p>
+<p>As the title suggests, we’ll be deploying the app to <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My experience with it has been good, it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.</p>
+<p>This isn’t a tutorial on Clojure, so I’ll assume you already have some familiarity with the language as well as some of its libraries.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>In this post, we’ll be building a barebones bookmarks manager for the demo app. Users can log in using <a href="https://roadmap.sh/guides/http-basic-authentication">basic authentication</a>, view all bookmarks, and create a new bookmark. It’ll be a traditional multi-page web app and the data will be stored in a <a href="https://sqlite.org">SQLite</a> database.</p>
 <p>Here’s an overview of the project’s starting directory structure:</p>
@@ -102,7 +101,7 @@
  <span class="token symbol">:database</span>
  <span class="token punctuation">{</span><span class="token symbol">:dbtype</span> <span class="token string">"sqlite"</span>
   <span class="token symbol">:dbname</span> <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env DB_DATABASE <span class="token string">"database.db"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
-<p>In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don’t have any sensitive values in our config (e.g., API keys), so it’s fine to commit this file to version control. If there are such values, I usually put them in another file that’s not tracked by version control and including them in the config file using Aero’s <code>#include</code> reader tag.</p>
+<p>In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don’t have any sensitive values in our config (e.g., API keys), so it’s fine to commit this file to version control. If there are such values, I usually put them in another file that’s not tracked by version control and include them in the config file using Aero’s <code>#include</code> reader tag.</p>
 <p>This config file is then “expanded” into the Integrant system map using the <code>expand-key</code> method:</p>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
 <span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
@@ -367,16 +366,16 @@ hi world</code></pre>
 <span class="token comment">;; ...</span></code></pre>
 <p>This is an implementation of a typical <a href="https://en.wikipedia.org/wiki/Post/Redirect/Get">post/redirect/get</a> pattern. We get the value from the URL form field, insert a new row in the database with that value, and redirect back to the index page. Again, we’re using a try-catch block to handle possible exceptions from the database query.</p>
 <p>That should be all of the code for the controllers. If you reload your REPL and go to <code>http://localhost:8080</code>, you should see something that looks like this after logging in:</p>
-<p><img loading="lazy" decoding="async" src="/img/YmhzvGHPKu-1214.webp" alt="Screnshot of the application" width="1214" height="737"></p>
+<p><img loading="lazy" decoding="async" src="/img/YmhzvGHPKu-1214.webp" alt="Screnshot of the app" width="1214" height="737"></p>
 <p>The last thing we need to do is to update the main function to start the system:</p>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
 <span class="token comment">;; ...</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> -main <span class="token punctuation">[</span>&amp; _<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">read-config</span><span class="token punctuation">)</span> ig/expand ig/init<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
-<p>Now, you should be able to run the app using <code>clj -M -m acme.main</code>. That’s all the code needed for the application. In the next section, we’ll package the app into a Docker image to deploy to Fly.</p>
-<h2 id="packaging-the-application" tabindex="-1"><a class="header-anchor" href="#packaging-the-application">Packaging the Application</a></h2>
-<p>While there are <a href="https://www.metosin.fi/blog/packaging-clojure">many ways to package a Clojure application</a>, Fly.io specifically requires a Docker image. There are two approaches to doing this:</p>
+<p>Now, you should be able to run the app using <code>clj -M -m acme.main</code>. That’s all the code needed for the app. In the next section, we’ll package the app into a Docker image to deploy to Fly.</p>
+<h2 id="packaging-the-app" tabindex="-1"><a class="header-anchor" href="#packaging-the-app">Packaging the App</a></h2>
+<p>While there are <a href="https://www.metosin.fi/blog/packaging-clojure">many ways to package a Clojure app</a>, Fly.io specifically requires a Docker image. There are two approaches to doing this:</p>
 <ol>
 <li>Build an uberjar and run it using Java in the container, or</li>
 <li>Load the source code and run it using Clojure in the container</li>
@@ -546,7 +545,7 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
 </code></pre>
 <p>To get this to work, you’ll need to create a <a href="https://fly.io/docs/security/tokens/">deploy token</a> from your app’s dashboard. Then, in your GitHub repo, create a new repository secret called <code>FLY_API_TOKEN</code> with the value of your deploy token. Now, whenever you push to the <code>main</code> branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the <code>workflow_dispatch</code> option.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
-<p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Overall, I like how easy and fast it is to get a Clojure app deployed to Fly.io. It’s a great platform for deploying side projects or hackathon projects. My side projects are never finished so I don’t have any experience yet to share about how well Fly handles real user traffic. Anyway, here is some further reading on deploying Clojure apps:</p>
+<p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the <a href="https://github.com/seancorfield/usermanager-example/">user manager example app</a>. Anyway, hope this article provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:</p>
 <ul>
 <li><a href="https://bogoyavlensky.com/blog/deploying-full-stack-clojure-app-with-kamal/">Deploying a Full-Stack Clojure App With Kamal on a Single Server</a></li>
 <li><a href="https://ericnormand.me/article/jvm-deployment-options">JVM Deployment Options</a></li>
