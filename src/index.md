@@ -14,10 +14,10 @@ for building onchain games, at <a href="https://argus.gg">Argus Labs</a>.
 Occasionally, I write (mostly technical) articles about the things I've learnt.
 Here are some of my recent posts:
 
-<ul style="list-style-position:inside">
+<ul style="margin-left: 1rem">
   {% assign articles = collections.articles | sort: 'data.published' | reverse %}
   {%- for article in articles limit:3 -%}
-    <li>
+    <li style="margin-top: .25rem;">
       <a href="{{ article.page.url }}">{{ article.data.title}}</a>
     </li>
   {%- endfor -%}
