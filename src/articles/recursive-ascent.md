@@ -1,12 +1,12 @@
 ---
-title: Writing a Recursive Ascent Parser
+title: Understanding Recursive Ascent Parsers
 tags:
   - algorithms
   - compilers
   - parsers
   - python
 published: 2024-05-28
-updated: 2024-06-08
+updated: 2024-11-02
 ---
 
 Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like [Bison](https://www.gnu.org/software/bison/) or [ANTLR](https://www.antlr.org/). If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.

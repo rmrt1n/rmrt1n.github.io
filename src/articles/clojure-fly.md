@@ -1,5 +1,5 @@
 ---
-title: Fast Clojure Deployments with Fly.io
+title: Build and Deploy Web Apps With Clojure and FLy.io
 tags:
   - clojure
   - deployment
@@ -7,16 +7,14 @@ tags:
   - networking
   - web-development
 published: 2024-10-20
-updated: 2024-10-20
+updated: 2024-11-02
 ---
 
-I've been building a Clojure web application and reached the point where I needed to deploy it to a live server. The app itself is nowhere near finished yet but I wanted to make sure that it would work in a production environment. I needed a way to deploy the app without requiring much work on my end.
+This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It's a collection of insights and tips I've learned from building my Clojure side projects but presented in a more structured format.
 
-After some consideration, I went with [Fly.io](https://fly.io). It's a service that allows you to deploy applications packaged as Docker images on lightweight virtual machines.[^1] In my experience it's easy to use and quick to set up. One downside of Fly is that it doesn't have a free tier, but since I don't plan on leaving the app deployed, it barely costs me anything.
+As the title suggests, we'll be deploying the app to [Fly.io](https://fly.io). It's a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.[^1] My experience with it has been good, it's easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.
 
-I found some helpful tips while trying to deploy my app, so I thought I'd share them here.
-
-Personally, I like technical articles that cover a project from start to finish, so this post will also include the development (of a demo app) in addition to the deployment process. If you just want to read about the deployment, feel free to [skip ahead](#packaging-the-application). I'll also assume you have some familiarity with Clojure and some of its libraries.[^2]
+This isn't a tutorial on Clojure, so I'll assume you already have some familiarity with the language as well as some of its libraries.[^2]
 
 ## Project Setup
 
@@ -99,7 +97,7 @@ If you're new to Integrant or other dependency injection libraries like [Compone
   :dbname #or [#env DB_DATABASE "database.db"]}}
 ```
 
-In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don't have any sensitive values in our config (e.g., API keys), so it's fine to commit this file to version control. If there are such values, I usually put them in another file that's not tracked by version control and including them in the config file using Aero's `#include` reader tag.
+In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don't have any sensitive values in our config (e.g., API keys), so it's fine to commit this file to version control. If there are such values, I usually put them in another file that's not tracked by version control and include them in the config file using Aero's `#include` reader tag.
 
 This config file is then "expanded" into the Integrant system map using the `expand-key` method:
 
@@ -431,7 +429,7 @@ This is an implementation of a typical [post/redirect/get](https://en.wikipedia.
 
 That should be all of the code for the controllers. If you reload your REPL and go to `http://localhost:8080`, you should see something that looks like this after logging in:
 
-![Screnshot of the application](/assets/images/clojure-fly-1.png)
+![Screnshot of the app](/assets/images/clojure-fly-1.png)
 
 The last thing we need to do is to update the main function to start the system:
 
@@ -443,11 +441,11 @@ The last thing we need to do is to update the main function to start the system:
   (-> (read-config) ig/expand ig/init))
 ```
 
-Now, you should be able to run the app using `clj -M -m acme.main`. That's all the code needed for the application. In the next section, we'll package the app into a Docker image to deploy to Fly.
+Now, you should be able to run the app using `clj -M -m acme.main`. That's all the code needed for the app. In the next section, we'll package the app into a Docker image to deploy to Fly.
 
-## Packaging the Application
+## Packaging the App
 
-While there are [many ways to package a Clojure application](https://www.metosin.fi/blog/packaging-clojure), Fly.io specifically requires a Docker image. There are two approaches to doing this:
+While there are [many ways to package a Clojure app](https://www.metosin.fi/blog/packaging-clojure), Fly.io specifically requires a Docker image. There are two approaches to doing this:
 
 1. Build an uberjar and run it using Java in the container, or
 2. Load the source code and run it using Clojure in the container
@@ -691,7 +689,7 @@ To get this to work, you'll need to create a [deploy token](https://fly.io/docs/
 
 ## End
 
-As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Overall, I like how easy and fast it is to get a Clojure app deployed to Fly.io. It's a great platform for deploying side projects or hackathon projects. My side projects are never finished so I don't have any experience yet to share about how well Fly handles real user traffic. Anyway, here is some further reading on deploying Clojure apps:
+As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the [user manager example app](https://github.com/seancorfield/usermanager-example/). Anyway, hope this article provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:
 
 - [Deploying a Full-Stack Clojure App With Kamal on a Single Server](https://bogoyavlensky.com/blog/deploying-full-stack-clojure-app-with-kamal/)
 - [JVM Deployment Options](https://ericnormand.me/article/jvm-deployment-options)

@@ -20,7 +20,7 @@ export default function (eleventyConfig) {
     containerClass: 'toc',
     listType: 'ol',
     transformContainerOpen: () => `<aside class="toc">
-      <details><summary><h2>Contents</h2></summary>`,
+      <details><summary><h2>Table of Contents</h2></summary>`,
     transformContainerClose: () => `</details></aside>`
   }))
 

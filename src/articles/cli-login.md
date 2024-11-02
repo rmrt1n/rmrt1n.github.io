@@ -8,7 +8,7 @@ tags:
   - sveltekit
   - web-development
 published: 2024-06-10
-updated: 2024-06-10
+updated: 2024-10-02
 ---
 
 I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.
@@ -411,7 +411,7 @@ One type of attack we're vulnerable to is the [man-in-the-middle attack](https:/
 
 Another kind of attack is a [brute force attack](https://en.wikipedia.org/wiki/Brute-force_attack). Since the endpoints to poll for the access tokens don't require authentication, attackers can brute force UUID values until they get an access token. This can be mitigated by expiring the CLI sessions and applying the same strategies as with DDOS attacks.
 
-Both of these attacks have one thing in common. If an attacker gets a hold of your access token, you're hacked. We can increase the security of our application by encrypting the access tokens. This way, even if attackers obtain an encrypted access token, they won't be able to decrypt it.
+Both of these attacks have one thing in common. If an attacker gets a hold of your access token, you're hacked. We can increase the security of our app by encrypting the access tokens. This way, even if attackers obtain an encrypted access token, they won't be able to decrypt it.
 
 Encrypting the tokens presents some challenges. How do we ensure that only the CLI can decrypt the token? What encryption scheme should be used? What if an attacker obtained the decryption key?
 
@@ -638,7 +638,7 @@ You can find the code for this project [on GitHub](https://github.com/rmrt1n/rmr
 [^1]: I learned about how this works mostly by digging into the [Supabase CLI code](https://github.com/supabase/cli), so I'm biased toward this approach. You can also see [Supabase's blog post about this](https://supabase.com/blog/automatic-cli-login) and [Fly's guide on implementing this in Laravel](https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/).
 [^2]: I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach where both participants are sending requests to each other.
 [^3]: 450,000 is the number of registered developers on [their website](https://supabase.com/company). It's a vanity metric, but it's still an impressive number.
-[^4]: I made this choice just to keep the code as small as possible. You shouldn't do this in a real application unless you have a really specific reason. This UX is unfamiliar and can confuse users.
+[^4]: I made this choice just to keep the code as small as possible. You shouldn't do this in a real app unless you have a really specific reason. This UX is unfamiliar and can confuse users.
 [^5]: Check out [the section on ECDH](https://cryptobook.nakov.com/asymmetric-key-ciphers/ecdh-key-exchange) from the [Practical Cryptography for Developers](https://cryptobook.nakov.com/) book for more details on how the algorithm works. It's also a great resource for learning about cryptography in general without going too deep into the maths.
 [^6]: This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good [introduction to cryptography article](https://www.comparitech.com/blog/information-security/cryptography-guide/) that explains the basic concepts as well as resources if you want to learn further.
 [^7]: If I'm using a third-party library like [@noble/curves](https://github.com/paulmillr/noble-curves), I'll use [X25519](https://en.wikipedia.org/wiki/Curve25519) for ECDH. I'm not an expert in ECC, and most of my algorithm/curve choices are based on [this blog post on choosing an elliptic curve signature algorithm](https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/). Although it's about digital signatures ([ECDSA](https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages)), I still find it helpful for ECDH.
