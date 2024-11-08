@@ -205,7 +205,6 @@ pre {
 
 code {
   font-family: var(--font-mono) !important;
-  font-weight: 500;
 }
 
 p code, li code {
