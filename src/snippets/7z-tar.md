@@ -6,7 +6,7 @@ published: 2024-11-20
 updated: 2024-11-20
 ---
 
-If you're like me, you probably don't remember the [`tar`](https://www.man7.org/linux/man-pages/man1/tar.1.html) commands. In modern UX standards, `tar` probably stands at the very bottom of user-friendliness. They're so hard to remember, there's even an XKCD about it.
+If you're like me, you probably don't remember the [`tar`](https://www.man7.org/linux/man-pages/man1/tar.1.html) commands. In modern UX standards, `tar` probably stands at the very bottom of user-friendliness. They're so hard to remember, there's even an [XKCD about it](https://xkcd.com/1168/).
 
 ![XKCD on Tar](/assets/images/7z-tar-1.png)
 
