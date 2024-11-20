@@ -35,7 +35,7 @@
     <ul class="tags"><li><a href="/tags/linux">#linux</a></li></ul>
   </header>
   <section id="content">
-    <p>If you’re like me, you probably don’t remember the <a href="https://www.man7.org/linux/man-pages/man1/tar.1.html"><code>tar</code></a> commands. In modern UX standards, <code>tar</code> probably stands at the very bottom of user-friendliness. They’re so hard to remember, there’s even an XKCD about it.</p>
+    <p>If you’re like me, you probably don’t remember the <a href="https://www.man7.org/linux/man-pages/man1/tar.1.html"><code>tar</code></a> commands. In modern UX standards, <code>tar</code> probably stands at the very bottom of user-friendliness. They’re so hard to remember, there’s even an <a href="https://xkcd.com/1168/">XKCD about it</a>.</p>
 <p><img loading="lazy" decoding="async" src="/img/Cg289tqH8S-713.webp" alt="XKCD on Tar" width="713" height="229"></p>
 <p>Instead of remembering the <code>tar</code> commands, I use <a href="https://en.wikipedia.org/wiki/7-Zip">7-Zip</a>. Not only does it extract tar files, it also works on a lot of other archive formats like ZIP files and its own 7z format. There is however, a limitation of 7-Zip when dealing with tar files.</p>
 <p>Tar files preserve file permissions and symbolic links. <a href="https://unix.stackexchange.com/questions/600282/preserve-file-permissions-and-symlinks-in-archive-with-7-zip">7-Zip unfortunately doesn’t respect this</a> and won’t preserve them when extracting tar files. There are no workarounds here, so you’ll have to fallback to using <code>tar</code>.</p>
