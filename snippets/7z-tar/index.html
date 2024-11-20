@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <title>The Problem with Using 7-Zip on Tar Files</title>
+    <script src="/js/toc.js" defer=""></script>
+  </head>
+  <body>
+    <header>
+      <a href="/">ryanmartin.me</a>
+      <nav>
+            <a href="/articles/">Articles</a>
+          
+            <a href="/snippets/">Snippets</a>
+          
+            <a href="/projects/">Projects</a>
+          
+            <a href="/">About</a>
+          </nav>
+    </header>
+    <main>
+      
+<article>
+  <header>
+    <h1>The Problem with Using 7-Zip on Tar Files</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time>20 November 2024</time>
+    </p>
+    <ul class="tags"><li><a href="/tags/linux">#linux</a></li></ul>
+  </header>
+  <section id="content">
+    <p>If you’re like me, you probably don’t remember the <a href="https://www.man7.org/linux/man-pages/man1/tar.1.html"><code>tar</code></a> commands. In modern UX standards, <code>tar</code> probably stands at the very bottom of user-friendliness. They’re so hard to remember, there’s even an XKCD about it.</p>
+<p><img loading="lazy" decoding="async" src="/img/Cg289tqH8S-713.webp" alt="XKCD on Tar" width="713" height="229"></p>
+<p>Instead of remembering the <code>tar</code> commands, I use <a href="https://en.wikipedia.org/wiki/7-Zip">7-Zip</a>. Not only does it extract tar files, it also works on a lot of other archive formats like ZIP files and its own 7z format. There is however, a limitation of 7-Zip when dealing with tar files.</p>
+<p>Tar files preserve file permissions and symbolic links. <a href="https://unix.stackexchange.com/questions/600282/preserve-file-permissions-and-symlinks-in-archive-with-7-zip">7-Zip unfortunately doesn’t respect this</a> and won’t preserve them when extracting tar files. There are no workarounds here, so you’ll have to fallback to using <code>tar</code>.</p>
+<p><a href="https://devhints.io/tar">Here’s a cheatsheet</a>.</p>
+
+  </section>
+</article>
+
+    </main>
+    <footer>
+      <small>CC BY-NC 4.0 2024 &copy; Ryan Martin</small>
+      <a href="/feed.xml">Feed</a>
+    </footer>
+  </body>
+</html>
