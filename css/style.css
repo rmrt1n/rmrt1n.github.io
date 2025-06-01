@@ -18,7 +18,7 @@
     --color-bg: #0a0a0a;
     --color-fg: #e5e5e5;
     --color-links: skyblue;
-    --color-code:  #262626;
+    --color-code: #262626;
   }
 }
 
@@ -138,6 +138,13 @@ main > article {
       line-height: 1.25;
 
       ol > * + * { margin-top: .5rem; }
+
+      li pre code {
+        background-color: transparent;
+        padding: 0;
+        font-size: 0.75rem;
+        line-height: 1;
+      }
     }
   }
 }
@@ -280,7 +287,7 @@ table {
       padding-left: .75rem;
 
       ::marker {
-        content: counters(list-item,'.') '. '
+        content: counters(list-item, '.') '. '
       }
     }
   }
@@ -297,4 +304,10 @@ table {
       top: 1rem;
     }
   }
+}
+
+#back-to-top {
+  display: inline-block;
+  width: 100%;
+  text-align: right;
 }
