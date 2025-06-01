@@ -17,4 +17,7 @@ layout: base.liquid
   <section id="content">
     {{ content }}
   </section>
+  {% if tags contains "articles" %}
+    <a id="back-to-top" href="#top">Back to top ⤴</a>
+  {% endif %}
 </article>
