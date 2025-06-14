@@ -8,8 +8,8 @@ frameworks but I always end up back with 11ty. It's simple, flexible, has a lot 
 and just gets the job done. The site is hosted on [GitHub Pages](https://pages.github.com/).
 
 Fonts used are based on a slightly modified [Modern Font Stacks](https://modernfontstacks.com/).
-Heading text uses transitional typefaces and the body text uses neo-grotesque typefaces. Code blocks
-are set in [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono).
+Heading text uses transitional typefaces and body text uses neo-grotesque typefaces. Code blocks are
+set in [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono).
 
 The code for this site is open source under the [MIT license](https://spdx.org/licenses/MIT.html)
 and is available on [GitHub](https://github.com/rmrt1n/rmrt1n.github.io). Content on this site, such
