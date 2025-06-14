@@ -6,7 +6,7 @@
 
 :root {
   --font-serif: Cambria, Charter, 'Bitstream Charter', 'Sitka Text', serif;
-  --font-sans: Arial, system-ui, sans-serif;
+  --font-sans: Arial, Inter, Roboto, 'Helvetica Neue', 'Nimbus Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --color-bg: #fafafa;
