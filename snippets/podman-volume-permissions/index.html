@@ -52,8 +52,7 @@ steghide: could not <span class="token function">open</span> the <span class="to
   <span class="token comment"># ...</span></code></pre>
 <p>The <code>:z</code> and <code>:Z</code> suffixes tell Podman to set the required labels to the volume mount directory &amp; files. Without these labels, SELinux will prevent any processes inside the container from using the contents of the volume mount.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>The difference between <code>:z</code> and <code>:Z</code> is that <code>:z</code> tells Podman that more than one container will access the volume, while <code>:Z</code> means that only the current container can use it. In general, I recommend to just use the <code>:z</code> label unless you know that only 1 container will be using the volume.</p>
-<hr class="footnotes-sep">
-<section class="footnotes">
+<p id="asterism">⁂</p><section class="footnotes">
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p>The other options is to set SELinux to permissive mode: <code>setenforce 0</code>, but you probably shouldn’t do this, especially if you’re running on a server. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>

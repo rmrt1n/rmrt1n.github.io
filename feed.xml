@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-06-14T18:35:53Z</updated>
+  <updated>2025-06-14T19:36:38Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-06-14T18:35:53Z</updated>
+    <updated>2025-06-14T19:36:38Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Table of Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;Bottom-Up vs Top-Down Parsing&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#lr-algorithm&quot;&gt;LR Algorithm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#building-the-state-machine&quot;&gt;Building the State Machine&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#the-action-and-goto-table&quot;&gt;The Action and Goto Table&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#writing-the-parser&quot;&gt;Writing The Parser&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#a-simple-lexer&quot;&gt;A Simple Lexer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#representing-the-abstract-syntax-tree-(ast)&quot;&gt;Representing the Abstract Syntax Tree (AST)&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#converting-the-parse-table-into-functions&quot;&gt;Converting the Parse Table into Functions&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#interpreting-the-ast&quot;&gt;Interpreting the AST&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
@@ -747,8 +747,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;And that’s all. You can find the complete code on &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent&quot;&gt;this GitHub repo&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
-&lt;section class=&quot;footnotes&quot;&gt;
+&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This &lt;a href=&quot;https://www.abubalay.com/blog/2018/04/08/recursive-ascent&quot;&gt;blog post&lt;/a&gt; by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -783,7 +782,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-06-14T18:35:53Z</updated>
+    <updated>2025-06-14T19:36:38Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Table of Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#systems-and-configuration&quot;&gt;Systems and Configuration&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#routing%2C-middleware%2C-and-route-handlers&quot;&gt;Routing, Middleware, and Route Handlers&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#implementing-the-middlewares&quot;&gt;Implementing the Middlewares&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#implementing-the-route-handlers&quot;&gt;Implementing the Route Handlers&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#packaging-the-app&quot;&gt;Packaging the App&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#deploying-with-fly.io&quot;&gt;Deploying with Fly.io&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#adding-a-production-repl&quot;&gt;Adding a Production REPL&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#deploy-with-github-actions&quot;&gt;Deploy with GitHub Actions&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#end&quot;&gt;End&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
@@ -1302,8 +1301,7 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
 &lt;li&gt;&lt;a href=&quot;https://tonitalksdev.com/deploying-clojure-like-a-seasoned-hobbyist&quot;&gt;Deploying Clojure Like a Seasoned Hobbyist&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.braveclojure.com/quests/deploy/&quot;&gt;Brave Clojure’s Deploy Quest&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
-&lt;section class=&quot;footnotes&quot;&gt;
+&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and “loaded” into a VM. See &lt;a href=&quot;https://www.youtube.com/watch?v=7iypMRKniPU&quot;&gt;this video explanation&lt;/a&gt; for more details. &lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -1332,7 +1330,7 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-06-14T18:35:53Z</updated>
+    <updated>2025-06-14T19:36:38Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">&lt;aside class=&quot;toc&quot;&gt;
       &lt;details&gt;&lt;summary&gt;&lt;h2&gt;Table of Contents&lt;/h2&gt;&lt;/summary&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#how-it-works&quot;&gt;How it Works&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#a-basic-authentication-system&quot;&gt;A Basic Authentication System&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#the-cli-login-endpoints&quot;&gt;The CLI Login Endpoints&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#writing-the-cli-tool&quot;&gt;Writing the CLI Tool&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#security-considerations&quot;&gt;Security Considerations&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#ecdh-key-exchange-%26-encryption&quot;&gt;ECDH Key Exchange &amp;amp; Encryption&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#securing-the-endpoints&quot;&gt;Securing the Endpoints&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/details&gt;&lt;/aside&gt;
@@ -1826,8 +1824,7 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
 &lt;p&gt;You can also see the decrypted token is the same as the token in the database.&lt;/p&gt;
 &lt;h2 id=&quot;what%E2%80%99s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;You can find the code for this project &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login&quot;&gt;on GitHub&lt;/a&gt;. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
-&lt;section class=&quot;footnotes&quot;&gt;
+&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I learned about how this works mostly by digging into the &lt;a href=&quot;https://github.com/supabase/cli&quot;&gt;Supabase CLI code&lt;/a&gt;, so I’m biased toward this approach. You can also see &lt;a href=&quot;https://supabase.com/blog/automatic-cli-login&quot;&gt;Supabase’s blog post about this&lt;/a&gt; and &lt;a href=&quot;https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/&quot;&gt;Fly’s guide on implementing this in Laravel&lt;/a&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
