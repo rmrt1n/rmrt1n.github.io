@@ -5,6 +5,7 @@ import markdownIt from 'markdown-it'
 import footnote from 'markdown-it-footnote'
 import anchor from 'markdown-it-anchor'
 import toc from 'markdown-it-table-of-contents'
+import crypto from 'crypto'
 
 export default function (eleventyConfig) {
   eleventyConfig.setLibrary('md', markdownIt({
@@ -12,6 +13,11 @@ export default function (eleventyConfig) {
     typographer: true
   }))
   eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
+  eleventyConfig.amendLibrary('md', (md) => md.renderer.rules.footnote_block_open = () => (
+    '<p id="asterism">⁂</p>' +
+    '<section class="footnotes">\n' +
+    '<ol class="footnotes-list">\n'
+  ))
   eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
     permalink: anchor.permalink.headerLink()
   }))
@@ -94,6 +100,20 @@ export default function (eleventyConfig) {
     return content.replaceAll('__$ ',
       `<code style="user-select:none;color:var(--color-links)">$ </code>`
     )
+  })
+
+  eleventyConfig.addGlobalData('eleventyComputed', {
+    eleventyExcludeFromCollections: (data) => {
+      if (data.draft) return true
+      return data.eleventyExcludeFromCollections
+    },
+    permalink: (data) => {
+      if (data.draft) {
+        const hash = crypto.createHash('md5').update(data.title).digest('hex')
+        return `drafts/${hash}/`
+      }
+      return data.permalink
+    }
   })
 
   return {

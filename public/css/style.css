@@ -132,11 +132,11 @@ main > article {
       > * + * { margin-top: 0.25rem; }
     }
 
-    .footnotes-sep {
-      border: 0;
-      border-top: 1px solid var(--color-fg);
-      width: 45%;
+    #asterism {
+      text-align: center;
       margin: 1.5rem 0;
+      font-size: 1.375rem;
+      line-height: 1.25;
     }
 
     .footnotes {
