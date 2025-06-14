@@ -3,16 +3,21 @@ layout: base.liquid
 title: Ryan Martin | About
 ---
 
-I'm a designer and developer based in Indonesia. My work usually ranges from
-product design and web development to low-level systems and software security.
-Currently I'm working on developer tooling for the
+Hi there 👋.
+
+I'm a software developer from Indonesia. I'm interested in foundational
+software, cybersecurity, and the craft of software engineering — from compilers
+to command lines to user-facing apps. Outside of work, I enjoy reading, playing
+pool, and exploring good food and drinks.
+
+Currently I'm working on the core systems behind the
 <a href="https://github.com/argus-labs/world-engine">World Engine</a>, an SDK
 for building onchain games, at <a href="https://argus.gg">Argus Labs</a>.
 
 <!-- placeholder for any previous exp -->
 
-Occasionally, I write (mostly technical) articles about the things I've learnt.
-Here are some of my recent posts:
+Occasionally, I write (mostly technical) articles about the things I've
+learned. Here are a few recent ones:
 
 <ul style="margin-left: 1rem">
   {% assign articles = collections.articles | sort: 'data.published' | reverse %}
@@ -24,7 +29,9 @@ Here are some of my recent posts:
 </ul>
 
 
-If you ever want to chat or have any questions, don’t hesitate to reach out! You
-can find me on [GitHub](https://github.com/rmrt1n),
-[X](https://x.com/gud_mornign), [LinkedIn](https://linkedin.com/in/ryanmrt1n),
-or email me directly at [hi@ryanmartin.me](mailto:hi@ryanmartin.me).
+If you ever want to chat or work together on a project, You can find me on
+[GitHub](https://github.com/rmrt1n), [X](https://x.com/gud_mornign),
+[LinkedIn](https://linkedin.com/in/ryanmrt1n), or email me directly at
+[hi@ryanmartin.me](mailto:hi@ryanmartin.me).
+
+– Ryan.
