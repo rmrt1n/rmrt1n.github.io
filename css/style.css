@@ -71,10 +71,16 @@ footer {
   border-top: 1px solid var(--color-fg);
   padding-top: .5rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 .25rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: .25rem;
+
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .25rem;
+    flex-wrap: wrap;
+  }
 }
 
 main {
