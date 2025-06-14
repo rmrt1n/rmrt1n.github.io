@@ -1,6 +1,6 @@
 ---
 layout: base.liquid
-title: Ryan Martin | Tags
+title: Tags
 pagination:
   data: collections
   size: 1
@@ -11,7 +11,7 @@ pagination:
 permalink: /tags/{{ tag }}/
 ---
 
-<p>Tagged <strong>#{{ tag }}</strong>:</p>
+Tagged **#{{ tag }}**:
 
 <ul class="archive">
   {% assign posts = collections[tag] | sort: 'data.published' | reverse %} 

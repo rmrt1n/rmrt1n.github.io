@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    <title>{{ title }}</title>
+    <title>Ryan Martin | {{ title }}</title>
     <script src="/js/toc.js" defer></script>
   </head>
   <body>
@@ -26,6 +26,11 @@
     </header>
     <div id="top"></div>
     <main>
+      {% unless page.url != "/articles/" and page.url contains "/articles/"
+                or
+                page.url != "/snippets/" and page.url contains "/snippets/" %}
+        <h1>{{ title }}</h1>
+      {% endunless %}
       {{ content }}
     </main>
     <footer>

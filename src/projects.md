@@ -1,6 +1,6 @@
 ---
 layout: base.liquid
-title: Ryan Martin | Projects
+title: Projects
 ---
 
 Page under construction...

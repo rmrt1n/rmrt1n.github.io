@@ -1,9 +1,7 @@
 ---
 layout: base.liquid
-title: Ryan Martin | Tags
+title: Tags
 ---
-
-<strong>Tags:</strong>
 
 <ol class="tags">
   {%- for tag in collections.tags -%}

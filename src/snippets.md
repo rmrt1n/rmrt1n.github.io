@@ -1,14 +1,12 @@
 ---
 layout: base.liquid
-title: Ryan Martin | Snippets
+title: Snippets
 eleventyImport:
   collections: ['snippets']
 ---
 
-<p>
-  Snippets are random notes, thoughts, or code that I want to remember and 
-  share, but are not long enough to be an article by themselves.
-</p>
+Snippets are random notes, thoughts, or code that I want to remember and share, but are not long
+enough to be an article by themselves.
 
 <ul class="archive">
   {% assign snippets = collections.snippets | sort: 'data.published' | reverse %} 
