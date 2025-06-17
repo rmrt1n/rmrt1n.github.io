@@ -1,2 +1,4 @@
+Sitemap: https://ryanmartin.me/sitemap.xml
+
 User-agent: *
 Disallow:

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Eleventy">
+    <meta name="description" content="true">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +14,7 @@
     <script src="/js/toc.js" defer=""></script>
   </head>
   <body>
+    <a href="#main" id="skip-link">Skip to main content</a>
     <header>
       <a href="/">ryanmartin.me</a>
       <nav>
@@ -28,7 +30,7 @@
           </nav>
     </header>
     <div id="top"></div>
-    <main>
+    <main id="main">
       
       
 <article>
@@ -37,7 +39,7 @@
     <p> <!-- wrap with p just to make the line height consistent -->
       <time>22 May 2024</time>
     </p>
-    <ul class="tags"><li><a href="/tags/containers">#containers</a></li><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/permissions">#permissions</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/podman">#podman</a></li></ul>
+    <ul class="tags"><li><a href="/tags/containers">#containers</a></li><li><a href="/tags/linux">#linux</a></li><li><a href="/tags/security">#security</a></li></ul>
   </header>
   <section id="content">
     <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
