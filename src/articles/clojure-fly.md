@@ -2,7 +2,7 @@
 title: Build and Deploy Web Apps With Clojure and FLy.io
 tags:
   - clojure
-  - deployment
+  - infrastructure
   - java
   - networking
   - web-development

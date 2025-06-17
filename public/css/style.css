@@ -213,7 +213,10 @@ a {
 pre {
   border: 1px solid var(--color-fg);
   overflow: clip;
-  font-size: 0.875rem;
+
+  code {
+    font-size: 0.85rem !important;
+  }
 }
 
 code {

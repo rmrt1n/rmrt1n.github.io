@@ -29,7 +29,9 @@
     <main>
       {% unless page.url != "/articles/" and page.url contains "/articles/"
                 or
-                page.url != "/snippets/" and page.url contains "/snippets/" %}
+                page.url != "/snippets/" and page.url contains "/snippets/"
+                or
+                page.url contains "/drafts/" %}
         <h1>{{ title }}</h1>
       {% endunless %}
       {{ content }}

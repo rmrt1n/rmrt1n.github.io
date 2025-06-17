@@ -3,7 +3,6 @@ title: A Better Shell Script Wrapper for JAR Files
 tags:
   - linux
   - java
-  - hack
 published: 2024-09-09
 updated: 2024-10-14
 ---

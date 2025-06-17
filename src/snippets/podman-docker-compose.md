@@ -2,8 +2,6 @@
 title: Trick Docker Compose to Use Podman
 tags:
   - containers
-  - hack
-  - podman
   - linux
 published: 2024-05-29
 updated: 2024-06-04
