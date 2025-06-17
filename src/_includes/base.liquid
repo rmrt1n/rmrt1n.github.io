@@ -1,18 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ metadata.language }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content="Eleventy">
+    <meta name="description" content="{{ description or metadata.description }}">
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    <title>Ryan Martin | {{ title }}</title>
+    <title>{{ metadata.author.name }} | {{ title }}</title>
     <script src="/js/toc.js" defer></script>
   </head>
   <body>
+    <a href="#main" id="skip-link">Skip to main content</a>
     <header>
       <a href="/">ryanmartin.me</a>
       <nav>
@@ -26,7 +28,7 @@
       </nav>
     </header>
     <div id="top"></div>
-    <main>
+    <main id="main">
       {% unless page.url != "/articles/" and page.url contains "/articles/"
                 or
                 page.url != "/snippets/" and page.url contains "/snippets/"
