@@ -24,15 +24,11 @@
 
 /* Highlight targeted anchor link after click with fade away */
 @keyframes highlight-fade {
-  0% { background-color: #fef08acc; /* yellow-200/80 */ }
-  80% { background-color: #fef08acc; }
-  100% { background-color: transparent; }
+  0%, 80% { background-color: #fef08acc; /* yellow-200/80 */ }
 }
 
 @keyframes highlight-fade-dark {
-  0% { background-color: #404040cc; /* neutral-700/80 */ }
-  80% { background-color: #404040cc; }
-  100% { background-color: transparent; }
+  0%, 80% { background-color: #404040cc; /* neutral-700/80 */ }
 }
 
 
