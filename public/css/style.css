@@ -11,6 +11,7 @@
 
   --color-bg: #fafafa;
   --color-fg: #262626;
+  --color-border: #737373;
   --color-links: blue;
   --color-code: #e5e5e5;
 
@@ -58,7 +59,7 @@ body {
 body > header {
   max-width: 42rem;
   margin-inline: auto;
-  border-bottom: 1px solid var(--color-fg);
+  border-bottom: 1px solid var(--color-border);
 
   > nav {
     display: flex;
@@ -81,7 +82,7 @@ body > header {
 footer {
   max-width: 42rem;
   margin-inline: auto;
-  border-top: 1px solid var(--color-fg);
+  border-top: 1px solid var(--color-border);
   padding-top: .5rem;
   display: flex;
   flex-direction: column;
@@ -225,7 +226,7 @@ a {
 }
 
 pre {
-  border: 1px solid var(--color-fg);
+  border: 1px solid var(--color-border);
   overflow: clip;
 
   code {
@@ -252,19 +253,25 @@ small code {
 }
 
 img {
-  border: 1px solid var(--color-fg);
+  padding: .5rem;
+  border: 1px solid var(--color-border);
+  box-shadow:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: white;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #404040;
+  }
 }
 
 table {
   min-width: 100%;
-  border: 1px solid var(--color-fg);
+  border: 1px solid var(--color-border);
   border-bottom: 0;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
 
-  th,
-  td {
+  th, td {
     padding: 0.25rem 0.5rem;
     text-align: left;
     white-space: nowrap;
@@ -276,7 +283,7 @@ table {
   }
 
   td {
-    border-bottom: 1px solid var(--color-fg);
+    border-bottom: 1px solid var(--color-border);
   }
 }
 
