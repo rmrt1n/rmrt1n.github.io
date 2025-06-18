@@ -373,7 +373,7 @@ hi world</code></pre>
 <span class="token comment">;; ...</span></code></pre>
 <p>This is an implementation of a typical <a href="https://en.wikipedia.org/wiki/Post/Redirect/Get">post/redirect/get</a> pattern. We get the value from the URL form field, insert a new row in the database with that value, and redirect back to the index page. Again, we’re using a try-catch block to handle possible exceptions from the database query.</p>
 <p>That should be all of the code for the controllers. If you reload your REPL and go to <code>http://localhost:8080</code>, you should see something that looks like this after logging in:</p>
-<p><img loading="lazy" decoding="async" src="/img/YmhzvGHPKu-1214.webp" alt="Screnshot of the app" width="1214" height="737"></p>
+<p><img loading="lazy" decoding="async" src="/articles/clojure-fly/YmhzvGHPKu-1214.webp" alt="Screnshot of the app" width="1214" height="737"></p>
 <p>The last thing we need to do is to update the main function to start the system:</p>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
 <span class="token comment">;; ...</span>
@@ -504,7 +504,7 @@ Checking DNS configuration <span class="token keyword">for</span> blue-water-648
 
 Visit your newly deployed app at https://blue-water-6489.fly.dev/</code></pre>
 <p>The first deployment will take longer since it’s building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run <code>fly open</code> which will do the same thing. Here’s the app in action:</p>
-<p><img loading="lazy" decoding="async" src="/img/-0hDAZFbRj-800.webp" alt="The app in action" width="800" height="488"></p>
+<p><img loading="lazy" decoding="async" src="/articles/clojure-fly/-0hDAZFbRj-800.webp" alt="The app in action" width="800" height="488"></p>
 <p>If you made additional changes to the app or <code>fly.toml</code>, you can redeploy the app using the same command, <code>fly deploy</code>. The app is configured to auto stop/start, which helps to cut costs when there’s not a lot of traffic to the site. If you want to take down the deployment, you’ll need to delete the app itself using <code>fly app destroy &lt;your app name&gt;</code>.</p>
 <h2 id="adding-a-production-repl" tabindex="-1"><a class="header-anchor" href="#adding-a-production-repl">Adding a Production REPL</a></h2>
 <p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>

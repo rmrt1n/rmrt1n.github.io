@@ -51,10 +51,10 @@
 <p>There are probably many different ways to implement this, each with different trade-offs. In this post, I’ll write about just one way of doing this, which is also the same approach used by Supabase and Fly.io.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
 <h2 id="how-it-works" tabindex="-1"><a class="header-anchor" href="#how-it-works">How it Works</a></h2>
 <p>At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you’ll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?</p>
-<p><img loading="lazy" decoding="async" src="/img/8zjhL3f3r0-2146.webp" alt="Two-way communication scheme" width="2146" height="683"></p>
+<p><img loading="lazy" decoding="async" src="/articles/cli-login/8zjhL3f3r0-2146.webp" alt="Two-way communication scheme" width="2146" height="683"></p>
 <p>This probably works, though I haven’t actually tested it yet. This isn’t the approach that I implemented, but it could be a good area for future experimentation.</p>
 <p>How it works in Supabase CLI and <code>flyctl</code> is that it uses a “one-way” communication scheme instead of a two-way one.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> Instead of the remote server sending the access token after the user has logged in, the CLI will keep polling for the access token in the background. At a high level, the flow should look like this diagram:</p>
-<p><img loading="lazy" decoding="async" src="/img/stdV4wS9zs-2146.webp" alt="One-way communication scheme" width="2146" height="683"></p>
+<p><img loading="lazy" decoding="async" src="/articles/cli-login/stdV4wS9zs-2146.webp" alt="One-way communication scheme" width="2146" height="683"></p>
 <p>The CLI will provide a session ID and ask the server to create a “CLI login session” when the user logs in successfully. An access token will be created for this specific session. Then, the CLI will request this access token from the server and store it for future requests.</p>
 <p>Since this approach uses <a href="https://javascript.info/long-polling#regular-polling">regular HTTP polling</a>, it’s a potential source of <a href="https://en.wikipedia.org/wiki/Denial-of-service_attack">DDOS attacks</a>. In a perfect world, a user needs to login to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it’s not a perfect defence.</p>
 <p>This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSockets</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events">SSE</a>. This might not work for you depending on your <a href="https://en.wikipedia.org/wiki/Threat_model">threat model</a>. But hey, if it works for Supabase, which has around 450,000 users,<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> it’ll probably work for me too.</p>
@@ -200,7 +200,7 @@
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>The <code>load</code> function is a <a href="https://kit.svelte.dev/docs/load">function that runs before the page is rendered</a>. It’s similar to page/route controllers in other web frameworks like <a href="https://www.djangoproject.com/">Django</a> and <a href="https://rubyonrails.org/">Ruby on Rails</a>. If you open <code>http://localhost:5173</code> in your browser, you should be redirected to the login page.</p>
-<p><img loading="lazy" decoding="async" src="/img/tAQxkDcEjc-800.webp" alt="Login page" width="800" height="485"></p>
+<p><img loading="lazy" decoding="async" src="/articles/cli-login/tAQxkDcEjc-800.webp" alt="Login page" width="800" height="485"></p>
 <h2 id="the-cli-login-endpoints" tabindex="-1"><a class="header-anchor" href="#the-cli-login-endpoints">The CLI Login Endpoints</a></h2>
 <p>Now let’s get to the main focus of this article. We’ll need to add new tables in our database schema to support this feature:</p>
 <pre class="language-javascript"><code class="language-javascript"><span class="token comment">// src/lib/db/schema.js</span>
@@ -334,7 +334,7 @@
 <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">)</span></code></pre>
 <p>The <code>acme</code> CLI will generate a random UUID for the session ID and include it as a search parameter in a URL to <code>/cli/login</code>. Then, it’ll call <code>exec</code>, which will run an OS process. In my case, it uses <code>xdg-open</code>, a Linux program that opens a file or URL with the user’s default application. If you’re using a Mac, replace this with <code>open</code>, and if you’re on Windows, replace it with <code>start</code>.</p>
 <p>If you’re not already logged in, you will be redirected to the login page. Once you’ve logged in and seen the success message, the CLI should have already received the access token from the <code>/cli/login/:session</code> endpoint. If you run this script, you should get something like this:</p>
-<p><img loading="lazy" decoding="async" src="/img/zkfVaed1b4-800.webp" alt="The CLI login flow" width="800" height="485"></p>
+<p><img loading="lazy" decoding="async" src="/articles/cli-login/zkfVaed1b4-800.webp" alt="The CLI login flow" width="800" height="485"></p>
 <p>Nice! We now have a working automatic CLI login system. Note, I cleared the cookies in the video above so that I can log in again. If you didn’t do this, you’ll go straight to the success message as you’re already logged in. I also created a shell alias to make the script look like a “proper” CLI tool:</p>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># create the alias</span>
 <code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">alias</span> <span class="token assign-left variable">acme</span><span class="token operator">=</span><span class="token string">'node acme.js'</span>
@@ -530,7 +530,7 @@
 
 <span class="token function">login</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>The <code>decrypt</code> function follows the same steps as the encryption process, just reversed. And that’s it. When we run the script now, we should see that the login flow still works the same:</p>
-<p><img loading="lazy" decoding="async" src="/img/V6YTFcZrKa-800.webp" alt="Checking the new CLI login flow" width="800" height="485"></p>
+<p><img loading="lazy" decoding="async" src="/articles/cli-login/V6YTFcZrKa-800.webp" alt="Checking the new CLI login flow" width="800" height="485"></p>
 <p>You can also see the decrypted token is the same as the token in the database.</p>
 <h2 id="what%E2%80%99s-next" tabindex="-1"><a class="header-anchor" href="#what%E2%80%99s-next">What’s Next</a></h2>
 <p>You can find the code for this project <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login">on GitHub</a>. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!</p>
