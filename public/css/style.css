@@ -50,25 +50,27 @@ html {
 
 body {
   padding: 1rem;
+  padding-top: 0;
   font-size: 1rem;
   line-height: 1.5;
 }
 
-header {
+body > header {
   max-width: 42rem;
   margin-inline: auto;
+  border-bottom: 1px solid var(--color-fg);
 
   > nav {
     display: flex;
     gap: 0 1.25rem;
     flex-wrap: wrap;
-    padding-top: .25rem;
+    padding: .5rem 0;
   }
 
   > a:first-child {
-    display: block;
-    width: 100%;
+    display: inline-block;
     padding: .25rem .5rem;
+    padding-top: .5rem;
     background-color: var(--color-links);
     color: var(--color-bg);
     font-weight: bold;
