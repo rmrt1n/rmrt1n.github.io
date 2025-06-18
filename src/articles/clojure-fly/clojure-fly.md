@@ -429,7 +429,7 @@ This is an implementation of a typical [post/redirect/get](https://en.wikipedia.
 
 That should be all of the code for the controllers. If you reload your REPL and go to `http://localhost:8080`, you should see something that looks like this after logging in:
 
-![Screnshot of the app](/assets/images/clojure-fly-1.png)
+![Screnshot of the app](./clojure-fly-1.png)
 
 The last thing we need to do is to update the main function to start the system:
 
@@ -609,7 +609,7 @@ Visit your newly deployed app at https://blue-water-6489.fly.dev/
 
 The first deployment will take longer since it's building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run `fly open` which will do the same thing. Here's the app in action:
 
-![The app in action](/assets/images/clojure-fly-2.webp)
+![The app in action](./clojure-fly-2.webp)
 
 If you made additional changes to the app or `fly.toml`, you can redeploy the app using the same command, `fly deploy`. The app is configured to auto stop/start, which helps to cut costs when there's not a lot of traffic to the site. If you want to take down the deployment, you'll need to delete the app itself using `fly app destroy <your app name>`.
 

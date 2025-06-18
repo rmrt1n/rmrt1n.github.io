@@ -1,16 +1,17 @@
-import { feedPlugin } from '@11ty/eleventy-plugin-rss'
+import { InputPathToUrlTransformPlugin } from "@11ty/eleventy";
 import { eleventyImageTransformPlugin } from '@11ty/eleventy-img'
+import { feedPlugin } from '@11ty/eleventy-plugin-rss'
 import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight'
 import markdownIt from 'markdown-it'
-import footnote from 'markdown-it-footnote'
 import anchor from 'markdown-it-anchor'
+import footnote from 'markdown-it-footnote'
 import toc from 'markdown-it-table-of-contents'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 export default function (eleventyConfig) {
   eleventyConfig.setLibrary('md', markdownIt({
     html: true,
-    typographer: true
+    typographer: true,
   }))
   eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
   eleventyConfig.amendLibrary('md', (md) => md.renderer.rules.footnote_block_open = () => (
@@ -19,7 +20,7 @@ export default function (eleventyConfig) {
     '<ol class="footnotes-list">\n'
   ))
   eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
-    permalink: anchor.permalink.headerLink()
+    permalink: anchor.permalink.headerLink(),
   }))
   eleventyConfig.amendLibrary('md', (md) => md.use(toc, {
     includeLevel: [2, 3],
@@ -27,9 +28,10 @@ export default function (eleventyConfig) {
     listType: 'ol',
     transformContainerOpen: () => `<aside class="toc">
       <details><summary><h2>Table of Contents</h2></summary>`,
-    transformContainerClose: () => `</details></aside>`
+    transformContainerClose: () => `</details></aside>`,
   }))
 
+  eleventyConfig.addPlugin(InputPathToUrlTransformPlugin)
   eleventyConfig.addPlugin(syntaxHighlight)
   eleventyConfig.addPlugin(feedPlugin, {
     type: 'atom',
@@ -40,14 +42,14 @@ export default function (eleventyConfig) {
     },
     metadata: {
       language: 'en',
-      title: 'Ryan Martin\'s Blog',
+      title: "Ryan Martin's Blog",
       subtitle: '',
       base: 'https://ryanmartin.me/',
       author: {
         name: 'Ryan Martin',
-        email: 'hi@ryanmartin.me'
-      }
-    }
+        email: 'hi@ryanmartin.me',
+      },
+    },
   })
   eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
     extensions: 'html',
@@ -67,53 +69,41 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
 
-  eleventyConfig.addPairedShortcode(
-    'table',
-    (content) => `<div style="overflow-x: auto">${content}</div>`,
-  )
+  eleventyConfig.addPairedShortcode('table', (content) => (
+    `<div style="overflow-x: auto">${content}</div>`
+  ))
 
   eleventyConfig.addCollection('tags', (collection) => {
-    const tags = {}
-    collection.getAll().forEach((item) => {
-      if (!item.data.tags) return
-      item.data.tags
-        .filter((tag) => !['articles', 'snippets'].includes(tag))
-        .forEach((tag) => {
-          if (tags[tag]) {
-            tags[tag]++
-          } else {
-            tags[tag] = 1
-          }
-        })
-    })
-    return Object.keys(tags)
-      .map((tag) => ({ tag, count: tags[tag] }))
+    const frequencies = collection
+      .getAll()
+      .flatMap((item) => item.data.tags || [])
+      .filter((tag) => !['articles', 'snippets'].includes(tag))
+      .reduce((acc, tag) => ({ ...acc, [tag]: (acc[tag] || 0) + 1 }))
+    return Object.keys(frequencies)
+      .map(([tag, count]) => ({ tag, count }))
       .sort((a, b) => b.count - a.count)
   })
 
-  eleventyConfig.addPreprocessor('toc', 'md', (data, content) => {
-    if (data.tags?.includes('articles')) return '[[toc]]\n' + content
-    return content
-  })
+  eleventyConfig.addPreprocessor('toc', 'md', (data, content) => (
+    data.tags?.includes('articles') ? '[[toc]]\n' + content : content
+  ))
 
   eleventyConfig.addTransform('ps1', (content) => {
-    return content.replaceAll('__$ ',
-      `<code style="user-select:none;color:var(--color-links)">$ </code>`
+    return content.replaceAll(
+      '__$ ',
+      `<code style="user-select:none;color:var(--color-links)">$ </code>`,
     )
   })
 
   eleventyConfig.addGlobalData('eleventyComputed', {
-    eleventyExcludeFromCollections: (data) => {
-      if (data.draft) return true
-      return data.eleventyExcludeFromCollections
-    },
+    eleventyExcludeFromCollections: (data) => data.draft ?? data.eleventyExcludeFromCollections,
     permalink: (data) => {
       if (data.draft) {
         const hash = crypto.createHash('md5').update(data.title).digest('hex')
         return `drafts/${hash}/`
       }
       return data.permalink
-    }
+    },
   })
 
   return {

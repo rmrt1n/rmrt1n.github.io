@@ -26,7 +26,7 @@ A nice way to visualise the difference between top-down and bottom-up approaches
 
 Let's use this math expression `1 + 2 * 3` as an example. We can also represent this expression as a tree:
 
-![Math expression as tree diagram](/assets/images/recursive-ascent-1.png)
+![Math expression as tree diagram](./recursive-ascent-1.png)
 
 A top-down parser builds the parse tree starting from the root node and ending in the leaf nodes. In computer science lingo, this is also called a pre-order traversal. If you write down the nodes in the order it is traversed, you'll end up with `+ 1 * 2 3`, the Polish notation of the previous expression.
 
@@ -174,7 +174,7 @@ term -> term '*' factor •
 
 And we're done! Here's a diagram to help you visualise the state transitions:
 
-![State transition diagram](/assets/images/recursive-ascent-2.png)
+![State transition diagram](./recursive-ascent-2.png)
 
 ## The Action and Goto Table
 

@@ -25,13 +25,13 @@ There are probably many different ways to implement this, each with different tr
 
 At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you'll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?
 
-![Two-way communication scheme](/assets/images/cli-login-1.png)
+![Two-way communication scheme](./cli-login-1.png)
 
 This probably works, though I haven't actually tested it yet. This isn't the approach that I implemented, but it could be a good area for future experimentation.
 
 How it works in Supabase CLI and `flyctl` is that it uses a "one-way" communication scheme instead of a two-way one.[^2] Instead of the remote server sending the access token after the user has logged in, the CLI will keep polling for the access token in the background. At a high level, the flow should look like this diagram:
 
-![One-way communication scheme](/assets/images/cli-login-2.png)
+![One-way communication scheme](./cli-login-2.png)
 
 The CLI will provide a session ID and ask the server to create a "CLI login session" when the user logs in successfully. An access token will be created for this specific session. Then, the CLI will request this access token from the server and store it for future requests.
 
@@ -227,7 +227,7 @@ export async function load({ cookies }) {
 
 The `load` function is a [function that runs before the page is rendered](https://kit.svelte.dev/docs/load). It's similar to page/route controllers in other web frameworks like [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). If you open `http://localhost:5173` in your browser, you should be redirected to the login page.
 
-![Login page](/assets/images/cli-login-3.webp)
+![Login page](./cli-login-3.webp)
 
 ## The CLI Login Endpoints
 
@@ -391,7 +391,7 @@ The `acme` CLI will generate a random UUID for the session ID and include it as 
 
 If you're not already logged in, you will be redirected to the login page. Once you've logged in and seen the success message, the CLI should have already received the access token from the `/cli/login/:session` endpoint. If you run this script, you should get something like this:
 
-![The CLI login flow](/assets/images/cli-login-4.webp)
+![The CLI login flow](./cli-login-4.webp)
 
 Nice! We now have a working automatic CLI login system. Note, I cleared the cookies in the video above so that I can log in again. If you didn't do this, you'll go straight to the success message as you're already logged in. I also created a shell alias to make the script look like a "proper" CLI tool:
 
@@ -627,7 +627,7 @@ login()
 
 The `decrypt` function follows the same steps as the encryption process, just reversed. And that's it. When we run the script now, we should see that the login flow still works the same:
 
-![Checking the new CLI login flow](/assets/images/cli-login-5.webp)
+![Checking the new CLI login flow](./cli-login-5.webp)
 
 You can also see the decrypted token is the same as the token in the database.
 
