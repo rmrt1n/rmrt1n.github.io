@@ -76,10 +76,10 @@ export default function (eleventyConfig) {
   eleventyConfig.addCollection('tags', (collection) => {
     const frequencies = collection
       .getAll()
-      .flatMap((item) => item.data.tags || [])
+      .flatMap((item) => item.data.tags ?? [])
       .filter((tag) => !['articles', 'snippets'].includes(tag))
-      .reduce((acc, tag) => ({ ...acc, [tag]: (acc[tag] || 0) + 1 }))
-    return Object.keys(frequencies)
+      .reduce((acc, tag) => ({ ...acc, [tag]: (acc[tag] ?? 0) + 1 }), {})
+    return Object.entries(frequencies)
       .map(([tag, count]) => ({ tag, count }))
       .sort((a, b) => b.count - a.count)
   })

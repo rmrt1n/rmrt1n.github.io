@@ -7,7 +7,7 @@ Hi there 👋,
 
 I'm a software developer from Indonesia. I'm interested in foundational software, cybersecurity, and
 the craft of software engineering — from compilers to command lines to user-facing apps. Outside of
-work, I enjoy reading, playing billiards, and exploring good food and drinks.
+work, I enjoy reading, playing billiards, and finding good food and drinks.
 
 Currently I'm working on the core systems behind the
 [World Engine](https://github.com/argus-labs/world-engine), an SDK for building onchain games, at
