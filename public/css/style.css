@@ -76,6 +76,13 @@ body > header {
     color: var(--color-bg);
     font-weight: bold;
     text-decoration: none;
+    border: 1px solid var(--color-links);
+    border-top: 0;
+
+    &:focus {
+      background-color: var(--color-bg);
+      color: var(--color-links);
+    }
   }
 }
 

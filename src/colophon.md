@@ -8,7 +8,7 @@ frameworks but I always end up back with 11ty. It's simple, flexible, has a lot 
 and just gets the job done. The site is hosted on [GitHub Pages](https://pages.github.com/).
 
 Fonts used are based on a slightly modified [Modern Font Stacks](https://modernfontstacks.com/).
-Heading text uses transitional typefaces and body text uses neo-grotesque typefaces. Code blocks are
+Heading text uses transitional typefaces and body text uses neo-grotesques. Code blocks are
 set in [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono).
 
 The code for this site is open source under the [MIT license](https://spdx.org/licenses/MIT.html)
@@ -18,6 +18,7 @@ as articles and snippets, is licensed under the Creative Commons license
 
 This site doesn't use cookies or analytics scripts.
 
-Build:
-[`{% commitHash %}`](https://github.com/rmrt1n/rmrt1n.github.io/commit/{% commitHash %})
-` – {% commitMessage %} ({{ 'now' | date: '%Y-%m-%d %H:%M %z' }})`.
+Last updated on <time>{{ 'now' | date: '%d %B %Y' }}</time>:
+
+<pre class="language-plaintext">
+<code class="language-plaintext"><a href="https://github.com/rmrt1n/rmrt1n.github.io/commit/{% commitHash %}" style="display:inline-block">{% commitHash %}</a> – {% commitMessage %}</code></pre>
