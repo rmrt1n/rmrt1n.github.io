@@ -17,3 +17,7 @@ as articles and snippets, is licensed under the Creative Commons license
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 This site doesn't use cookies or analytics scripts.
+
+Build:
+[`{% commitHash %}`](https://github.com/rmrt1n/rmrt1n.github.io/commit/{% commitHash %})
+` – {% commitMessage %} ({{ 'now' | date: '%Y-%m-%d %H:%M %z' }})`.

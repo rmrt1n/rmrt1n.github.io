@@ -7,6 +7,7 @@ import anchor from 'markdown-it-anchor'
 import footnote from 'markdown-it-footnote'
 import toc from 'markdown-it-table-of-contents'
 import crypto from 'node:crypto'
+import { execSync } from 'node:child_process'
 
 export default function (eleventyConfig) {
   eleventyConfig.setLibrary('md', markdownIt({
@@ -68,6 +69,9 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
+
+  eleventyConfig.addShortcode("commitHash", () => execSync('git show -s --format="%h"'))
+  eleventyConfig.addShortcode("commitMessage", () => execSync('git show -s --format="%s"'))
 
   eleventyConfig.addPairedShortcode('table', (content) => (
     `<div style="overflow-x: auto">${content}</div>`
