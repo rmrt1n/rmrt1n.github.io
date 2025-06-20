@@ -76,6 +76,13 @@ body > header {
     color: var(--color-bg);
     font-weight: bold;
     text-decoration: none;
+    border: 1px solid var(--color-links);
+    border-top: 0;
+
+    &:focus {
+      background-color: var(--color-bg);
+      color: var(--color-links);
+    }
   }
 }
 
@@ -299,26 +306,13 @@ table {
 }
 
 .toc {
-  > details {
-    cursor: default;
+  > div > * + * { margin-top: 1rem; }
 
-    &[open] {
-      summary {
-        margin-bottom: .5rem;
-      }
-    }
+  ol {
+    padding-left: .75rem;
 
-    h2 {
-      display: inline;
-    }
-
-    ol {
-      margin-left: 0;
-      padding-left: .75rem;
-
-      ::marker {
-        content: counters(list-item, '.') '. '
-      }
+    ::marker {
+      content: counters(list-item, '.') '. '
     }
   }
 
@@ -329,7 +323,7 @@ table {
     right: -22rem;
     height: 100%;
 
-    > details {
+    > div {
       position: sticky;
       top: 1rem;
     }

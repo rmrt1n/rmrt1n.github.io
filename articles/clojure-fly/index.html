@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | Build and Deploy Web Apps With Clojure and FLy.io</title>
-    <script src="/js/toc.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -42,11 +41,10 @@
     <ul class="tags"><li><a href="/tags/clojure">#clojure</a></li><li><a href="/tags/infrastructure">#infrastructure</a></li><li><a href="/tags/java">#java</a></li><li><a href="/tags/networking">#networking</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
   </header>
   <section id="content">
-    <aside class="toc">
-      <details><summary><h2>Table of Contents</h2></summary><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-app">Packaging the App</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></details></aside>
-<p>This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.</p>
+    <p>This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.</p>
 <p>As the title suggests, we’ll be deploying the app to <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My experience with it has been good, it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.</p>
 <p>This isn’t a tutorial on Clojure, so I’ll assume you already have some familiarity with the language as well as some of its libraries.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+<aside class="toc"><div><h2>Table of Contents</h2><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-app">Packaging the App</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></div></aside>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>In this post, we’ll be building a barebones bookmarks manager for the demo app. Users can log in using <a href="https://roadmap.sh/guides/http-basic-authentication">basic authentication</a>, view all bookmarks, and create a new bookmark. It’ll be a traditional multi-page web app and the data will be stored in a <a href="https://sqlite.org">SQLite</a> database.</p>
 <p>Here’s an overview of the project’s starting directory structure:</p>
