@@ -17,4 +17,37 @@ layout: base.liquid
   <section id="content">
     {{ content }}
   </section>
+  <section id="hey">
+    <p>
+
+    Hi 👋. If you like this article, consider
+    <a href="https://twitter.com/intent/tweet/?text={{ title }} @gud_mornign&url={{ metadata.url }}{{ page.url }}">
+      sharing it on X
+    </a> or
+    <a href="https://news.ycombinator.com/submitlink?u={{ metadata.url }}{{ page.url }}&t={{ title }}">
+      Hacker News
+    </a>.
+    Have a comment or correction? Feel free to <a href="mailto:{{ metadata.author.email }}">email me</a>
+    or <a href="{{ metadata.author.x }}">reach out on X</a>.
+    You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
+    </p>
+
+    <p>Continue reading:</p>
+
+    {% if page.url contains "/articles/" %}
+      {% assign previous = collections.articles | getPreviousCollectionItem: page %}
+      {% assign next = collections.articles | getNextCollectionItem: page %}
+    {% elsif page.url contains "/snippets/" %}
+      {% assign previous = collections.snippets | getPreviousCollectionItem: page %}
+      {% assign next = collections.snippets | getNextCollectionItem: page %}
+    {% endif %}
+    <ul>
+      {% if next %}
+        <li><strong>Next: </strong><a href="{{ next.url }}">{{next.data.title}}</a></li>
+      {% endif %}
+      {% if previous %}
+        <li><strong>Back: </strong><a href="{{ previous.url }}">{{previous.data.title }}</a></li>
+      {% endif %}
+    </ul>
+  </section>
 </article>

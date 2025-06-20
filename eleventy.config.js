@@ -15,11 +15,6 @@ export default function (eleventyConfig) {
     typographer: true,
   }))
   eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
-  eleventyConfig.amendLibrary('md', (md) => md.renderer.rules.footnote_block_open = () => (
-    '<p id="asterism">⁂</p>' +
-    '<section class="footnotes">\n' +
-    '<ol class="footnotes-list">\n'
-  ))
   eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
     permalink: anchor.permalink.headerLink(),
   }))

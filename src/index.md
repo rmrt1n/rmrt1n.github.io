@@ -29,8 +29,8 @@ recent ones:
 
 
 If you ever want to chat or work together on a project, you can find me on
-[GitHub](https://github.com/rmrt1n), [X](https://x.com/gud_mornign),
-[LinkedIn](https://linkedin.com/in/ryanmrt1n), or email me directly at
-[hi@ryanmartin.me](mailto:hi@ryanmartin.me).
+[GitHub]({{ metadata.author.github }}), [X]({{ metadata.author.x }}),
+[LinkedIn]({{ metadata.author.linkedin }}), or email me directly at
+[hi@ryanmartin.me](mailto:{{ metadata.author.email }}).
 
 – Ryan.
