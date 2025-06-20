@@ -27,9 +27,8 @@ export default function (eleventyConfig) {
     includeLevel: [2, 3],
     containerClass: 'toc',
     listType: 'ol',
-    transformContainerOpen: () => `<aside class="toc">
-      <details><summary><h2>Table of Contents</h2></summary>`,
-    transformContainerClose: () => `</details></aside>`,
+    transformContainerOpen: () => `<aside class="toc"><div><h2>Table of Contents</h2>`,
+    transformContainerClose: () => `</div></aside>`,
   }))
 
   eleventyConfig.addPlugin(InputPathToUrlTransformPlugin)
@@ -89,7 +88,9 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addPreprocessor('toc', 'md', (data, content) => (
-    data.tags?.includes('articles') ? '[[toc]]\n' + content : content
+    data.tags?.includes('articles')
+      ? content.replace(/^##\s/m, '[[toc]]\n## ')
+      : content
   ))
 
   eleventyConfig.addTransform('ps1', (content) => {
