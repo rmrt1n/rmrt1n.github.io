@@ -53,7 +53,8 @@ steghide: could not <span class="token function">open</span> the <span class="to
   <span class="token comment"># ...</span></code></pre>
 <p>The <code>:z</code> and <code>:Z</code> suffixes tell Podman to set the required labels to the volume mount directory &amp; files. Without these labels, SELinux will prevent any processes inside the container from using the contents of the volume mount.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>The difference between <code>:z</code> and <code>:Z</code> is that <code>:z</code> tells Podman that more than one container will access the volume, while <code>:Z</code> means that only the current container can use it. In general, I recommend to just use the <code>:z</code> label unless you know that only 1 container will be using the volume.</p>
-<p id="asterism">⁂</p><section class="footnotes">
+<hr class="footnotes-sep">
+<section class="footnotes">
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p>The other options is to set SELinux to permissive mode: <code>setenforce 0</code>, but you probably shouldn’t do this, especially if you’re running on a server. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
@@ -62,6 +63,34 @@ steghide: could not <span class="token function">open</span> the <span class="to
 </ol>
 </section>
 
+  </section>
+  <section id="hey">
+    <p>
+
+    Hi 👋. If you like this article, consider
+    <a href="https://twitter.com/intent/tweet/?text=Fixing Podman Volume Permission Issues @gud_mornign&url=https://ryanmartin.me/snippets/podman-volume-permissions/">
+      sharing it on X
+    </a> or
+    <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/snippets/podman-volume-permissions/&t=Fixing Podman Volume Permission Issues">
+      Hacker News
+    </a>.
+    Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
+    or <a href="https://x.com/gud_mornign">reach out on X</a>.
+    You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
+    </p>
+
+    <p>Continue reading:</p>
+
+    
+      
+      
+    
+    <ul>
+      
+      
+        <li><strong>Back: </strong><a href="/snippets/podman-docker-compose/">Trick Docker Compose to Use Podman</a></li>
+      
+    </ul>
   </section>
 </article>
 

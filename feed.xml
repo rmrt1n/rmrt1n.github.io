@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-06-20T10:33:57Z</updated>
+  <updated>2025-06-20T19:13:42Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-06-20T10:33:57Z</updated>
+    <updated>2025-06-20T19:13:42Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
 &lt;p&gt;Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
@@ -746,7 +746,8 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;And that’s all. You can find the complete code on &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent&quot;&gt;this GitHub repo&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
-&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This &lt;a href=&quot;https://www.abubalay.com/blog/2018/04/08/recursive-ascent&quot;&gt;blog post&lt;/a&gt; by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -781,7 +782,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-06-20T10:33:57Z</updated>
+    <updated>2025-06-20T19:13:42Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
 &lt;p&gt;As the title suggests, we’ll be deploying the app to &lt;a href=&quot;https://fly.io&quot;&gt;Fly.io&lt;/a&gt;. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; My experience with it has been good, it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.&lt;/p&gt;
@@ -1299,7 +1300,8 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
 &lt;li&gt;&lt;a href=&quot;https://tonitalksdev.com/deploying-clojure-like-a-seasoned-hobbyist&quot;&gt;Deploying Clojure Like a Seasoned Hobbyist&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.braveclojure.com/quests/deploy/&quot;&gt;Brave Clojure’s Deploy Quest&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and “loaded” into a VM. See &lt;a href=&quot;https://www.youtube.com/watch?v=7iypMRKniPU&quot;&gt;this video explanation&lt;/a&gt; for more details. &lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -1328,7 +1330,7 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-06-20T10:33:57Z</updated>
+    <updated>2025-06-20T19:13:42Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
 &lt;p&gt;It usually works like this. When you type a command like &lt;code&gt;cli login&lt;/code&gt; in your terminal, a login page will open in your web browser. After you log in, the page will show a message like “Your CLI is connected now”. When you go back to the terminal, it will say that it’s “connected” and you can now perform commands that require authentication.&lt;/p&gt;
@@ -1821,7 +1823,8 @@ Proxying &lt;span class=&quot;token builtin class-name&quot;&gt;local&lt;/span&g
 &lt;p&gt;You can also see the decrypted token is the same as the token in the database.&lt;/p&gt;
 &lt;h2 id=&quot;what%E2%80%99s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;You can find the code for this project &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login&quot;&gt;on GitHub&lt;/a&gt;. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!&lt;/p&gt;
-&lt;p id=&quot;asterism&quot;&gt;⁂&lt;/p&gt;&lt;section class=&quot;footnotes&quot;&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I learned about how this works mostly by digging into the &lt;a href=&quot;https://github.com/supabase/cli&quot;&gt;Supabase CLI code&lt;/a&gt;, so I’m biased toward this approach. You can also see &lt;a href=&quot;https://supabase.com/blog/automatic-cli-login&quot;&gt;Supabase’s blog post about this&lt;/a&gt; and &lt;a href=&quot;https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/&quot;&gt;Fly’s guide on implementing this in Laravel&lt;/a&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
