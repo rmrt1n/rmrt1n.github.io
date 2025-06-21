@@ -10,7 +10,7 @@ layout: base.liquid
     </p>
     <ul class="tags">
       {%- for tag in tags offset:1 -%}
-        <li><a href="/tags/{{ tag }}">#{{ tag }}</a></li>
+        <li><a href="/tags/#{{ tag | slugify }}">#{{ tag | slugify }}</a></li>
       {%- endfor -%}
     </ul>
   </header>
@@ -40,16 +40,17 @@ layout: base.liquid
       {% assign posts = collections.snippets | sort: 'data.published' %}
     {% endif %}
 
-    {% assign previous = posts | getPreviousCollectionItem: page %}
-    {% assign next = posts | getNextCollectionItem: page %}
-
-    <ul>
-      {% if previous %}
-        <li><strong>Back: </strong><a href="{{ previous.url }}">{{previous.data.title }}</a></li>
-      {% endif %}
-      {% if next %}
-        <li><strong>Next: </strong><a href="{{ next.url }}">{{next.data.title}}</a></li>
-      {% endif %}
-    </ul>
+    {% if posts %}
+      {% assign previous = posts | getPreviousCollectionItem: page %}
+      {% assign next = posts | getNextCollectionItem: page %}
+      <ul>
+        {% if previous %}
+          <li><strong>Back: </strong><a href="{{ previous.url }}">{{previous.data.title }}</a></li>
+        {% endif %}
+        {% if next %}
+          <li><strong>Next: </strong><a href="{{ next.url }}">{{next.data.title}}</a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
   </section>
 </article>

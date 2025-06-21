@@ -1,9 +1,9 @@
 ---
 title: Understanding Recursive Ascent Parsers
 tags:
-  - algorithms
-  - compilers
-  - python
+  - Algorithms
+  - Compilers
+  - Python
 published: 2024-05-28
 updated: 2024-11-02
 ---

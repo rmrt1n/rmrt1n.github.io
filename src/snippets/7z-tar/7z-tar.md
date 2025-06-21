@@ -1,7 +1,7 @@
 ---
 title: The Problem with Using 7-Zip on Tar Files
 tags:
-  - linux
+  - Linux
 published: 2024-11-20
 updated: 2024-11-20
 ---

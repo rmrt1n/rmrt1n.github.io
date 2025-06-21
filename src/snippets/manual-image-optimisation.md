@@ -1,9 +1,9 @@
 ---
 title: How to Manually Optimise Images for the Web
 tags:
-  - html
-  - performance
-  - web-development
+  - HTML
+  - Performance
+  - Web Development
 published: 2024-05-16
 updated: 2024-05-22
 ---

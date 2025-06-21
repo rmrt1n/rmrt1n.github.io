@@ -1,8 +1,8 @@
 ---
 title: My CSS reset
 tags:
-  - css
-  - web-development
+  - CSS
+  - Web Development
 published: 2024-06-05
 updated: 2024-06-05
 ---

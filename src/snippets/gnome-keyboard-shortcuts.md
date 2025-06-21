@@ -1,7 +1,7 @@
 ---
 title: Configure Keyboard Shortcuts for GNOME Workspace Switching
 tags:
-  - linux
+  - Linux
 published: 2024-05-14
 updated: 2024-05-22
 status: published

@@ -1,12 +1,12 @@
 ---
 title: How to Implement Automatic CLI Login
 tags:
-  - authentication
-  - cryptography
-  - javascript
-  - security
-  - sveltekit
-  - web-development
+  - Authentication
+  - Cryptography
+  - JavaScript
+  - Security
+  - SvelteKit
+  - Web Development
 published: 2024-06-10
 updated: 2024-10-02
 ---

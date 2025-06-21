@@ -22,7 +22,8 @@ export default function (eleventyConfig) {
     includeLevel: [2, 3],
     containerClass: 'toc',
     listType: 'ol',
-    transformContainerOpen: () => `<aside class="toc"><div><h2>Table of Contents</h2>`,
+    transformContainerOpen: () => `<aside class="toc"><div>
+      <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2>`,
     transformContainerClose: () => `</div></aside>`,
   }))
 
