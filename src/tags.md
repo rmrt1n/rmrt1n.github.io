@@ -13,7 +13,7 @@ title: Tags
 
 {%- for tag in collections.tags -%}
   <h2 id="{{ tag.tag | slugify }}">
-    <a href="#{{ tag.tag }}" class="header-anchor">{{ tag.tag }}</a>
+    <a href="#{{ tag.tag | slugify }}" class="header-anchor">{{ tag.tag }}</a>
   </h2>
   <ul class="archive">
     {% assign posts = collections[tag.tag] | sort: 'data.published' | reverse %}
