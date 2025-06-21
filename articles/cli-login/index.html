@@ -38,7 +38,7 @@
     <p> <!-- wrap with p just to make the line height consistent -->
       <time>10 June 2024</time>
     </p>
-    <ul class="tags"><li><a href="/tags/authentication">#authentication</a></li><li><a href="/tags/cryptography">#cryptography</a></li><li><a href="/tags/javascript">#javascript</a></li><li><a href="/tags/security">#security</a></li><li><a href="/tags/sveltekit">#sveltekit</a></li><li><a href="/tags/web-development">#web-development</a></li></ul>
+    <ul class="tags"><li><a href="/tags/#authentication">#authentication</a></li><li><a href="/tags/#cryptography">#cryptography</a></li><li><a href="/tags/#javascript">#javascript</a></li><li><a href="/tags/#security">#security</a></li><li><a href="/tags/#sveltekit">#sveltekit</a></li><li><a href="/tags/#web-development">#web-development</a></li></ul>
   </header>
   <section id="content">
     <p>I’ve recently had the chance to work on an “automatic CLI login” feature for a <a href="https://github.com/Argus-Labs/world-cli">CLI tool</a> at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.</p>
@@ -46,7 +46,8 @@
 <p>The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.</p>
 <p>You’ve probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include <a href="https://supabase.com/docs/reference/cli/introduction">Supabase CLI</a>, <a href="https://cli.github.com/">GitHub CLI</a>, <a href="https://graphite.dev/features/cli">Graphite CLI</a>, and Fly.io’s <a href="https://fly.io/docs/flyctl/"><code>flyctl</code></a>. It’s a UX pattern that I like, as it hides a lot of complexity from the user.</p>
 <p>There are probably many different ways to implement this, each with different trade-offs. In this post, I’ll write about just one way of doing this, which is also the same approach used by Supabase and Fly.io.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
-<aside class="toc"><div><h2>Table of Contents</h2><ol><li><a href="#how-it-works">How it Works</a></li><li><a href="#project-setup">Project Setup</a></li><li><a href="#a-basic-authentication-system">A Basic Authentication System</a></li><li><a href="#the-cli-login-endpoints">The CLI Login Endpoints</a></li><li><a href="#writing-the-cli-tool">Writing the CLI Tool</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></li><li><a href="#securing-the-endpoints">Securing the Endpoints</a></li><li><a href="#what%E2%80%99s-next">What’s Next</a></li></ol></div></aside>
+<aside class="toc"><div>
+      <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#how-it-works">How it Works</a></li><li><a href="#project-setup">Project Setup</a></li><li><a href="#a-basic-authentication-system">A Basic Authentication System</a></li><li><a href="#the-cli-login-endpoints">The CLI Login Endpoints</a></li><li><a href="#writing-the-cli-tool">Writing the CLI Tool</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></li><li><a href="#securing-the-endpoints">Securing the Endpoints</a></li><li><a href="#what%E2%80%99s-next">What’s Next</a></li></ol></div></aside>
 <h2 id="how-it-works" tabindex="-1"><a class="header-anchor" href="#how-it-works">How it Works</a></h2>
 <p>At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you’ll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?</p>
 <p><img loading="lazy" decoding="async" src="/articles/cli-login/8zjhL3f3r0-2146.webp" alt="Two-way communication scheme" width="2146" height="683"></p>
@@ -575,16 +576,17 @@
     
 
     
+      
+      
+      <ul>
+        
+          <li><strong>Back: </strong><a href="/articles/recursive-ascent/">Understanding Recursive Ascent Parsers</a></li>
+        
+        
+          <li><strong>Next: </strong><a href="/articles/clojure-fly/">Build and Deploy Web Apps With Clojure and FLy.io</a></li>
+        
+      </ul>
     
-
-    <ul>
-      
-        <li><strong>Back: </strong><a href="/articles/recursive-ascent/">Understanding Recursive Ascent Parsers</a></li>
-      
-      
-        <li><strong>Next: </strong><a href="/articles/clojure-fly/">Build and Deploy Web Apps With Clojure and FLy.io</a></li>
-      
-    </ul>
   </section>
 </article>
 
