@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | Understanding Recursive Ascent Parsers</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -337,9 +338,12 @@ term -> term '*' factor •</code></pre>
 <p>The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we’ll implement this mechanism as mutually recursive functions.</p>
 <h2 id="writing-the-parser" tabindex="-1"><a class="header-anchor" href="#writing-the-parser">Writing The Parser</a></h2>
 <p>At this point, we’re ready to build the actual parser. I’ll be writing the code in Python because it’s easy to read. To make sure our parser is correct, we’ll also implement an interpreter for the expressions we parsed. First, let’s start with the program’s entry point:</p>
-<pre class="language-python"><code class="language-python"><span class="token comment"># recursive-ascent.py</span>
-<span class="token keyword">import</span> sys
-
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-python"><code class="language-python"><span class="token keyword">import</span> sys
 
 <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>sys<span class="token punctuation">.</span>argv<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">2</span><span class="token punctuation">:</span>
@@ -350,22 +354,34 @@ term -> term '*' factor •</code></pre>
     result <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">)</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
 
-
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
     main<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>This program will receive a string as an argument and print out the evaluated string. Don’t worry about the unimplemented functions for now. We’ll get to them soon.</p>
 <h3 id="a-simple-lexer" tabindex="-1"><a class="header-anchor" href="#a-simple-lexer">A Simple Lexer</a></h3>
 <p>Since we don’t have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.<sup class="footnote-ref"><a href="#fn11" id="fnref11">[11]</a></sup></p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lex</span><span class="token punctuation">(</span>string<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> string<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <h3 id="representing-the-abstract-syntax-tree-(ast)" tabindex="-1"><a class="header-anchor" href="#representing-the-abstract-syntax-tree-(ast)">Representing the Abstract Syntax Tree (AST)</a></h3>
 <p>We’ll also need a type to represent the AST that will be produced by the parser:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">AST</span><span class="token punctuation">:</span>
     <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> left<span class="token punctuation">:</span> <span class="token string">"AST | None"</span><span class="token punctuation">,</span> right<span class="token punctuation">:</span> <span class="token string">"AST | None"</span><span class="token punctuation">,</span> value<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> kind<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
         self<span class="token punctuation">.</span>left <span class="token operator">=</span> left
         self<span class="token punctuation">.</span>right <span class="token operator">=</span> right
         self<span class="token punctuation">.</span>value <span class="token operator">=</span> value
         self<span class="token punctuation">.</span>kind <span class="token operator">=</span> kind</code></pre>
+<p></p></div><p></p>
 <p>If you’ve noticed, the <code>AST</code> class above looks like a binary tree. That’s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like <a href="#bottom-up-vs-top-down-parsing">this diagram</a> from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.</p>
 <h3 id="converting-the-parse-table-into-functions" tabindex="-1"><a class="header-anchor" href="#converting-the-parse-table-into-functions">Converting the Parse Table into Functions</a></h3>
 <p>Our <code>parse</code> function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:</p>
@@ -408,6 +424,11 @@ term -> term '*' factor •</code></pre>
 </table>
 </div>
 <p>We can translate this to code like so:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state0</span><span class="token punctuation">(</span>tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     token <span class="token operator">=</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     <span class="token keyword">if</span> token<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -426,10 +447,15 @@ term -> term '*' factor •</code></pre>
     <span class="token comment"># go to state 1</span>
     <span class="token keyword">return</span> state1<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
 
-
 <span class="token keyword">def</span> <span class="token function">parse</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> state0<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Note, we don’t actually need to check the <code>ast.kind</code> here because if <code>ast = state4(token)</code> succeeds, then we’re guaranteed to get a <code>factor</code>. The same goes for <code>ast = state3(ast)</code>, which is guaranteed to return a <code>term</code>. So, we can rewrite <code>state0</code> like this:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state0</span><span class="token punctuation">(</span>tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     token <span class="token operator">=</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     <span class="token keyword">if</span> token<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -445,14 +471,20 @@ term -> term '*' factor •</code></pre>
     ast<span class="token punctuation">,</span> tokens <span class="token operator">=</span> state2<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
     <span class="token comment"># go to state 1</span>
     <span class="token keyword">return</span> state1<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Here are the helper function definitions. <code>peek</code> returns the next token, while <code>panic</code> prints an error message if an unexpected token is found and terminates the program:<sup class="footnote-ref"><a href="#fn12" id="fnref12">[12]</a></sup></p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">peek</span><span class="token punctuation">(</span>tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> <span class="token string">""</span> <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token keyword">else</span> tokens<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-
 
 <span class="token keyword">def</span> <span class="token function">panic</span><span class="token punctuation">(</span>token<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"unexpected token: {}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span><span class="token punctuation">)</span>
     exit<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>As mentioned before, reduce happens when returning from a function:</p>
 <div style="overflow-x: auto">
 <table>
@@ -502,14 +534,19 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state3</span><span class="token punctuation">(</span>ast<span class="token punctuation">:</span> AST<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># reduce using rule 5: term -> factor</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>right<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token string">"term"</span><span class="token punctuation">)</span>
 
-
 <span class="token keyword">def</span> <span class="token function">state4</span><span class="token punctuation">(</span>token<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># reduce using rule 6: factor -> INTEGER</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> <span class="token string">"factor"</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Now here’s where things get more interesting:</p>
 <div style="overflow-x: auto">
 <table>
@@ -559,6 +596,11 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state1</span><span class="token punctuation">(</span>ast<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># loop to handle left recursion</span>
     <span class="token keyword">while</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"+"</span><span class="token punctuation">:</span>
@@ -569,13 +611,13 @@ term -> term '*' factor •</code></pre>
     <span class="token comment"># accept</span>
     <span class="token keyword">return</span> ast
 
-
 <span class="token keyword">def</span> <span class="token function">state2</span><span class="token punctuation">(</span>ast<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">while</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"*"</span><span class="token punctuation">:</span>
         tokens <span class="token operator">=</span> tokens<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
         ast<span class="token punctuation">,</span> tokens <span class="token operator">=</span> state6<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
     <span class="token comment"># reduce using rule 3: expr -> term</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>right<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token string">"expr"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tokens</code></pre>
+<p></p></div><p></p>
 <p>The grammar we used has rules that contain <a href="https://en.wikipedia.org/wiki/Left_recursion">left recursion</a>. This happens when a rule starts with a symbol that is itself, e.g. <code>expr -&gt; expr '+' term</code> and <code>term -&gt; term '*' factor</code>. Top-down parsers can’t handle this type of grammar. If you’ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.</p>
 <p>When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn’t a problem for us. We can use a loop and a condition to check whether the recursive calls are done.</p>
 <p>In state 1 and state 2, the parser has parsed the left side of the binary operation. In the next states, the parser will parse the right side of the binary operation:</p>
@@ -627,6 +669,11 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state5</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     token <span class="token operator">=</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     <span class="token keyword">if</span> token<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -637,7 +684,6 @@ term -> term '*' factor •</code></pre>
     right <span class="token operator">=</span> state3<span class="token punctuation">(</span>right<span class="token punctuation">)</span>
     <span class="token keyword">return</span> state7<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
 
-
 <span class="token keyword">def</span> <span class="token function">state6</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     token <span class="token operator">=</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     <span class="token keyword">if</span> token<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -646,6 +692,7 @@ term -> term '*' factor •</code></pre>
     <span class="token keyword">else</span><span class="token punctuation">:</span>
         panic<span class="token punctuation">(</span>token<span class="token punctuation">)</span>
     <span class="token keyword">return</span> state8<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">,</span> tokens</code></pre>
+<p></p></div><p></p>
 <p>Once the right side is parsed, we can then reduce these rules in state 7 and state 8:</p>
 <div style="overflow-x: auto">
 <table>
@@ -695,6 +742,11 @@ term -> term '*' factor •</code></pre>
 </tbody>
 </table>
 </div>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state7</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> right<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> tokens<span class="token punctuation">:</span> <span class="token builtin">list</span><span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">while</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"*"</span><span class="token punctuation">:</span>
         tokens <span class="token operator">=</span> tokens<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
@@ -702,11 +754,16 @@ term -> term '*' factor •</code></pre>
     <span class="token comment"># reduce using rule 2: expr -> expr '+' term</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> <span class="token string">"+"</span><span class="token punctuation">,</span> <span class="token string">"expr"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tokens
 
-
 <span class="token keyword">def</span> <span class="token function">state8</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> right<span class="token punctuation">:</span> AST<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># reduce using rule 4: term -> term '*' factor</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> <span class="token string">"*"</span><span class="token punctuation">,</span> <span class="token string">"term"</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>And that’s all of the code for the parser! Now we just have to check whether the output is correct. Let’s add a method in the <code>AST</code> class to pretty-print itself, so that it’s easier to visualise:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">AST</span><span class="token punctuation">:</span>
     <span class="token comment"># ...</span>
 
@@ -721,9 +778,15 @@ term -> term '*' factor •</code></pre>
             self<span class="token punctuation">.</span>right<span class="token punctuation">.</span>pprint<span class="token punctuation">(</span><span class="token punctuation">)</span>
         <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>value<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
             <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">" )"</span><span class="token punctuation">,</span> end<span class="token operator">=</span><span class="token string">""</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>I’m printing the AST as s-expressions so that it’s easy to see the expressions follow the correct operator precedence.<sup class="footnote-ref"><a href="#fn13" id="fnref13">[13]</a></sup> Given an input like <code>1 + 2 * 3 + 4</code>, this method will print out the following: <code>( + ( +  1 ( *  2  3  ) ) 4  )</code>. This looks right. All that’s left now is to implement the <code>evaluate</code> function and test if it works as expected.</p>
 <h3 id="interpreting-the-ast" tabindex="-1"><a class="header-anchor" href="#interpreting-the-ast">Interpreting the AST</a></h3>
 <p>Here’s the <code>evaluate</code> function:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">evaluate</span><span class="token punctuation">(</span>ast<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">if</span> ast<span class="token punctuation">.</span>value <span class="token operator">==</span> <span class="token string">"+"</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">+</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
@@ -731,13 +794,22 @@ term -> term '*' factor •</code></pre>
         <span class="token keyword">return</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">*</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
     <span class="token keyword">else</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> <span class="token builtin">int</span><span class="token punctuation">(</span>ast<span class="token punctuation">.</span>value<span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>It will recursively evaluate all the nodes in the AST. Let’s run the program and check if the output is correct:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>python3 recursive-ascent.py <span class="token string">'1 + 2 * 3 + 4'</span>
-<span class="token number">11</span>
-
-<code style="user-select:none;color:var(--color-links)">$ </code>python3 recursive-ascent.py <span class="token string">'1 * 2 + 3 * 4'</span>
-<span class="token number">14</span></code></pre>
+<span class="token comment"># 11</span></code></pre>
+<p></p></div><p></p>
 <p>Good, it works! Now let’s write some generated tests to have more confidence in the program. Here’s a function that would generate random numbers and combinations of operators (<code>+</code> and <code>*</code>), run the <code>evaluate</code> function on them, and compare the result to Python’s <code>eval</code> function:</p>
+<div class="codeblock">
+      <div>
+        <span>recursive-ascent.py</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">tests</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     errors <span class="token operator">=</span> <span class="token number">0</span>
     <span class="token keyword">for</span> _ <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -768,8 +840,8 @@ term -> term '*' factor •</code></pre>
     tokens <span class="token operator">=</span> lex<span class="token punctuation">(</span><span class="token builtin">input</span><span class="token punctuation">)</span>
     ast <span class="token operator">=</span> parse<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span>
     result <span class="token operator">=</span> evaluate<span class="token punctuation">(</span>ast<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
-</code></pre>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>The <code>eval</code> function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our <code>evaluate</code> function. If you run <code>python3 main.py test</code>, you should get this output: <code>all tests passed!</code>.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
 <p>And that’s all. You can find the complete code on <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent">this GitHub repo</a>. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.</p>

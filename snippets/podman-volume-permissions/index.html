@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | Fixing Podman Volume Permission Issues</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -42,15 +43,27 @@
   </header>
   <section id="content">
     <p>If you use <a href="https://podman.io/">Podman</a> to run containers on a system with <a href="https://www.redhat.com/en/topics/linux/what-is-selinux">SELinux</a> enabled, you’ve probably encountered some permission errors when trying to mount volumes like:</p>
-<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root steghide info favicon.png
-<span class="token comment"># error, the container process can't find the file</span>
-steghide: could not <span class="token function">open</span> the <span class="token function">file</span> <span class="token string">"favicon.png"</span><span class="token builtin class-name">.</span></code></pre>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># will error, the container process can't find the file</span>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root steghide info favicon.png
+<span class="token comment"># steghide: could not open the file "favicon.png".</span></code></pre>
+<p></p></div><p></p>
 <p>This happens because by default, rootless containers are not given access to the host machine’s volume bind directory. To fix this, you just have to add a <code>:z</code> or a <code>:Z</code> suffix to the volume mounts.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> <span class="token parameter variable">-it</span> <span class="token parameter variable">-v</span> .:/root:z steghide info favicon.png
 <span class="token comment"># it works now</span>
-<span class="token string">"favicon.png"</span><span class="token builtin class-name">:</span>
-  format: png
-  <span class="token comment"># ...</span></code></pre>
+<span class="token comment"># "favicon.png":</span>
+<span class="token comment">#   format: png</span>
+<span class="token comment">#   ...</span></code></pre>
+<p></p></div><p></p>
 <p>The <code>:z</code> and <code>:Z</code> suffixes tell Podman to set the required labels to the volume mount directory &amp; files. Without these labels, SELinux will prevent any processes inside the container from using the contents of the volume mount.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
 <p>The difference between <code>:z</code> and <code>:Z</code> is that <code>:z</code> tells Podman that more than one container will access the volume, while <code>:Z</code> means that only the current container can use it. In general, I recommend to just use the <code>:z</code> label unless you know that only 1 container will be using the volume.</p>
 <hr class="footnotes-sep">

@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | A Better Shell Script Wrapper for JAR Files</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -42,26 +43,48 @@
   </header>
   <section id="content">
     <p>To run a JAR file, usually you would do:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
+<p></p></div><p></p>
 <p>It’s a bit long to type, so some people (me included) would wrap it in a shell script:</p>
-<pre class="language-bash"><code class="language-bash"><span class="token comment"># run-jar</span>
-<span class="token comment">#!/usr/bin/bash</span>
+<div class="codeblock">
+      <div>
+        <span>run-jar.sh</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-bash"><code class="language-bash"><span class="token shebang important">#!/usr/bin/bash</span>
 <span class="token function">java</span> <span class="token parameter variable">-jar</span> /path/to/jar</code></pre>
-<p>This way, you only have to type <code>./run-jar</code>, or <code>run-jar</code> if you have the script somewhere in your shell’s <code>PATH</code>.</p>
-<p>A problem with this approach is that you now have two files, the shell script and the JAR file. If you move or delete the JAR file, the script breaks. A better way to do this is to “include” the JAR file directly in the shell script:</p>
-<pre class="language-bash"><code class="language-bash"><span class="token comment"># Add the shebang (#!) line to specify the script's interpreter</span>
-<span class="token comment"># This will tell the shell to run the script using java -jar instead of the</span>
-<span class="token comment"># usual bash or sh</span>
-<code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">echo</span> <span class="token string">'#!/usr/bin/java -jar'</span> <span class="token operator">></span> run-jar
-
-<span class="token comment"># Append the JAR file to the script</span>
-<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">cat</span> /path/to/jar <span class="token operator">>></span> run-jar
-
-<span class="token comment"># Set the file permission to be executable</span>
-<code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">chmod</span> +x run-jar
-
-<span class="token comment"># Run the jar file</span>
-<code style="user-select:none;color:var(--color-links)">$ </code>./run-jar</code></pre>
+<p></p></div><p></p>
+<p>This way, you only have to type <code>./run-jar.sh</code>, or <code>run-jar.sh</code> if you have the script somewhere in your shell’s <code>PATH</code>.</p>
+<p>A problem with this approach is that you now have two files, the shell script and the JAR file. If you move or delete the JAR file, the script breaks. A better way to do this is to “include” the JAR file directly in the shell script.</p>
+<p>First, we’ll change <code>run-jar.sh</code>’s shebang (<code>#!</code>) line from <code>#!/usr/bin/bash</code> to <code>#!/usr/bin/java</code>. This tells the shell to run the script using <code>java -jar</code> instead of the usual bash or sh:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token builtin class-name">echo</span> <span class="token string">'#!/usr/bin/java -jar'</span> <span class="token operator">></span> run-jar.sh</code></pre>
+<p></p></div><p></p>
+<p>Then, we’ll append the entire JAR file to the script:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">cat</span> /path/to/jar <span class="token operator">>></span> run-jar.sh</code></pre>
+<p></p></div><p></p>
+<p>Finally, all we have to do is set the script file permission to executable:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">chmod</span> +x run-jar.sh</code></pre>
+<p></p></div><p></p>
 <p>This way, everything you need to run the program is in a single file, making it simpler to manage.</p>
 
   </section>

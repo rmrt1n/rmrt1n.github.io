@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | Configure Keyboard Shortcuts for GNOME Workspace Switching</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -42,8 +43,14 @@
   </header>
   <section id="content">
     <p>GNOME settings only allow you to configure the keyboard shortcuts to switch to workspaces 1-4. There are no options to add shortcuts to switch to any other workspaces. It’s possible to configure this by editing <code>dconf</code> directly using <code>gsettings</code> from the command line:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># replace range with whatever workspaces you want</span>
 <code style="user-select:none;color:var(--color-links)">$ </code><span class="token keyword">for</span> <span class="token for-or-select variable">i</span> <span class="token keyword">in</span> <span class="token punctuation">{</span><span class="token number">5</span><span class="token punctuation">..</span><span class="token number">6</span><span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token keyword">do</span> gsettings <span class="token builtin class-name">set</span> org.gnome.desktop.wm.keybindings switch-to-workspace-<span class="token variable">$i</span> <span class="token string">"['&lt;Super><span class="token variable">$i</span>']"</span><span class="token punctuation">;</span> <span class="token keyword">done</span></code></pre>
+<p></p></div><p></p>
 <p><code>dconf</code> is GNOME’s configuration system, and <code>gsettings</code> is the frontend for <code>dconf</code>. It’s essentially a key-value store of GNOME’s config. You can also configure the keyboard shortcuts for other settings that are not shown in GNOME settings with <code>gsettings</code>.</p>
 
   </section>

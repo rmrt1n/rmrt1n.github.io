@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | My CSS reset</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -43,6 +44,11 @@
   <section id="content">
     <p>I find myself using vanilla CSS more often recently. Especially for smaller websites like this blog. The thing about using just CSS instead of a complete or opinionated styling system is that you have to worry about the default browser styles. This is what <a href="https://mattbrictson.com/blog/css-normalize-and-reset">normalise stylesheets and CSS resets</a> are for.</p>
 <p>Here’s the CSS reset that I use now, it’s a combination of <a href="https://github.com/sindresorhus/modern-normalize/">modern-normalize</a> with resets I found from <a href="https://www.youtube.com/@KevinPowell">Kevin Powell</a>:</p>
+<div class="codeblock">
+      <div>
+        <span>reset.css</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-css"><code class="language-css"><span class="token atrule"><span class="token rule">@import</span> <span class="token string">'modern-normalize.css'</span><span class="token punctuation">;</span></span>
 
 <span class="token comment">/* src: https://www.youtube.com/watch?v=cCAtD_BAHNw */</span>
@@ -98,6 +104,7 @@
     <span class="token property">scroll-padding-top</span><span class="token punctuation">:</span> 8rem<span class="token punctuation">;</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
 
   </section>
   <section id="hey">

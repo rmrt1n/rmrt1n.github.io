@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <title>Ryan Martin | Build and Deploy Web Apps With Clojure and FLy.io</title>
+    <script src="/js/script.js" defer=""></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
@@ -59,8 +60,12 @@
 │       └── main.clj
 └── deps.edn</code></pre>
 <p>And the libraries we’re going to use. If you have some Clojure experience or have used <a href="https://kit-clj.github.io/">Kit</a>, you’re probably already familiar with all the libraries listed below.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; deps.edn</span>
-<span class="token punctuation">{</span><span class="token symbol">:paths</span> <span class="token punctuation">[</span><span class="token string">"src"</span> <span class="token string">"resources"</span><span class="token punctuation">]</span>
+<div class="codeblock">
+      <div>
+        <span>deps.edn</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">{</span><span class="token symbol">:paths</span> <span class="token punctuation">[</span><span class="token string">"src"</span> <span class="token string">"resources"</span><span class="token punctuation">]</span>
  <span class="token symbol">:deps</span> <span class="token punctuation">{</span>org.clojure/clojure               <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"1.12.0"</span><span class="token punctuation">}</span>
         aero/aero                         <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"1.1.6"</span><span class="token punctuation">}</span>
         integrant/integrant               <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"0.11.0"</span><span class="token punctuation">}</span>
@@ -74,10 +79,15 @@
         <span class="token symbol">:extra-deps</span>  <span class="token punctuation">{</span>nrepl/nrepl    <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"1.3.0"</span><span class="token punctuation">}</span>
                       integrant/repl <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"0.3.3"</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
         <span class="token symbol">:main-opts</span>   <span class="token punctuation">[</span><span class="token string">"-m"</span> <span class="token string">"nrepl.cmdline"</span> <span class="token string">"--interactive"</span> <span class="token string">"--color"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
 <p>I use <a href="https://github.com/juxt/aero">Aero</a> and <a href="https://github.com/weavejester/integrant">Integrant</a> for my system configuration (more on this in the next section), <a href="https://github.com/ring-clojure/ring">Ring</a> with the Jetty adaptor for the web server, <a href="https://github.com/metosin/reitit">Reitit</a> for routing, <a href="https://github.com/seancorfield/next-jdbc/">next.jdbc</a> for database interaction, and <a href="https://github.com/weavejester/hiccup/">Hiccup</a> for rendering HTML. From what I’ve seen, this is a popular “library combination” for building web apps in Clojure.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup></p>
 <p>The <code>user</code> namespace in <code>dev/user.clj</code> contains helper functions from <a href="https://github.com/weavejester/integrant-repl">Integrant-repl</a> to start, stop, and restart the Integrant system.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; dev/user.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> user
+<div class="codeblock">
+      <div>
+        <span>dev/user.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> user
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>acme.main <span class="token symbol">:as</span> main<span class="token punctuation">]</span>
    <span class="token punctuation">[</span>clojure.tools.namespace.repl <span class="token symbol">:as</span> repl<span class="token punctuation">]</span>
@@ -95,10 +105,15 @@
   <span class="token punctuation">(</span><span class="token function">halt</span><span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token function">reset</span><span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token function">reset-all</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <h2 id="systems-and-configuration" tabindex="-1"><a class="header-anchor" href="#systems-and-configuration">Systems and Configuration</a></h2>
 <p>If you’re new to Integrant or other dependency injection libraries like <a href="https://github.com/stuartsierra/component">Component</a>, I’d suggest reading <a href="https://mccue.dev/pages/12-7-22-clojure-web-primer">“How to Structure a Clojure Web”</a>. It’s a great explanation about the reasoning behind these libraries. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a <code>.edn</code> file. I usually name mine as <code>resources/config.edn</code>. Here’s what it looks like:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; resources/config.edn</span>
-<span class="token punctuation">{</span><span class="token symbol">:server</span>
+<div class="codeblock">
+      <div>
+        <span>resources/config.edn</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">{</span><span class="token symbol">:server</span>
  <span class="token punctuation">{</span><span class="token symbol">:port</span> <span class="token operator">#</span>long <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env PORT <span class="token number">8080</span><span class="token punctuation">]</span>
   <span class="token symbol">:host</span> <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env HOST <span class="token string">"0.0.0.0"</span><span class="token punctuation">]</span>
   <span class="token symbol">:auth</span> <span class="token punctuation">{</span><span class="token symbol">:username</span> <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env AUTH_USER <span class="token string">"john.doe@email.com"</span><span class="token punctuation">]</span>
@@ -107,10 +122,15 @@
  <span class="token symbol">:database</span>
  <span class="token punctuation">{</span><span class="token symbol">:dbtype</span> <span class="token string">"sqlite"</span>
   <span class="token symbol">:dbname</span> <span class="token operator">#</span>or <span class="token punctuation">[</span><span class="token operator">#</span>env DB_DATABASE <span class="token string">"database.db"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
 <p>In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don’t have any sensitive values in our config (e.g., API keys), so it’s fine to commit this file to version control. If there are such values, I usually put them in another file that’s not tracked by version control and include them in the config file using Aero’s <code>#include</code> reader tag.</p>
 <p>This config file is then “expanded” into the Integrant system map using the <code>expand-key</code> method:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
+<div class="codeblock">
+      <div>
+        <span>src/acme/main.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>aero.core <span class="token symbol">:as</span> aero<span class="token punctuation">]</span>
    <span class="token punctuation">[</span>clojure.java.io <span class="token symbol">:as</span> io<span class="token punctuation">]</span>
@@ -127,9 +147,15 @@
      <span class="token symbol">:handler/ring</span> <span class="token punctuation">{</span><span class="token symbol">:database</span> <span class="token punctuation">(</span><span class="token function">ig/ref</span> <span class="token symbol">:database/sql</span><span class="token punctuation">)</span>
                     <span class="token symbol">:auth</span>     <span class="token punctuation">(</span><span class="token symbol">:auth</span> server<span class="token punctuation">)</span><span class="token punctuation">}</span>
      <span class="token symbol">:database/sql</span> database<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>The system map is created in code instead of being in the configuration file. This makes refactoring your system simpler as you only need to change this method while leaving the config file (mostly) untouched.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup></p>
 <p>My current approach to Integrant + Aero config files is mostly inspired by the blog post <a href="https://robjohnson.dev/posts/aero-and-integrant/">“Rethinking Config with Aero &amp; Integrant”</a> and Laravel’s configuration. The config file follows a similar structure to Laravel’s config files and contains the app configurations without describing the structure of the system. Previously I had a key for each Integrant component, which led to the config file being littered with <code>#ig/ref</code> and more difficult to refactor.</p>
 <p>Also, if you haven’t already, start a REPL and connect to it from your editor. Run <code>clj -M:dev</code> if your editor doesn’t automatically start a REPL. Next, we’ll implement the <code>init-key</code> and <code>halt-key!</code> methods for each of the components:</p>
+<div class="codeblock">
+      <div>
+        <span>src/acme/main.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
 <span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
@@ -161,9 +187,14 @@
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span>datasource <span class="token punctuation">(</span><span class="token function">jdbc/get-datasource</span> opts<span class="token punctuation">)</span><span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token function">util/setup-db</span> datasource<span class="token punctuation">)</span>
     datasource<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>The <code>setup-db</code> function creates the required tables in the database if they don’t exist yet. This works fine for database migrations in small projects like this demo app, but for larger projects, consider using libraries such as <a href="https://github.com/yogthos/migratus">Migratus</a> (my preferred library) or <a href="https://github.com/weavejester/ragtime">Ragtime</a>.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/util.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util 
+<div class="codeblock">
+      <div>
+        <span>src/acme/util.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util 
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>next.jdbc <span class="token symbol">:as</span> jdbc<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
@@ -176,9 +207,14 @@
        url text not null,
        created_at datetime default (unixepoch()) not null
      )"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>For the server handler, let’s start with a simple function that returns a “hi world” string.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>ring.util.response <span class="token symbol">:as</span> res<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
@@ -186,18 +222,29 @@
   <span class="token punctuation">[</span>_opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"hi world"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Now all the components are implemented. We can check if the system is working properly by evaluating <code>(reset)</code> in the <code>user</code> namespace. This will reload your files and restart the system. You should see this message printed in your REPL:</p>
 <pre class="language-plaintext"><code class="language-plaintext">:reloading (acme.util acme.handler acme.main)
 Server started on port  8080
 :resumed</code></pre>
 <p>If we send a request to <code>http://localhost:8080/</code>, we should get “hi world” as the response:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">curl</span> localhost:8080/
-hi world</code></pre>
+<span class="token comment"># hi world</span></code></pre>
+<p></p></div><p></p>
 <p>Nice! The system is working correctly. In the next section, we’ll implement routing and our business logic handlers.</p>
 <h2 id="routing%2C-middleware%2C-and-route-handlers" tabindex="-1"><a class="header-anchor" href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a></h2>
 <p>First, let’s set up a ring handler and router using Reitit. We only have one route, the index <code>/</code> route that’ll handle both GET and POST requests.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>reitit.ring <span class="token symbol">:as</span> ring<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
@@ -213,6 +260,7 @@ hi world</code></pre>
     <span class="token punctuation">(</span><span class="token function">ring/redirect-trailing-slash-handler</span><span class="token punctuation">)</span>
     <span class="token punctuation">(</span><span class="token function">ring/create-resource-handler</span> <span class="token punctuation">{</span><span class="token symbol">:path</span> <span class="token string">"/"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
     <span class="token punctuation">(</span><span class="token function">ring/create-default-handler</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>We’re including some useful middleware:</p>
 <ul>
 <li><code>redirect-trailing-slash-handler</code> to resolve routes with trailing slashes,</li>
@@ -221,8 +269,12 @@ hi world</code></pre>
 </ul>
 <h3 id="implementing-the-middlewares" tabindex="-1"><a class="header-anchor" href="#implementing-the-middlewares">Implementing the Middlewares</a></h3>
 <p>If you remember the <code>:handler/ring</code> from earlier, you’ll notice that it has two dependencies, <code>database</code> and <code>auth</code>. Currently, they’re inaccessible to our route handlers. To fix this, we can inject these components into the Ring request map using a middleware function.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token comment">;; ...</span>
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> components-middleware
   <span class="token punctuation">[</span>components<span class="token punctuation">]</span>
@@ -233,10 +285,15 @@ hi world</code></pre>
                         <span class="token symbol">:db</span> database
                         <span class="token symbol">:auth</span> auth<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
+<p></p></div><p></p>
 <p>The <code>components-middleware</code> function takes in a map of components and creates a middleware function that “assocs” each component into the request map.<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> If you have more components such as a Redis cache or a mail service, you can add them here.</p>
 <p>We’ll also need a middleware to handle HTTP basic authentication.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup> This middleware will check if the username and password from the request map matche the values in the <code>auth</code> map injected by <code>components-middleware</code>. If they match, then the request is authenticated and the user can view the site.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token comment">;; ...</span>
    <span class="token punctuation">[</span>acme.util <span class="token symbol">:as</span> util<span class="token punctuation">]</span>
@@ -257,18 +314,28 @@ hi world</code></pre>
             <span class="token punctuation">(</span><span class="token function">res/status</span> <span class="token number">401</span><span class="token punctuation">)</span>
             <span class="token punctuation">(</span><span class="token function">res/header</span> <span class="token string">"WWW-Authenticate"</span> <span class="token string">"Basic realm=protected"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
+<p></p></div><p></p>
 <p>A nice feature of Clojure is that interop with the host language is easy. The <code>base64-encode</code> function is just a thin wrapper over Java’s <code>Base64.Encoder</code>:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/util.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util
+<div class="codeblock">
+      <div>
+        <span>src/acme/util.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util
    <span class="token comment">;; ...</span>
   <span class="token punctuation">(</span><span class="token symbol">:import</span> java.util.Base64<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> base64-encode
   <span class="token punctuation">[</span>s<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">.encodeToString</span> <span class="token punctuation">(</span><span class="token function">Base64/getEncoder</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">.getBytes</span> s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Finally, we need to add them to the router. Since we’ll be handling form requests later, we’ll also bring in Ring’s <code>wrap-params</code> middleware.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token comment">;; ...</span>
    <span class="token punctuation">[</span>ring.middleware.params <span class="token symbol">:refer</span> <span class="token punctuation">[</span>wrap-params<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -281,14 +348,19 @@ hi world</code></pre>
    <span class="token punctuation">{</span><span class="token symbol">:middleware</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token function">components-middleware</span> opts<span class="token punctuation">)</span>
                  wrap-basic-auth
                  wrap-params<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <h3 id="implementing-the-route-handlers" tabindex="-1"><a class="header-anchor" href="#implementing-the-route-handlers">Implementing the Route Handlers</a></h3>
 <p>We now have everything we need to implement the route handlers or the business logic of the app. First, we’ll implement the <code>index-page</code> function which renders a page that:</p>
 <ol>
 <li>Shows all of the user’s bookmarks in the database, and</li>
 <li>Shows a form that allows the user to insert new bookmarks into the database</li>
 </ol>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.handler
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token comment">;; ...</span>
    <span class="token punctuation">[</span>next.jdbc <span class="token symbol">:as</span> jdbc<span class="token punctuation">]</span>
@@ -332,9 +404,14 @@ hi world</code></pre>
     <span class="token punctuation">(</span><span class="token function">catch</span> Exception e
       <span class="token punctuation">(</span><span class="token function">util/server-error</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
+<p></p></div><p></p>
 <p>Database queries can sometimes throw exceptions, so it’s good to wrap them in a try-catch block. I’ll also introduce some helper functions:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/util.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util
+<div class="codeblock">
+      <div>
+        <span>src/acme/util.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.util
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token comment">;; ...</span>
    <span class="token punctuation">[</span>hiccup2.core <span class="token symbol">:as</span> h<span class="token punctuation">]</span>
@@ -355,10 +432,15 @@ hi world</code></pre>
   <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Caught exception: "</span> e<span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Internal server error"</span><span class="token punctuation">)</span>
       <span class="token punctuation">(</span><span class="token function">res/status</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p><code>render</code> takes a hiccup form and turns it into a ring response, while <code>server-error</code> takes an exception, logs it, and returns a 500 response.</p>
 <p>Next, we’ll implement the <code>index-action</code> function:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/handler.clj</span>
-<span class="token comment">;; ...</span>
+<div class="codeblock">
+      <div>
+        <span>src/acme/handler.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> index-action
   <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
@@ -370,15 +452,21 @@ hi world</code></pre>
     <span class="token punctuation">(</span><span class="token function">catch</span> Exception e
       <span class="token punctuation">(</span><span class="token function">util/server-error</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
+<p></p></div><p></p>
 <p>This is an implementation of a typical <a href="https://en.wikipedia.org/wiki/Post/Redirect/Get">post/redirect/get</a> pattern. We get the value from the URL form field, insert a new row in the database with that value, and redirect back to the index page. Again, we’re using a try-catch block to handle possible exceptions from the database query.</p>
 <p>That should be all of the code for the controllers. If you reload your REPL and go to <code>http://localhost:8080</code>, you should see something that looks like this after logging in:</p>
 <p><img loading="lazy" decoding="async" src="/articles/clojure-fly/YmhzvGHPKu-1214.webp" alt="Screnshot of the app" width="1214" height="737"></p>
 <p>The last thing we need to do is to update the main function to start the system:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
-<span class="token comment">;; ...</span>
+<div class="codeblock">
+      <div>
+        <span>src/acme/main.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> -main <span class="token punctuation">[</span>&amp; _<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">read-config</span><span class="token punctuation">)</span> ig/expand ig/init<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>Now, you should be able to run the app using <code>clj -M -m acme.main</code>. That’s all the code needed for the app. In the next section, we’ll package the app into a Docker image to deploy to Fly.</p>
 <h2 id="packaging-the-app" tabindex="-1"><a class="header-anchor" href="#packaging-the-app">Packaging the App</a></h2>
 <p>While there are <a href="https://www.metosin.fi/blog/packaging-clojure">many ways to package a Clojure app</a>, Fly.io specifically requires a Docker image. There are two approaches to doing this:</p>
@@ -387,16 +475,25 @@ hi world</code></pre>
 <li>Load the source code and run it using Clojure in the container</li>
 </ol>
 <p>Both are valid approaches. I prefer the first since its only dependency is the JVM. We’ll use the <a href="https://github.com/clojure/tools.build">tools.build</a> library to build the uberjar. Check out the <a href="https://clojure.org/guides/tools_build">official guide</a> for more information on building Clojure programs. Since it’s a library, to use it we can add it to our <code>deps.edn</code> file with an alias:</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; deps.edn</span>
-<span class="token punctuation">{</span><span class="token comment">;; ...</span>
+<div class="codeblock">
+      <div>
+        <span>deps.edn</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">{</span><span class="token comment">;; ...</span>
  <span class="token symbol">:aliases</span>
  <span class="token punctuation">{</span><span class="token comment">;; ...</span>
   <span class="token symbol">:build</span> <span class="token punctuation">{</span><span class="token symbol">:extra-deps</span> <span class="token punctuation">{</span>io.github.clojure/tools.build 
                        <span class="token punctuation">{</span><span class="token symbol">:git/tag</span> <span class="token string">"v0.10.5"</span> <span class="token symbol">:git/sha</span> <span class="token string">"2a21b7a"</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
           <span class="token symbol">:ns-default</span> build<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
 <p>Tools.build expects a <code>build.clj</code> file in the root of the project directory, so we’ll need to create that file. This file contains the instructions to build artefacts, which in our case is a single uberjar. There are many great examples of <code>build.clj</code> files on the web, including from the official documentation. For now, you can copy+paste this file into your project.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; build.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> build
+<div class="codeblock">
+      <div>
+        <span>build.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> build
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>clojure.tools.build.api <span class="token symbol">:as</span> b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
@@ -423,27 +520,43 @@ hi world</code></pre>
            <span class="token symbol">:class-dir</span> class-dir
            <span class="token symbol">:uber-file</span> <span class="token string">"target/standalone.jar"</span>
            <span class="token symbol">:main</span>      'acme.main<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p></p></div><p></p>
 <p>To build the project, run <code>clj -T:build uber</code>. This will create the uberjar <code>standalone.jar</code> in the <code>target</code> directory. The <code>uber</code> in <code>clj -T:build uber</code> refers to the <code>uber</code> function from <code>build.clj</code>. Since the build system is a Clojure program, you can customise it however you like. If we try to run the uberjar now, we’ll get an error:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># build the uberjar</span>
 <code style="user-select:none;color:var(--color-links)">$ </code>clj <span class="token parameter variable">-T:build</span> uber
-Cleaning build directory<span class="token punctuation">..</span>.
-Copying files<span class="token punctuation">..</span>.
-Compiling Clojure<span class="token punctuation">..</span>.
-Building Uberjar<span class="token punctuation">..</span>.
+<span class="token comment"># Cleaning build directory...</span>
+<span class="token comment"># Copying files...</span>
+<span class="token comment"># Compiling Clojure...</span>
+<span class="token comment"># Building Uberjar...</span>
 
 <span class="token comment"># run the uberjar</span>
 <code style="user-select:none;color:var(--color-links)">$ </code><span class="token function">java</span> <span class="token parameter variable">-jar</span> target/standalone.jar
-Error: Could not <span class="token function">find</span> or load main class acme.main
-Caused by: java.lang.ClassNotFoundException: acme.main</code></pre>
+<span class="token comment"># Error: Could not find or load main class acme.main</span>
+<span class="token comment"># Caused by: java.lang.ClassNotFoundException: acme.main</span></code></pre>
+<p></p></div><p></p>
 <p>This error occurred because the Main class that is required by Java isn’t built. To fix this, we need to add the <code>:gen-class</code> directive in our main namespace. This will instruct Clojure to create the Main class from the <code>-main</code> function.</p>
-<pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; src/acme/main.clj</span>
-<span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
+<div class="codeblock">
+      <div>
+        <span>src/acme/main.clj</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-clojure"><code class="language-clojure"><span class="token punctuation">(</span><span class="token keyword">ns</span> acme.main
   <span class="token comment">;; ...</span>
   <span class="token punctuation">(</span><span class="token symbol">:gen-class</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
+<p></p></div><p></p>
 <p>If you rebuild the project and run <code>java -jar target/standalone.jar</code> again, it should work perfectly. Now that we have a working build script, we can write the Dockerfile:</p>
-<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
-<span class="token comment"># install additional dependencies here in the base layer</span>
+<div class="codeblock">
+      <div>
+        <span>Dockerfile</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># install additional dependencies here in the base layer</span>
 <span class="token comment"># separate base from build layer so any additional deps installed are cached</span>
 <span class="token instruction"><span class="token keyword">FROM</span> clojure:temurin-21-tools-deps-bookworm-slim <span class="token keyword">AS</span> base</span>
 
@@ -456,18 +569,29 @@ Caused by: java.lang.ClassNotFoundException: acme.main</code></pre>
 <span class="token instruction"><span class="token keyword">COPY</span> <span class="token options"><span class="token property">--from</span><span class="token punctuation">=</span><span class="token string">build</span></span> /opt/target/standalone.jar /</span>
 <span class="token instruction"><span class="token keyword">EXPOSE</span> 8080</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
+<p></p></div><p></p>
 <p>It’s a <a href="https://www.docker.com/blog/multi-stage-builds/">multi-stage Dockerfile</a>. We use the official Clojure Docker image as the layer to build the uberjar. Once it’s built, we copy it to a smaller Docker image that only contains the Java runtime.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.</p>
 <p>That should be all for packaging the app. We can move on to the deployment now.</p>
 <h2 id="deploying-with-fly.io" tabindex="-1"><a class="header-anchor" href="#deploying-with-fly.io">Deploying with Fly.io</a></h2>
 <p>First things first, you’ll need to <a href="https://fly.io/docs/flyctl/install/">install <code>flyctl</code></a>, Fly’s CLI tool for interacting with their platform. Create <a href="https://fly.io/app/sign-up">a Fly.io account</a> if you haven’t already. Then run <code>fly auth login</code> to authenticate <code>flyctl</code> with your account.</p>
 <p>Next, we’ll need to create a new <a href="https://fly.io/docs/apps/overview/">Fly App</a>:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly app create
-? Choose an app name <span class="token punctuation">(</span>leave blank to generate one<span class="token punctuation">)</span>: 
-automatically selected personal organization: Ryan Martin
-New app created: blue-water-6489</code></pre>
+<span class="token comment"># ? Choose an app name (leave blank to generate one): </span>
+<span class="token comment"># automatically selected personal organization: Ryan Martin</span>
+<span class="token comment"># New app created: blue-water-6489</span></code></pre>
+<p></p></div><p></p>
 <p>Another way to do this is with the <code>fly launch</code> command, which automates a lot of the app configuration for you. We have some steps to do that are not done by <code>fly launch</code>, so we’ll be configuring the app manually. I also already have a <code>fly.toml</code> file ready that you can straight away copy to your project.</p>
-<pre class="language-toml"><code class="language-toml"><span class="token comment"># fly.toml</span>
-<span class="token comment"># replace these with your app and region name</span>
+<div class="codeblock">
+      <div>
+        <span>fly.toml</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-toml"><code class="language-toml"><span class="token comment"># replace these with your app and region name</span>
 <span class="token comment"># run `fly platform regions` to get a list of regions</span>
 <span class="token key property">app</span> <span class="token punctuation">=</span> <span class="token string">'blue-water-6489'</span> 
 <span class="token key property">primary_region</span> <span class="token punctuation">=</span> <span class="token string">'sin'</span>
@@ -492,16 +616,28 @@ New app created: blue-water-6489</code></pre>
   <span class="token key property">memory</span> <span class="token punctuation">=</span> <span class="token string">"512mb"</span>
   <span class="token key property">cpus</span> <span class="token punctuation">=</span> <span class="token number">1</span>
   <span class="token key property">cpu_kind</span> <span class="token punctuation">=</span> <span class="token string">"shared"</span></code></pre>
+<p></p></div><p></p>
 <p>These are mostly the default configuration values with some additions. Under the <code>[env]</code> section, we’re setting the SQLite database location to <code>/data/database.db</code>. The <code>database.db</code> file itself will be stored in a persistent <a href="https://fly.io/docs/volumes/overview/">Fly Volume</a> mounted on the <code>/data</code> directory. This is specified under the <code>[mounts]</code> section. Fly Volumes are similar to regular Docker volumes but are designed for Fly’s micro VMs.</p>
 <p>We’ll need to set the <code>AUTH_USER</code> and <code>AUTH_PASSWORD</code> environment variables too, but not through the <code>fly.toml</code> file as these are sensitive values. To securely set these credentials with Fly, we can set them as <a href="https://fly.io/docs/apps/secrets/">app secrets</a>. They’re stored encrypted and will be automatically injected into the app at boot time.</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly secrets <span class="token builtin class-name">set</span> <span class="token assign-left variable">AUTH_USER</span><span class="token operator">=</span>hi@ryanmartin.me <span class="token assign-left variable">AUTH_PASSWORD</span><span class="token operator">=</span>not-so-secure-password
-Secrets are staged <span class="token keyword">for</span> the first deployment</code></pre>
+<span class="token comment"># Secrets are staged for the first deployment</span></code></pre>
+<p></p></div><p></p>
 <p>With this, the configuration is done and we can deploy the app using <code>fly deploy</code>:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly deploy
 <span class="token comment"># ...</span>
-Checking DNS configuration <span class="token keyword">for</span> blue-water-6489.fly.dev
-
-Visit your newly deployed app at https://blue-water-6489.fly.dev/</code></pre>
+<span class="token comment"># Checking DNS configuration for blue-water-6489.fly.dev</span>
+<span class="token comment"># Visit your newly deployed app at https://blue-water-6489.fly.dev/</span></code></pre>
+<p></p></div><p></p>
 <p>The first deployment will take longer since it’s building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run <code>fly open</code> which will do the same thing. Here’s the app in action:</p>
 <p><img loading="lazy" decoding="async" src="/articles/clojure-fly/-0hDAZFbRj-800.webp" alt="The app in action" width="800" height="488"></p>
 <p>If you made additional changes to the app or <code>fly.toml</code>, you can redeploy the app using the same command, <code>fly deploy</code>. The app is configured to auto stop/start, which helps to cut costs when there’s not a lot of traffic to the site. If you want to take down the deployment, you’ll need to delete the app itself using <code>fly app destroy &lt;your app name&gt;</code>.</p>
@@ -509,28 +645,54 @@ Visit your newly deployed app at https://blue-water-6489.fly.dev/</code></pre>
 <p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>
 <p>If you’re brave, you can even restart the app directly without redeploying from the REPL. You can easily go wrong with it, which is why some prefer to not use it.</p>
 <p>For this project, we’re gonna add a <a href="https://clojure.org/reference/repl_and_main#_launching_a_socket_server">socket REPL</a>. It’s very simple to add (you just need to add a JVM option) and it doesn’t require additional dependencies like <a href="https://nrepl.org/">nREPL</a>. Let’s update the Dockerfile:</p>
-<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
-<span class="token comment"># ...</span>
+<div class="codeblock">
+      <div>
+        <span>Dockerfile</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># ...</span>
 <span class="token instruction"><span class="token keyword">EXPOSE</span> 7888</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-Dclojure.server.repl={:port 7888 :accept clojure.core.server/repl}"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
+<p></p></div><p></p>
 <p>The socket REPL will be listening on port 7888. If we redeploy the app now, the REPL will be started but we won’t be able to connect to it. That’s because we haven’t exposed the service through <a href="https://fly.io/docs/reference/fly-proxy/">Fly proxy</a>. We can do this by adding the socket REPL as a service in the <code>[services]</code> section in <code>fly.toml</code>.</p>
 <p>However, doing this will also expose the REPL port to the public. This means that anyone can connect to your REPL and possibly mess with your app. Instead, what we want to do is to configure the socket REPL as a private service.</p>
 <p>By default, all Fly apps in your organisation live in the same <a href="https://fly.io/docs/networking/private-networking/">private network</a>. This private network, called 6PN, connects the apps in your organisation through <a href="https://www.wireguard.com/">Wireguard tunnels</a> (a VPN) using IPv6. Fly private services aren’t exposed to the public internet but can be reached from this private network. We can then use Wireguard to connect to this private network to reach our socket REPL.</p>
 <p>Fly VMs are also configured with the hostname <code>fly-local-6pn</code>, which maps to its 6PN address. This is analogous to <code>localhost</code>, which points to your loopback address <code>127.0.0.1</code>. To expose a service to 6PN, all we have to do is bind or serve it to <code>fly-local-6pn</code> instead of the usual <code>0.0.0.0</code>. We have to update the socket REPL options to:</p>
-<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># Dockerfile</span>
-<span class="token comment"># ...</span>
+<div class="codeblock">
+      <div>
+        <span>Dockerfile</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># ...</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-Dclojure.server.repl={:port 7888,:address \"fly-local-6pn\",:accept clojure.core.server/repl}"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
+<p></p></div><p></p>
 <p>After redeploying, we can use the <code>fly proxy</code> command to forward the port from the remote server to our local machine.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>fly proxy <span class="token number">7888</span>:7888
-Proxying <span class="token builtin class-name">local</span> port <span class="token number">7888</span> to remote <span class="token punctuation">[</span>blue-water-6489.internal<span class="token punctuation">]</span>:7888</code></pre>
+<span class="token comment"># Proxying local port 7888 to remote [blue-water-6489.internal]:7888</span></code></pre>
+<p></p></div><p></p>
 <p>In another shell, run:</p>
+<div class="codeblock">
+      <div>
+        <span></span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>rlwrap <span class="token function">nc</span> localhost <span class="token number">7888</span>
-<span class="token assign-left variable">user</span><span class="token operator">=</span><span class="token operator">></span></code></pre>
+<span class="token comment"># user=></span></code></pre>
+<p></p></div><p></p>
 <p>Now we have a REPL connected to the production app! <code>rlwrap</code> is used for <a href="https://en.wikipedia.org/wiki/GNU_Readline">readline</a> functionality, e.g. up/down arrow keys, vi bindings. Of course you can also connect to it from your editor.</p>
 <h2 id="deploy-with-github-actions" tabindex="-1"><a class="header-anchor" href="#deploy-with-github-actions">Deploy with GitHub Actions</a></h2>
 <p>If you’re using <a href="https://github.com">GitHub</a>, we can also set up automatic deployments on pushes/PRs with <a href="https://github.com/features/actions">GitHub Actions</a>. All you need is to create the workflow file:</p>
-<pre class="language-yaml"><code class="language-yaml"><span class="token comment"># .github/workflows/fly.yaml</span>
-<span class="token key atrule">name</span><span class="token punctuation">:</span> Fly Deploy
+<div class="codeblock">
+      <div>
+        <span>.github/workflows/fly.yaml</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">name</span><span class="token punctuation">:</span> Fly Deploy
 <span class="token key atrule">on</span><span class="token punctuation">:</span>
   <span class="token key atrule">push</span><span class="token punctuation">:</span>
     <span class="token key atrule">branches</span><span class="token punctuation">:</span>
@@ -549,6 +711,7 @@ Proxying <span class="token builtin class-name">local</span> port <span class="t
         <span class="token key atrule">env</span><span class="token punctuation">:</span>
           <span class="token key atrule">FLY_API_TOKEN</span><span class="token punctuation">:</span> $<span class="token punctuation">{</span><span class="token punctuation">{</span> secrets.FLY_API_TOKEN <span class="token punctuation">}</span><span class="token punctuation">}</span>
 </code></pre>
+<p></p></div><p></p>
 <p>To get this to work, you’ll need to create a <a href="https://fly.io/docs/security/tokens/">deploy token</a> from your app’s dashboard. Then, in your GitHub repo, create a new repository secret called <code>FLY_API_TOKEN</code> with the value of your deploy token. Now, whenever you push to the <code>main</code> branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the <code>workflow_dispatch</code> option.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
 <p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the <a href="https://github.com/seancorfield/usermanager-example/">user manager example app</a>. Anyway, hope this article provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:</p>
