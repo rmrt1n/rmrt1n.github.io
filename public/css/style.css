@@ -150,7 +150,11 @@ main > article {
       /* multiple lines are aligned from the list marker */
       margin-left: 1rem;
 
-      > * + * { margin-top: 0.25rem; }
+      > * + * { margin-top: 0.5rem; }
+
+      > li {
+        > * + * { margin-top: 0.5rem; }
+      }
     }
 
     .footnotes-sep {
@@ -158,8 +162,9 @@ main > article {
       height: auto;
       font-family: var(--font-serif);
       font-size: 1.25rem;
+      line-height: 1;
       text-align: center;
-      margin: 1rem 0;
+      margin: 1.25rem 0;
 
       &::after {
         content: '* * *';
@@ -263,7 +268,7 @@ code {
   font-family: var(--font-mono) !important;
 }
 
-p code, li code {
+p > code, li > code {
   background-color: var(--color-code);
   padding: 1.5px;
   font-size: 0.875rem;
@@ -358,5 +363,49 @@ table {
     height: 1px;
     width: 1px;
     white-space: nowrap;
+  }
+}
+
+.codeblock {
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .25rem;
+    padding-left: 1rem;
+    border: 1px solid var(--color-border);
+    border-bottom: 0;
+    background-color: var(--color-code);
+
+    > span {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.25;
+    }
+
+    > button {
+      border: 1px solid var(--color-border);
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      padding: 0 .5rem;
+
+      &:hover {
+        background-color: white;
+        @media (prefers-color-scheme: dark) {
+          background-color: #404040;
+        }
+      }
+
+      &:active {
+        background-color: #d4d4d4;
+        @media (prefers-color-scheme: dark) {
+          background-color: black;
+        }
+      }
+    }
+  }
+
+  > pre {
+    margin: 0;
   }
 }

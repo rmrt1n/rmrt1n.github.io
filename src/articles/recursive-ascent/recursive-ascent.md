@@ -5,7 +5,7 @@ tags:
   - Compilers
   - Python
 published: 2024-05-28
-updated: 2024-11-02
+updated: 2025-06-22
 ---
 
 Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like [Bison](https://www.gnu.org/software/bison/) or [ANTLR](https://www.antlr.org/). If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.
@@ -67,7 +67,6 @@ This grammar defines a language that consists only of additions and subtractions
 | expr - 3    |           | Reduce term -> INTEGER                                   |
 | expr - term |           | Reduce expr -> expr - term                               |
 | expr        |           | Accept                                                   |
-
 {% endtable %}
 
 Here, I used the term "parse stack" for the shifted inputs. That's because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and push the corresponding rule to the stack.
@@ -194,7 +193,6 @@ Now that we have the state machine, we can translate it into the parse table. A 
 | State 6 |        |     |   s4    |        |      |      |  gt8   |
 | State 7 |   r2   | s6  |   r2    |   r2   |      |      |        |
 | State 8 |   r4   | r4  |   r4    |   r4   |      |      |        |
-
 {% endtable %}
 
 Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. **sN** means "shift and go to state N", **rN** means "reduce using rule N", and **gtN** means "go to state N". Unlike shift, goto doesn't take in a token from the input stream and just transitions to the next state.
@@ -218,10 +216,9 @@ The next step of the LR algorithm is to run the actual parser using a real input
 
 At this point, we're ready to build the actual parser. I'll be writing the code in Python because it's easy to read. To make sure our parser is correct, we'll also implement an interpreter for the expressions we parsed. First, let's start with the program's entry point:
 
+{% code "recursive-ascent.py" %}
 ```python
-# recursive-ascent.py
 import sys
-
 
 def main():
     if len(sys.argv) != 2:
@@ -232,10 +229,10 @@ def main():
     result = evaluate(ast)
     print(result)
 
-
 if __name__ == "__main__":
     main()
 ```
+{% endcode %}
 
 This program will receive a string as an argument and print out the evaluated string. Don't worry about the unimplemented functions for now. We'll get to them soon.
 
@@ -243,15 +240,18 @@ This program will receive a string as an argument and print out the evaluated st
 
 Since we don't have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.[^11]
 
+{% code "recursive-ascent.py" %}
 ```python
 def lex(string: str):
     return string.split()
 ```
+{% endcode %}
 
 ### Representing the Abstract Syntax Tree (AST)
 
 We'll also need a type to represent the AST that will be produced by the parser:
 
+{% code "recursive-ascent.py" %}
 ```python
 class AST:
     def __init__(self, left: "AST | None", right: "AST | None", value: str, kind: str):
@@ -260,6 +260,7 @@ class AST:
         self.value = value
         self.kind = kind
 ```
+{% endcode %}
 
 If you've noticed, the `AST` class above looks like a binary tree. That's because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like [this diagram](#bottom-up-vs-top-down-parsing) from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.
 
@@ -273,11 +274,11 @@ Our `parse` function will start from the first state. If you recall the previous
 | ------- | :----: | :-: | :-----: | :-: | :--: | :--: | :----: |
 | State   |   +    | \*  | INTEGER | eof | expr | term | factor |
 | State 0 |        |     |   s4    |     | gt1  | gt2  |  gt3   |
-
 {% endtable %}
 
 We can translate this to code like so:
 
+{% code "recursive-ascent.py" %}
 ```python
 def state0(tokens: list[str]):
     token = peek(tokens)
@@ -297,13 +298,14 @@ def state0(tokens: list[str]):
     # go to state 1
     return state1(ast, tokens)
 
-
 def parse(tokens):
     return state0(tokens)
 ```
+{% endcode %}
 
 Note, we don't actually need to check the `ast.kind` here because if `ast = state4(token)` succeeds, then we're guaranteed to get a `factor`. The same goes for `ast = state3(ast)`, which is guaranteed to return a `term`. So, we can rewrite `state0` like this:
 
+{% code "recursive-ascent.py" %}
 ```python
 def state0(tokens: list[str]):
     token = peek(tokens)
@@ -321,18 +323,20 @@ def state0(tokens: list[str]):
     # go to state 1
     return state1(ast, tokens)
 ```
+{% endcode %}
 
 Here are the helper function definitions. `peek` returns the next token, while `panic` prints an error message if an unexpected token is found and terminates the program:[^12]
 
+{% code "recursive-ascent.py" %}
 ```python
 def peek(tokens: list[str]):
     return "" if len(tokens) == 0 else tokens[0]
-
 
 def panic(token: str):
     print("unexpected token: {}".format(token))
     exit()
 ```
+{% endcode %}
 
 As mentioned before, reduce happens when returning from a function:
 
@@ -343,19 +347,19 @@ As mentioned before, reduce happens when returning from a function:
 | State   |   +    | \*  | INTEGER | eof | expr | term | factor |
 | State 3 |   r5   | r5  |   r5    | r5  |      |      |        |
 | State 4 |   r6   | r6  |   r6    | r6  |      |      |        |
-
 {% endtable %}
 
+{% code "recursive-ascent.py" %}
 ```python
 def state3(ast: AST):
     # reduce using rule 5: term -> factor
     return AST(ast.left, ast.right, ast.value, "term")
 
-
 def state4(token: str):
     # reduce using rule 6: factor -> INTEGER
     return AST(None, None, token, "factor")
 ```
+{% endcode %}
 
 Now here's where things get more interesting:
 
@@ -366,9 +370,9 @@ Now here's where things get more interesting:
 | State   |   +    | \*  | INTEGER |  eof   | expr | term | factor |
 | State 1 |   s5   |     |         | accept |      |      |        |
 | State 2 |   r3   | s6  |   r3    |   r3   |      |      |        |
-
 {% endtable %}
 
+{% code "recursive-ascent.py" %}
 ```python
 def state1(ast: AST, tokens: list[str]):
     # loop to handle left recursion
@@ -380,7 +384,6 @@ def state1(ast: AST, tokens: list[str]):
     # accept
     return ast
 
-
 def state2(ast: AST, tokens: list[str]):
     while peek(tokens) == "*":
         tokens = tokens[1:]
@@ -388,6 +391,7 @@ def state2(ast: AST, tokens: list[str]):
     # reduce using rule 3: expr -> term
     return AST(ast.left, ast.right, ast.value, "expr"), tokens
 ```
+{% endcode %}
 
 The grammar we used has rules that contain [left recursion](https://en.wikipedia.org/wiki/Left_recursion). This happens when a rule starts with a symbol that is itself, e.g. `expr -> expr '+' term` and `term -> term '*' factor`. Top-down parsers can't handle this type of grammar. If you've implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.
 
@@ -402,9 +406,9 @@ In state 1 and state 2, the parser has parsed the left side of the binary operat
 | State   |   +    | \*  | INTEGER | eof | expr | term | factor |
 | State 5 |        |     |   s4    |     |      | gt7  |  gt3   |
 | State 6 |        |     |   s4    |     |      |      |  gt8   |
-
 {% endtable %}
 
+{% code "recursive-ascent.py" %}
 ```python
 def state5(left: AST, tokens: list[str]):
     token = peek(tokens)
@@ -416,7 +420,6 @@ def state5(left: AST, tokens: list[str]):
     right = state3(right)
     return state7(left, right, tokens)
 
-
 def state6(left: AST, tokens: list[str]):
     token = peek(tokens)
     if token.isdigit():
@@ -426,6 +429,7 @@ def state6(left: AST, tokens: list[str]):
         panic(token)
     return state8(left, right), tokens
 ```
+{% endcode %}
 
 Once the right side is parsed, we can then reduce these rules in state 7 and state 8:
 
@@ -436,9 +440,9 @@ Once the right side is parsed, we can then reduce these rules in state 7 and sta
 | State   |   +    | \*  | INTEGER | eof | expr | term | factor |
 | State 7 |   r2   | s6  |   r2    | r2  |      |      |        |
 | State 8 |   r4   | r4  |   r4    | r4  |      |      |        |
-
 {% endtable %}
 
+{% code "recursive-ascent.py" %}
 ```python
 def state7(left: AST, right: AST, tokens: list[str]):
     while peek(tokens) == "*":
@@ -447,14 +451,15 @@ def state7(left: AST, right: AST, tokens: list[str]):
     # reduce using rule 2: expr -> expr '+' term
     return AST(left, right, "+", "expr"), tokens
 
-
 def state8(left: AST, right: AST):
     # reduce using rule 4: term -> term '*' factor
     return AST(left, right, "*", "term")
 ```
+{% endcode %}
 
 And that's all of the code for the parser! Now we just have to check whether the output is correct. Let's add a method in the `AST` class to pretty-print itself, so that it's easier to visualise:
 
+{% code "recursive-ascent.py" %}
 ```python
 class AST:
     # ...
@@ -471,6 +476,7 @@ class AST:
         if not self.value.isdigit():
             print(" )", end="")
 ```
+{% endcode %}
 
 I'm printing the AST as s-expressions so that it's easy to see the expressions follow the correct operator precedence.[^13] Given an input like `1 + 2 * 3 + 4`, this method will print out the following: `( + ( +  1 ( *  2  3  ) ) 4  )`. This looks right. All that's left now is to implement the `evaluate` function and test if it works as expected.
 
@@ -478,6 +484,7 @@ I'm printing the AST as s-expressions so that it's easy to see the expressions f
 
 Here's the `evaluate` function:
 
+{% code "recursive-ascent.py" %}
 ```python
 def evaluate(ast):
     if ast.value == "+":
@@ -487,19 +494,20 @@ def evaluate(ast):
     else:
         return int(ast.value)
 ```
+{% endcode %}
 
 It will recursively evaluate all the nodes in the AST. Let's run the program and check if the output is correct:
 
+{% code %}
 ```bash
 __$ python3 recursive-ascent.py '1 + 2 * 3 + 4'
-11
-
-__$ python3 recursive-ascent.py '1 * 2 + 3 * 4'
-14
+# 11
 ```
+{% endcode %}
 
 Good, it works! Now let's write some generated tests to have more confidence in the program. Here's a function that would generate random numbers and combinations of operators (`+` and `*`), run the `evaluate` function on them, and compare the result to Python's `eval` function:
 
+{% code "recursive-ascent.py" %}
 ```python
 def tests():
     errors = 0
@@ -532,8 +540,8 @@ def main():
     ast = parse(tokens)
     result = evaluate(ast)
     print(result)
-
 ```
+{% endcode %}
 
 The `eval` function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our `evaluate` function. If you run `python3 main.py test`, you should get this output: `all tests passed!`.
 

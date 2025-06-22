@@ -5,20 +5,27 @@ tags:
   - Performance
   - Web Development
 published: 2024-05-16
-updated: 2024-05-22
+updated: 2025-06-22
 ---
 
 JavaScript frameworks and build tools like [Next.js](https://nextjs.org/), [Astro](https://astro.build/), and [Vite](https://vitejs.dev/) perform optimisations on images to improve the performance of websites. If you're not using any tools that does this automatically, here are some things you can do to optimise the images in your website.
 
 1. Convert the images to `.webp` or `.avif` formats. These are the best formats for images on the web, as they are smaller in size but still have a similar image quality to larger formats like `.png`. In terms of image size, `.avif` is smaller than `.webp`, but both formats would still work well. Here's a command you can run to convert formats from the command line:[^1]
 
-```bash
-# this converts the image format. you can also specify the output file name
-__$ gm convert image.jpg image.webp
+    {% code %}
+    ```bash
+    # this converts the image format. you can also specify the output file name
+    __$ gm convert image.jpg image.webp
+    ```
+    {% endcode %}
 
-# you can shrink the image size even further at the cost of image quality
-__$ gm convert -quality 75 image.jpg image.webp
-```
+    You can also shrink the image even further at the cost of the image quality:
+
+    {% code %}
+    ```bash
+    __$ gm convert -quality 75 image.jpg image.webp
+    ```
+    {% endcode %}
 
 2. Set the `width` and `height` attributes. Just use the image's size if you're not resizing it. This is needed to prevent [cumulative layout shifts (CLS)](https://web.dev/articles/cls).
 3. Set `loading="lazy"`. This will defer the loading of the image until it is almost scrolled into the viewport. There's an exception to this. For important images, such as the [largest contentful paint (LCP)](https://web.dev/articles/lcp) image, set `loading="eager"`. [SvelteKit](https://kit.svelte.dev/docs/images) also recommends to set `fetchpriority="high"` for this.

@@ -11,6 +11,7 @@ I find myself using vanilla CSS more often recently. Especially for smaller webs
 
 Here's the CSS reset that I use now, it's a combination of [modern-normalize](https://github.com/sindresorhus/modern-normalize/) with resets I found from [Kevin Powell](https://www.youtube.com/@KevinPowell):
 
+{% code "reset.css" %}
 ```css
 @import 'modern-normalize.css';
 
@@ -68,4 +69,5 @@ img, picture, svg, video {
   }
 }
 ```
+{% endcode %}
 

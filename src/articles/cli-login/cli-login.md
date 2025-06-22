@@ -8,7 +8,7 @@ tags:
   - SvelteKit
   - Web Development
 published: 2024-06-10
-updated: 2024-10-02
+updated: 2025-06-22
 ---
 
 I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.
@@ -45,24 +45,28 @@ Now that we know how it works, let's get into the code implementation. I'll buil
 
 I'll use [SvelteKit](https://kit.svelte.dev) for this project, but the concepts apply to any web framework. I'll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.
 
+{% code %}
 ```bash
 # create a new sveltekit project & install dependencies
 __$ pnpm create svelte@latest acme
 __$ cd acme
 __$ pnpm install
 ```
+{% endcode %}
 
 I've heard good things about [Drizzle ORM](https://orm.drizzle.team/), so I'll also use it as the ORM for this project. The database will be [SQLite](https://www.sqlite.org/) using the [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3/) library. We'll need to install these too.
 
+{% code %}
 ```bash
 __$ pnpm add drizzle-orm better-sqlite3
 __$ pnpm add -D drizzle-kit
 ```
+{% endcode %}
 
 Drizzle requires some setup steps before we can use it. First, we'll create a Drizzle client:
 
+{% code "src/lib/db/db.js" %}
 ```javascript
-// src/lib/db/db.js
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 
@@ -70,11 +74,12 @@ const sqlite = new Database('data/database.db')
 
 export const db = drizzle(sqlite)
 ```
+{% endcode %}
 
 And define the database schema:
 
+{% code "src/lib/db/schema.js" %}
 ```javascript
-// src/lib/db/schema.js
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -94,13 +99,14 @@ export const sessions = sqliteTable('sessions', {
     .references(() => users.userId),
 })
 ```
+{% endcode %}
 
 The `users` table will store the user details, and the `sessions` table will store the authentication sessions. The app will use traditional [session-based authentication](https://roadmap.sh/guides/session-based-authentication).
 
 Then, we need to update the config file:
 
+{% code "drizzle.config.js" %}
 ```javascript
-// drizzle.config.js
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
@@ -111,9 +117,11 @@ export default defineConfig({
   },
 })
 ```
+{% endcode %}
 
 To apply the changes to the database, run:
 
+{% code %}
 ```bash
 # create database directory
 __$ mkdir data
@@ -121,6 +129,7 @@ __$ mkdir data
 # apply changes to database
 __$ pnpm drizzle-kit push
 ```
+{% endcode %}
 
 This will create the `data/database.db` SQLite database with our schema. You should only use `drizzle-kit push` for prototyping or local development. If you need database migrations, use `drizzle-kit generate` and `drizzle-kit migrate`. See the [official documentation](https://orm.drizzle.team/kit-docs/overview#prototyping-with-db-push) for more info.
 
@@ -132,8 +141,8 @@ As the focus of this post is on automatic CLI login, we won't be doing anything 
 
 First, let's build a login page. For this app, the login page will serve as both the login and the signup page.[^4]
 
+{% code "src/routes/login/+page.svelte" %}
 ```html
-<!-- src/routes/login/+page.svelte -->
 <h1>log in</h1>
 <form method="POST">
   <div>
@@ -147,11 +156,12 @@ First, let's build a login page. For this app, the login page will serve as both
   <button>log in</button>
 </form>
 ```
+{% endcode %}
 
 The login form sends a POST request with the user's email and password to this handler:
 
+{% code "src/routes/login/+page.server.js" %}
 ```javascript
-// src/routes/login/+page.server.js
 import { db } from '$lib/db/db'
 import { sessions, users } from '$lib/db/schema'
 import { fail, redirect } from '@sveltejs/kit'
@@ -194,6 +204,7 @@ export const actions = {
   },
 }
 ```
+{% endcode %}
 
 The exported `actions` map is [SvelteKit's version of form action handlers](https://kit.svelte.dev/docs/form-actions). You can just focus on the function in the `default` action.
 
@@ -201,8 +212,8 @@ If the user record doesn't exist in the database, this function will create a ne
 
 We'll also add route protection to the home page. Unauthenticated requests to the home page will be redirected to the login page.
 
+{% code "src/routes/+page.server.js" %}
 ```javascript
-// src/routes/+page.server.js
 import { db } from '$lib/db/db'
 import { sessions, users } from '$lib/db/schema'
 import { redirect } from '@sveltejs/kit'
@@ -224,6 +235,7 @@ export async function load({ cookies }) {
   }
 }
 ```
+{% endcode %}
 
 The `load` function is a [function that runs before the page is rendered](https://kit.svelte.dev/docs/load). It's similar to page/route controllers in other web frameworks like [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). If you open `http://localhost:5173` in your browser, you should be redirected to the login page.
 
@@ -233,10 +245,8 @@ The `load` function is a [function that runs before the page is rendered](https:
 
 Now let's get to the main focus of this article. We'll need to add new tables in our database schema to support this feature:
 
+{% code "src/lib/db/schema.js" %}
 ```javascript
-// src/lib/db/schema.js
-// ...
-
 export const accessTokens = sqliteTable('access_tokens', {
   tokenId: text('token_id')
     .primaryKey()
@@ -255,6 +265,7 @@ export const cliSessions = sqliteTable('cli_sessions', {
     .references(() => accessTokens.tokenId),
 })
 ```
+{% endcode %}
 
 The `access_tokens` table will store the users' access tokens, while the `cli_sessions` table will store the "login sessions" triggered by the CLI tool. When a user runs the command `acme login`, it will trigger a login session and an access token to be created in the server.
 
@@ -262,15 +273,16 @@ Run `pnpm drizzle-kit push` again to apply the changes to the database. If you e
 
 We'll also need to add new endpoints, `/cli/login` and `cli/login/:session`. Before we implement these endpoints, we'll need a page to show the "Your CLI is now connected" message once the user has logged in.
 
+{% code "src/routes/cli/login/+page.svelte" %}
 ```html
-<!-- src/routes/cli/login/+page.svelte -->
 <p>You're CLI is connected now. you can close this tab</p>
 ```
+{% endcode %}
 
 Now, here's the code for the `/cli/login` route handler:
 
+{% code "src/routes/cli/login/+page.server.js" %}
 ```javascript
-// src/routes/cli/login/+page.server.js
 import { db } from '$lib/db/db'
 import { accessTokens, cliSessions, sessions, users } from '$lib/db/schema'
 import { error, redirect } from '@sveltejs/kit'
@@ -317,6 +329,7 @@ export async function load({ cookies, url }) {
   }
 }
 ```
+{% endcode %}
 
 This function first checks if the user is logged in using the cookie. The mechanism is the almost same as in the home page, with the only difference being that we're setting the `next` search parameter to point back to this URL. This will redirect the user back to `/cli/login` after they have logged in.
 
@@ -324,8 +337,8 @@ If the user is already logged in,  a CLI session and an access token will be ins
 
 Next is the `/cli/login/:session` route handler:
 
+{% code "src/routes/cli/login/[session]/+server.js" %}
 ```javascript
-// src/routes/cli/login/[session]/+server.js
 import { db } from '$lib/db/db'
 import { cliSessions } from '$lib/db/schema'
 import { error } from '@sveltejs/kit'
@@ -346,6 +359,7 @@ export async function GET({ params }) {
   return Response.json({ token: cliSession.tokenId })
 }
 ```
+{% endcode %}
 
 This function checks if the session in the URL's path param is a valid CLI session in the database. If it is, it'll return the access token in the response body. This token will then be stored by the CLI tool and used in subsequent requests.
 
@@ -353,8 +367,8 @@ This function checks if the session in the URL's path param is a valid CLI sessi
 
 Our `acme` CLI tool will just be a single Node.js script. It'll have only one command, `acme login`. As mentioned in the previous section, the CLI will request a login session and poll for the access token:
 
+{% code "acme.js" %}
 ```javascript
-// acme.js
 import crypto from 'crypto'
 import { exec } from 'child_process'
 
@@ -386,6 +400,7 @@ const interval = setInterval(() => {
     })
 }, 1000)
 ```
+{% endcode %}
 
 The `acme` CLI will generate a random UUID for the session ID and include it as a search parameter in a URL to `/cli/login`. Then, it'll call `exec`, which will run an OS process. In my case, it uses `xdg-open`, a Linux program that opens a file or URL with the user's default application. If you're using a Mac, replace this with `open`, and if you're on Windows, replace it with `start`.
 
@@ -395,6 +410,7 @@ If you're not already logged in, you will be redirected to the login page. Once 
 
 Nice! We now have a working automatic CLI login system. Note, I cleared the cookies in the video above so that I can log in again. If you didn't do this, you'll go straight to the success message as you're already logged in. I also created a shell alias to make the script look like a "proper" CLI tool:
 
+{% code %}
 ```bash
 # create the alias
 __$ alias acme='node acme.js'
@@ -402,6 +418,7 @@ __$ alias acme='node acme.js'
 # then you can run
 __$ acme login
 ```
+{% endcode %}
 
 ## Security Considerations
 
@@ -447,8 +464,8 @@ While the underlying maths might be complex, the encryption scheme is straightfo
 
 First, we need to update our `cli_sessions` table definition to store the CLI's public key.
 
+{% code "src/lib/db/schema.js" %}
 ```javascript
-// src/lib/db/schema.js
 // ...
 
 export const cliSessions = sqliteTable('cli_sessions', {
@@ -461,13 +478,14 @@ export const cliSessions = sqliteTable('cli_sessions', {
   pubKey: text('pub_key').notNull(), // <-- new column
 })
 ```
+{% endcode %}
 
 Run `pnpm drizzle-kit push` again. This time, you should be prompted to delete some records. As we're just testing, we can always wipe the DB clean to start over.
 
 Next, we'll update the `/cli/login` endpoint to get the public key from the search parameter and insert it into the database:
 
+{% code "src/routes/cli/login/+page.server.js" %}
 ```javascript
-// src/routes/cli/login/+page.server.js
 // ...
 
 /** @type {import('./$types').PageServerLoad} */
@@ -486,11 +504,12 @@ export async function load({ cookies, url }) {
   await db.insert(cliSessions).values({ cliSessionId, pubKey, tokenId: token[0].tokenId })
 }
 ```
+{% endcode %}
 
 As for the `/cli/login/:session` endpoint, instead of returning the access token directly, we'll need to encrypt it first. We'll refactor this endpoint's handler function to implement the encryption:
 
+{% code "src/routes/cli/login/[session]/+server.js" %}
 ```javascript
-// src/routes/cli/login/[session]/+server.js
 import { bytesToHex, hexToBytes } from '$lib/utils'
 // ...
 
@@ -539,6 +558,7 @@ export async function GET({ params }) {
   })
 }
 ```
+{% endcode %}
 
 Now, this function will generate a random ECC key pair to calculate the secret using the public key provided by the CLI. I'm using the [NIST P-256](https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf) curve as the basis of the ECC key pair as the [WebCrypto API only supports NIST curves](https://developer.mozilla.org/en-US/docs/Web/API/EcKeyGenParams) at the moment.[^7]
 
@@ -546,8 +566,8 @@ This secret is then used as the key for the symmetric encryption algorithm. I us
 
 The private and public keys are byte arrays here, so we also need some helper functions here to decode byte arrays from/to hex strings:
 
+{% code "src/lib/utils.js" %}
 ```javascript
-// src/lib/utils.js
 export const bytesToHex = (bytes) => {
   return [...new Uint8Array(bytes)].map((x) => x.toString(16).padStart(2, '0')).join('')
 }
@@ -557,11 +577,12 @@ export const hexToBytes = (hex) => {
   return Uint8Array.from(hexBytes.map((byte) => parseInt(byte, 16)))
 }
 ```
+{% endcode %}
 
 Finally, we have to update the CLI code to decrypt the access token:
 
+{% code "acme.js" %}
 ```javascript
-// acme.js
 import { bytesToHex, hexToBytes } from './src/lib/utils.js'
 // ...
 
@@ -624,6 +645,7 @@ if (!argv1 || argv1 !== 'login') {
 
 login()
 ```
+{% endcode %}
 
 The `decrypt` function follows the same steps as the encryption process, just reversed. And that's it. When we run the script now, we should see that the login flow still works the same:
 

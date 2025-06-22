@@ -71,6 +71,15 @@ export default function (eleventyConfig) {
   eleventyConfig.addPairedShortcode('table', (content) => (
     `<div style="overflow-x: auto">${content}</div>`
   ))
+  eleventyConfig.addPairedShortcode('code', (content, filename) => (
+    `<div class="codeblock">
+      <div>
+        <span>${filename ?? ''}</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+      ${content}
+    </div>`
+  ))
 
   eleventyConfig.addCollection('tags', (collection) => {
     const frequencies = collection
