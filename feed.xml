@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-06-22T10:15:13Z</updated>
+  <updated>2025-06-24T12:43:58Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-06-22T10:15:13Z</updated>
+    <updated>2025-06-24T12:43:58Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
 &lt;p&gt;Unfortunately, there isn’t a lot of material about it on the internet. When I first started learning about it, there was only one blog post about it.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; There were also some academic papers about it, but these are very theory-heavy and difficult to read (at least for me).&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
@@ -854,7 +854,7 @@ term -&gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-06-22T10:15:13Z</updated>
+    <updated>2025-06-24T12:43:58Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
 &lt;p&gt;As the title suggests, we’ll be deploying the app to &lt;a href=&quot;https://fly.io&quot;&gt;Fly.io&lt;/a&gt;. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; My experience with it has been good, it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.&lt;/p&gt;
@@ -1565,7 +1565,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-06-22T10:15:13Z</updated>
+    <updated>2025-06-24T12:43:58Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
 &lt;p&gt;It usually works like this. When you type a command like &lt;code&gt;cli login&lt;/code&gt; in your terminal, a login page will open in your web browser. After you log in, the page will show a message like “Your CLI is connected now”. When you go back to the terminal, it will say that it’s “connected” and you can now perform commands that require authentication.&lt;/p&gt;
