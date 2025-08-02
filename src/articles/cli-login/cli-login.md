@@ -8,7 +8,7 @@ tags:
   - SvelteKit
   - Web Development
 published: 2024-06-10
-updated: 2025-06-22
+updated: 2025-07-28
 ---
 
 I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.
@@ -243,7 +243,7 @@ The `load` function is a [function that runs before the page is rendered](https:
 
 ## The CLI Login Endpoints
 
-Now let's get to the main focus of this article. We'll need to add new tables in our database schema to support this feature:
+Now let's get to the main focus of this post. We'll need to add new tables in our database schema to support this feature:
 
 {% code "src/lib/db/schema.js" %}
 ```javascript
@@ -653,7 +653,7 @@ The `decrypt` function follows the same steps as the encryption process, just re
 
 You can also see the decrypted token is the same as the token in the database.
 
-## What's Next
+## What's Next?
 
 You can find the code for this project [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login). I've only covered the minimum required to implement automatic CLI login with encryption. There's always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!
 

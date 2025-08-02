@@ -31,6 +31,6 @@ recent ones:
 If you ever want to chat or work together on a project, you can find me on
 [GitHub]({{ metadata.author.github }}), [X]({{ metadata.author.x }}),
 [LinkedIn]({{ metadata.author.linkedin }}), or email me directly at
-[hi@ryanmartin.me](mailto:{{ metadata.author.email }}).
+[{{ metadata.author.email }}](mailto:{{ metadata.author.email }}).
 
 – Ryan.

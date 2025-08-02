@@ -7,7 +7,7 @@ tags:
   - Networking
   - Web Development
 published: 2024-10-20
-updated: 2025-06-22
+updated: 2025-07-28
 ---
 
 This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It's a collection of insights and tips I've learned from building my Clojure side projects but presented in a more structured format.
@@ -726,7 +726,7 @@ To get this to work, you'll need to create a [deploy token](https://fly.io/docs/
 
 ## End
 
-As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the [user manager example app](https://github.com/seancorfield/usermanager-example/). Anyway, hope this article provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:
+As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the [user manager example app](https://github.com/seancorfield/usermanager-example/). Anyway, hope this post provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:
 
 - [Deploying a Full-Stack Clojure App With Kamal on a Single Server](https://bogoyavlensky.com/blog/deploying-full-stack-clojure-app-with-kamal/)
 - [JVM Deployment Options](https://ericnormand.me/article/jvm-deployment-options)

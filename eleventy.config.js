@@ -2,6 +2,7 @@ import { InputPathToUrlTransformPlugin } from "@11ty/eleventy";
 import { eleventyImageTransformPlugin } from '@11ty/eleventy-img'
 import { feedPlugin } from '@11ty/eleventy-plugin-rss'
 import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight'
+import mathJaxPlugin from 'eleventy-plugin-mathjax'
 import markdownIt from 'markdown-it'
 import anchor from 'markdown-it-anchor'
 import footnote from 'markdown-it-footnote'
@@ -58,6 +59,7 @@ export default function (eleventyConfig) {
       animated: true,
     },
   })
+  eleventyConfig.addPlugin(mathJaxPlugin)
 
   eleventyConfig.addPassthroughCopy({
     './public/': '/',
