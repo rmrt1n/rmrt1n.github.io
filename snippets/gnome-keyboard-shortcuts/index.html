@@ -1,9 +1,9 @@
-<!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.1">
+    <meta name="generator" content="Eleventy v3.1.2">
     <meta name="description" content="true">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -49,7 +49,7 @@
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-bash"><code class="language-bash"><span class="token comment"># replace range with whatever workspaces you want</span>
-<code style="user-select:none;color:var(--color-links)">$ </code><span class="token keyword">for</span> <span class="token for-or-select variable">i</span> <span class="token keyword">in</span> <span class="token punctuation">{</span><span class="token number">5</span><span class="token punctuation">..</span><span class="token number">6</span><span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token keyword">do</span> gsettings <span class="token builtin class-name">set</span> org.gnome.desktop.wm.keybindings switch-to-workspace-<span class="token variable">$i</span> <span class="token string">"['&lt;Super><span class="token variable">$i</span>']"</span><span class="token punctuation">;</span> <span class="token keyword">done</span></code></pre>
+<code style="user-select:none;color:var(--color-links)">$ </code><span class="token keyword">for</span> <span class="token for-or-select variable">i</span> <span class="token keyword">in</span> <span class="token punctuation">{</span><span class="token number">5</span><span class="token punctuation">..</span><span class="token number">6</span><span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token keyword">do</span> gsettings <span class="token builtin class-name">set</span> org.gnome.desktop.wm.keybindings switch-to-workspace-<span class="token variable">$i</span> <span class="token string">"['&lt;Super&gt;<span class="token variable">$i</span>']"</span><span class="token punctuation">;</span> <span class="token keyword">done</span></code></pre>
 <p></p></div><p></p>
 <p><code>dconf</code> is GNOME’s configuration system, and <code>gsettings</code> is the frontend for <code>dconf</code>. It’s essentially a key-value store of GNOME’s config. You can also configure the keyboard shortcuts for other settings that are not shown in GNOME settings with <code>gsettings</code>.</p>
 
@@ -65,7 +65,7 @@
       Hacker News
     </a>.
     Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
-    or <a href="https://x.com/gud_mornign">reach out on X</a>.
+    or <a href="https://x.com/gud_mornign">tweet me</a>.
     You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
     </p>
 
@@ -91,7 +91,7 @@
     </main>
     <footer>
       <div>
-        <small>&copy; 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>

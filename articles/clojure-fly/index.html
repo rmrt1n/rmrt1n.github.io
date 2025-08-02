@@ -1,9 +1,9 @@
-<!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.1">
+    <meta name="generator" content="Eleventy v3.1.2">
     <meta name="description" content="true">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -169,7 +169,7 @@
 <span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/init-key <span class="token symbol">:server/jetty</span>
   <span class="token punctuation">[</span>_ opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>handler port<span class="token punctuation">]</span><span class="token punctuation">}</span> opts
-        jetty-opts <span class="token punctuation">(</span><span class="token keyword">-></span> opts <span class="token punctuation">(</span><span class="token keyword">dissoc</span> <span class="token symbol">:handler</span> <span class="token symbol">:auth</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">assoc</span> <span class="token symbol">:join?</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        jetty-opts <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> opts <span class="token punctuation">(</span><span class="token keyword">dissoc</span> <span class="token symbol">:handler</span> <span class="token symbol">:auth</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">assoc</span> <span class="token symbol">:join?</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
         server     <span class="token punctuation">(</span><span class="token function">jetty/run-jetty</span> handler jetty-opts<span class="token punctuation">)</span><span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Server started on port "</span> port<span class="token punctuation">)</span>
     server<span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -310,7 +310,7 @@ Server started on port  8080
                                        <span class="token punctuation">(</span><span class="token function">format</span> <span class="token string">"%s:%s"</span> username password<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
       <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">and</span> authorization <span class="token punctuation">(</span><span class="token keyword">=</span> correct-creds authorization<span class="token punctuation">)</span><span class="token punctuation">)</span>
         <span class="token punctuation">(</span><span class="token function">handler</span> req<span class="token punctuation">)</span>
-        <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Access Denied"</span><span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Access Denied"</span><span class="token punctuation">)</span>
             <span class="token punctuation">(</span><span class="token function">res/status</span> <span class="token number">401</span><span class="token punctuation">)</span>
             <span class="token punctuation">(</span><span class="token function">res/header</span> <span class="token string">"WWW-Authenticate"</span> <span class="token string">"Basic realm=protected"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
@@ -421,16 +421,16 @@ Server started on port  8080
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> preprend-doctype
   <span class="token punctuation">[</span>s<span class="token punctuation">]</span>
-  <span class="token punctuation">(</span><span class="token keyword">str</span> <span class="token string">"&lt;!doctype html>"</span> s<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">str</span> <span class="token string">"&lt;!doctype html&gt;"</span> s<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> render
   <span class="token punctuation">[</span>hiccup<span class="token punctuation">]</span>
-  <span class="token punctuation">(</span><span class="token keyword">-></span> hiccup h/html str preprend-doctype res/response <span class="token punctuation">(</span><span class="token function">res/content-type</span> <span class="token string">"text/html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> hiccup h/html str preprend-doctype res/response <span class="token punctuation">(</span><span class="token function">res/content-type</span> <span class="token string">"text/html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> server-error
   <span class="token punctuation">[</span>e<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Caught exception: "</span> e<span class="token punctuation">)</span>
-  <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Internal server error"</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Internal server error"</span><span class="token punctuation">)</span>
       <span class="token punctuation">(</span><span class="token function">res/status</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p><code>render</code> takes a hiccup form and turns it into a ring response, while <code>server-error</code> takes an exception, logs it, and returns a 500 response.</p>
@@ -465,7 +465,7 @@ Server started on port  8080
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
 <span class="token punctuation">(</span><span class="token keyword">defn</span> -main <span class="token punctuation">[</span>&amp; _<span class="token punctuation">]</span>
-  <span class="token punctuation">(</span><span class="token keyword">-></span> <span class="token punctuation">(</span><span class="token function">read-config</span><span class="token punctuation">)</span> ig/expand ig/init<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+  <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> <span class="token punctuation">(</span><span class="token function">read-config</span><span class="token punctuation">)</span> ig/expand ig/init<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>Now, you should be able to run the app using <code>clj -M -m acme.main</code>. That’s all the code needed for the app. In the next section, we’ll package the app into a Docker image to deploy to Fly.</p>
 <h2 id="packaging-the-app" tabindex="-1"><a class="header-anchor" href="#packaging-the-app">Packaging the App</a></h2>
@@ -682,7 +682,7 @@ Server started on port  8080
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-bash"><code class="language-bash"><code style="user-select:none;color:var(--color-links)">$ </code>rlwrap <span class="token function">nc</span> localhost <span class="token number">7888</span>
-<span class="token comment"># user=></span></code></pre>
+<span class="token comment"># user=&gt;</span></code></pre>
 <p></p></div><p></p>
 <p>Now we have a REPL connected to the production app! <code>rlwrap</code> is used for <a href="https://en.wikipedia.org/wiki/GNU_Readline">readline</a> functionality, e.g. up/down arrow keys, vi bindings. Of course you can also connect to it from your editor.</p>
 <h2 id="deploy-with-github-actions" tabindex="-1"><a class="header-anchor" href="#deploy-with-github-actions">Deploy with GitHub Actions</a></h2>
@@ -714,7 +714,7 @@ Server started on port  8080
 <p></p></div><p></p>
 <p>To get this to work, you’ll need to create a <a href="https://fly.io/docs/security/tokens/">deploy token</a> from your app’s dashboard. Then, in your GitHub repo, create a new repository secret called <code>FLY_API_TOKEN</code> with the value of your deploy token. Now, whenever you push to the <code>main</code> branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the <code>workflow_dispatch</code> option.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
-<p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the <a href="https://github.com/seancorfield/usermanager-example/">user manager example app</a>. Anyway, hope this article provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:</p>
+<p>As always, all the code is available <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly">on GitHub</a>. Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the <a href="https://github.com/seancorfield/usermanager-example/">user manager example app</a>. Anyway, hope this post provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:</p>
 <ul>
 <li><a href="https://bogoyavlensky.com/blog/deploying-full-stack-clojure-app-with-kamal/">Deploying a Full-Stack Clojure App With Kamal on a Single Server</a></li>
 <li><a href="https://ericnormand.me/article/jvm-deployment-options">JVM Deployment Options</a></li>
@@ -759,7 +759,7 @@ Server started on port  8080
       Hacker News
     </a>.
     Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
-    or <a href="https://x.com/gud_mornign">reach out on X</a>.
+    or <a href="https://x.com/gud_mornign">tweet me</a>.
     You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
     </p>
 
@@ -785,7 +785,7 @@ Server started on port  8080
     </main>
     <footer>
       <div>
-        <small>&copy; 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>

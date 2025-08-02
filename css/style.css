@@ -268,18 +268,22 @@ code {
   font-family: var(--font-mono) !important;
 }
 
-p > code, li > code {
+p > code, li > code, strong > code, a > code {
   background-color: var(--color-code);
-  padding: 1.5px;
+  padding: 0 1.5px;
   font-size: 0.875rem;
   line-height: 1.25;
 }
 
 small code {
   background-color: var(--color-code);
-  padding: 1.5px;
+  padding: 0 1.5px;
   font-size: 0.75rem;
   line-height: 1;
+}
+
+s {
+  text-decoration-thickness: 1px;
 }
 
 img {

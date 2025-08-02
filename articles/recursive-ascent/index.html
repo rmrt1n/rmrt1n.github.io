@@ -1,9 +1,9 @@
-<!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.1">
+    <meta name="generator" content="Eleventy v3.1.2">
     <meta name="description" content="true">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -61,10 +61,10 @@
 <p><a href="https://en.wikipedia.org/wiki/LR_parser">LR</a> is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> but all of them are based on the same two fundamental actions: <strong>shift</strong> and <strong>reduce</strong>.</p>
 <p>Shift means to advance or “shift” to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or “reduced” into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let’s use an example to illustrate it.</p>
 <p>We’ll use this grammar:</p>
-<pre class="language-plaintext"><code class="language-plaintext">expr -> expr '+' term
-expr -> expr '-' term
-expr -> term
-term -> INTEGER</code></pre>
+<pre class="language-plaintext"><code class="language-plaintext">expr -&gt; expr '+' term
+expr -&gt; expr '-' term
+expr -&gt; term
+term -&gt; INTEGER</code></pre>
 <p>This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing this input <code>1 + 2 - 3</code> according to the grammar above:</p>
 <div style="overflow-x: auto">
 <table>
@@ -147,12 +147,12 @@ term -> INTEGER</code></pre>
 <h2 id="building-the-state-machine" tabindex="-1"><a class="header-anchor" href="#building-the-state-machine">Building the State Machine</a></h2>
 <p>Before getting into the code, first, we’ll need to understand how to generate a parse table. This is a process that is automated by parser generators, but in recursive ascent, we have to do this manually. The first step is to compute all the possible LR states for a given grammar, in other words, build a finite state machine. Again, we’ll use an example grammar to illustrate this.</p>
 <p>We’ll modify the grammar from the previous section to support multiplications and drop subtractions:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
-<pre class="language-plaintext"><code class="language-plaintext">S -> expr eof
-expr -> expr '+' term
-expr -> term
-term -> term '*' factor
-term -> factor
-factor -> INTEGER</code></pre>
+<pre class="language-plaintext"><code class="language-plaintext">S -&gt; expr eof
+expr -&gt; expr '+' term
+expr -&gt; term
+term -&gt; term '*' factor
+term -&gt; factor
+factor -&gt; INTEGER</code></pre>
 <p>Note the extra rule <code>S</code> (start), which will be used for a reduction when the parser has accepted the whole input. <code>eof</code> indicates the end of the input stream.</p>
 <p>Next, we’ll need to construct the <strong>LR(0) items</strong>, which are grammar rules with a dot (•) to mark the current position of the parser.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup> E.g., the rule <code>S -&gt; expr eof</code> contains one LR(0) item: <code>S -&gt; • expr eof</code>. Everything to the left of the dot has already been parsed or shifted.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> For brevity’s sake, I’ll shorten “LR(0) item” to just “item” going forward.</p>
 <p>For each item, we then need to compute its <strong>closure</strong>. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here’s how it works:</p>
@@ -164,46 +164,46 @@ factor -> INTEGER</code></pre>
 </ol>
 <p>A non-terminal is any symbol that represents a grammar rule, e.g. <code>expr</code>, <code>term</code>, or <code>factor</code>. The opposite of this is a terminal, which is an actual value or token that is produced by the lexer, e.g. <code>'+'</code>, <code>'-'</code>, and <code>INTEGER</code>. If we apply closure to the first item in the grammar <code>S -&gt; • expr eof</code>, we’ll end up with the first LR state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 0
-S -> • expr eof
-expr -> • expr '+' term
-expr -> • term
-term -> • term '*' factor
-term -> • factor
-factor -> • INTEGER</code></pre>
+S -&gt; • expr eof
+expr -&gt; • expr '+' term
+expr -&gt; • term
+term -&gt; • term '*' factor
+term -&gt; • factor
+factor -&gt; • INTEGER</code></pre>
 <p>We can then transition from this state into the other states by accepting different values and advancing the dot. The values that the parser can accept are the terminals and non-terminals on the right side of the dot. So, for state 0, the values it can accept are <code>expr</code>, <code>term</code>, <code>factor</code>, and <code>INTEGER</code>. Let’s say the parser receives an <code>expr</code>. This will become our second state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 1 (State 0 + expr)
-S -> expr • eof (Accept)
-expr -> expr • '+' term</code></pre>
+S -&gt; expr • eof (Accept)
+expr -&gt; expr • '+' term</code></pre>
 <p>When the dot reaches the end of the starting rule, it is called the accept state. It means that the input has been parsed fully and the parsing is complete. If we had instead received a <code>term</code> in the first state, then we’d end up with this state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 2 (State 0 + term)
-expr -> term •
-term -> term • '*' factor</code></pre>
+expr -&gt; term •
+term -&gt; term • '*' factor</code></pre>
 <p>And we just repeat this process until all dots are at the end of each rule. There is an exception to this though, which I’ll get to in a bit. Anyways, here are some more states:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 3 (State 0 + factor)
-term -> factor •
+term -&gt; factor •
 
 # State 4 (State 0 + INTEGER)
-factor -> INTEGER •
+factor -&gt; INTEGER •
 
 # State 5 (State 1 + '+')
-expr -> expr '+' • term
-term -> • term '*' factor
-term -> • factor
-factor -> • INTEGER
+expr -&gt; expr '+' • term
+term -&gt; • term '*' factor
+term -&gt; • factor
+factor -&gt; • INTEGER
 
 # State 6 (State 2 + '*')
-term -> term '*' • factor
-factor -> • INTEGER
+term -&gt; term '*' • factor
+factor -&gt; • INTEGER
 
 # State 7 (State 5 + term)
-expr -> expr '+' term •
-term -> term • '*' factor</code></pre>
+expr -&gt; expr '+' term •
+term -&gt; term • '*' factor</code></pre>
 <p>Now, it might make sense to do this for the next state:</p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 1 + factor)
-term -> factor •</code></pre>
+term -&gt; factor •</code></pre>
 <p>Notice that this is the same state as state 3. If we encounter a state that we have seen before, we don’t have to create a new state. Instead, we’ll just jump or <strong>goto</strong> the state that we’ve already found before. This will make more sense when we build the actual parse table. Now, let’s finish the last state.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
 <pre class="language-plaintext"><code class="language-plaintext"># State 8 (State 6 + factor)
-term -> term '*' factor •</code></pre>
+term -&gt; term '*' factor •</code></pre>
 <p>And we’re done! Here’s a diagram to help you visualise the state transitions:</p>
 <p><img loading="lazy" decoding="async" src="/articles/recursive-ascent/reip9qNHGK-3085.webp" alt="State transition diagram" width="3085" height="1272"></p>
 <h2 id="the-action-and-goto-table" tabindex="-1"><a class="header-anchor" href="#the-action-and-goto-table">The Action and Goto Table</a></h2>
@@ -328,12 +328,12 @@ term -> term '*' factor •</code></pre>
 </div>
 <p>Each row represents a state in the state machine, each column in the action table represents a terminal, and each column in the goto table represents a non-terminal. <strong>sN</strong> means “shift and go to state N”, <strong>rN</strong> means “reduce using rule N”, and <strong>gtN</strong> means “go to state N”. Unlike shift, goto doesn’t take in a token from the input stream and just transitions to the next state.</p>
 <p>Here are the grammar rules again for reference, with the rule numbers added for reductions:</p>
-<pre class="language-plaintext"><code class="language-plaintext">1. S -> expr eof
-2. expr -> expr '+' term
-3. expr -> term
-4. term -> term '*' factor
-5. term -> factor
-6. factor -> INTEGER</code></pre>
+<pre class="language-plaintext"><code class="language-plaintext">1. S -&gt; expr eof
+2. expr -&gt; expr '+' term
+3. expr -&gt; term
+4. term -&gt; term '*' factor
+5. term -&gt; factor
+6. factor -&gt; INTEGER</code></pre>
 <p>The parse table is usually much larger than the grammar, and languages with a complex grammar will produce huge tables which are almost impossible to compute by hand. This is why people create parser generators. Based on how the states and parse table are generated, the resulting parser can be called either a simple LR (SLR), look-ahead LR (LALR), or a canonical LR parser (LR(k)). I’m not going to go into detail about these algorithms here, as it can lead to a rabbit hole. Just know that we have a working LR(0) parse table now.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
 <p>The next step of the LR algorithm is to run the actual parser using a real input. Traditional LR parsers will run a loop and parse a token stream following the rules of the parse table. In our case, we’ll implement this mechanism as mutually recursive functions.</p>
 <h2 id="writing-the-parser" tabindex="-1"><a class="header-anchor" href="#writing-the-parser">Writing The Parser</a></h2>
@@ -540,11 +540,11 @@ term -> term '*' factor •</code></pre>
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">state3</span><span class="token punctuation">(</span>ast<span class="token punctuation">:</span> AST<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment"># reduce using rule 5: term -> factor</span>
+    <span class="token comment"># reduce using rule 5: term -&gt; factor</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>right<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token string">"term"</span><span class="token punctuation">)</span>
 
 <span class="token keyword">def</span> <span class="token function">state4</span><span class="token punctuation">(</span>token<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment"># reduce using rule 6: factor -> INTEGER</span>
+    <span class="token comment"># reduce using rule 6: factor -&gt; INTEGER</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> <span class="token string">"factor"</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>Now here’s where things get more interesting:</p>
@@ -615,7 +615,7 @@ term -> term '*' factor •</code></pre>
     <span class="token keyword">while</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"*"</span><span class="token punctuation">:</span>
         tokens <span class="token operator">=</span> tokens<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
         ast<span class="token punctuation">,</span> tokens <span class="token operator">=</span> state6<span class="token punctuation">(</span>ast<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
-    <span class="token comment"># reduce using rule 3: expr -> term</span>
+    <span class="token comment"># reduce using rule 3: expr -&gt; term</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>ast<span class="token punctuation">.</span>left<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>right<span class="token punctuation">,</span> ast<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token string">"expr"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tokens</code></pre>
 <p></p></div><p></p>
 <p>The grammar we used has rules that contain <a href="https://en.wikipedia.org/wiki/Left_recursion">left recursion</a>. This happens when a rule starts with a symbol that is itself, e.g. <code>expr -&gt; expr '+' term</code> and <code>term -&gt; term '*' factor</code>. Top-down parsers can’t handle this type of grammar. If you’ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.</p>
@@ -751,11 +751,11 @@ term -> term '*' factor •</code></pre>
     <span class="token keyword">while</span> peek<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"*"</span><span class="token punctuation">:</span>
         tokens <span class="token operator">=</span> tokens<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
         right <span class="token operator">=</span> state6<span class="token punctuation">(</span>right<span class="token punctuation">,</span> tokens<span class="token punctuation">)</span>
-    <span class="token comment"># reduce using rule 2: expr -> expr '+' term</span>
+    <span class="token comment"># reduce using rule 2: expr -&gt; expr '+' term</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> <span class="token string">"+"</span><span class="token punctuation">,</span> <span class="token string">"expr"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> tokens
 
 <span class="token keyword">def</span> <span class="token function">state8</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> AST<span class="token punctuation">,</span> right<span class="token punctuation">:</span> AST<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment"># reduce using rule 4: term -> term '*' factor</span>
+    <span class="token comment"># reduce using rule 4: term -&gt; term '*' factor</span>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">,</span> <span class="token string">"*"</span><span class="token punctuation">,</span> <span class="token string">"term"</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>And that’s all of the code for the parser! Now we just have to check whether the output is correct. Let’s add a method in the <code>AST</code> class to pretty-print itself, so that it’s easier to visualise:</p>
@@ -889,7 +889,7 @@ term -> term '*' factor •</code></pre>
       Hacker News
     </a>.
     Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
-    or <a href="https://x.com/gud_mornign">reach out on X</a>.
+    or <a href="https://x.com/gud_mornign">tweet me</a>.
     You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
     </p>
 
@@ -915,7 +915,7 @@ term -> term '*' factor •</code></pre>
     </main>
     <footer>
       <div>
-        <small>&copy; 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>

@@ -1,9 +1,9 @@
-<!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.1">
+    <meta name="generator" content="Eleventy v3.1.2">
     <meta name="description" content="true">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -67,10 +67,10 @@
 <p>Set the <code>width</code> and <code>height</code> attributes. Just use the image’s size if you’re not resizing it. This is needed to prevent <a href="https://web.dev/articles/cls">cumulative layout shifts (CLS)</a>.</p>
 </li>
 <li>
-<p>Set <code>loading=&quot;lazy&quot;</code>. This will defer the loading of the image until it is almost scrolled into the viewport. There’s an exception to this. For important images, such as the <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set <code>loading=&quot;eager&quot;</code>. <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set <code>fetchpriority=&quot;high&quot;</code> for this.</p>
+<p>Set <code>loading="lazy"</code>. This will defer the loading of the image until it is almost scrolled into the viewport. There’s an exception to this. For important images, such as the <a href="https://web.dev/articles/lcp">largest contentful paint (LCP)</a> image, set <code>loading="eager"</code>. <a href="https://kit.svelte.dev/docs/images">SvelteKit</a> also recommends to set <code>fetchpriority="high"</code> for this.</p>
 </li>
 <li>
-<p>Set <code>decoding=&quot;async&quot;</code>. This will defer the decoding of the image until after the other DOM content is loaded.</p>
+<p>Set <code>decoding="async"</code>. This will defer the decoding of the image until after the other DOM content is loaded.</p>
 </li>
 <li>
 <p>Set the <code>alt</code> attribute. Images aren’t always loaded. It’s just a good practice to have an <code>alt</code> text, except if the image is purely for decoration.</p>
@@ -99,7 +99,7 @@
       Hacker News
     </a>.
     Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
-    or <a href="https://x.com/gud_mornign">reach out on X</a>.
+    or <a href="https://x.com/gud_mornign">tweet me</a>.
     You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
     </p>
 
@@ -127,7 +127,7 @@
     </main>
     <footer>
       <div>
-        <small>&copy; 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>
