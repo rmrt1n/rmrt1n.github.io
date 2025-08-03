@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-08-03T09:42:52Z</updated>
+  <updated>2025-08-03T09:51:31Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-08-03T09:42:52Z</updated>
+    <updated>2025-08-03T09:51:31Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -856,7 +856,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-08-03T09:42:52Z</updated>
+    <updated>2025-08-03T09:51:31Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
@@ -1569,7 +1569,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-08-03T09:42:52Z</updated>
+    <updated>2025-08-03T09:51:31Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
