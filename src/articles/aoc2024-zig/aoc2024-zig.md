@@ -1,9 +1,10 @@
 ---
 title: Advent of Code 2024 in Zig
 tags:
-  - algorithms
-  - optimization
-  - zig
+  - Advent-of-Code
+  - Algorithms
+  - Optimization
+  - Zig
 published: 2025-08-03
 updated:
 draft: true
@@ -17,30 +18,7 @@ I went with Zig because I have been curious about it for a while, mainly because
 
 This post is mostly about my setup, results, and the things I learned from doing the puzzles. If you're more interested in my solutions, I've also uploaded my code and solution write-ups to my [GitHub repository](https://github.com/rmrt1n/advent-of-code).
 
-![](aoc2024-zig-1.png)
-
-## Self-Imposed Constraints
-
-While there are no rules to Advent of Code itself, to make things a little more interesting, I set a few constraints and rules for myself:
-
-1. **The code must be readable**.
-    By "readable", I mean the code should be straightforward and easy to follow. No unnecessary abstractions. I should be able to come back to the code months later and still understand (most of) it.
-2. **Solutions must be a single file**.
-    No external dependencies. No shared utilities module. Everything needed to solve the puzzle should be visible in that one solution file.
-3. **The total runtime must be under one second**.[^2]
-    All solutions when run sequentially should finish in under one second. I want to improve my performance engineering skills.
-4. **Parts should be solved separately**.
-    This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that make part two faster. The aim of this is to get a clear idea of how long each part takes on its own.
-5. **No concurrency or parallelism**.
-    Solutions must run sequentially on a single thread. This keeps the focus on the efficiency of the algorithm. I can't speed up slow solutions by using multiple CPU cores.
-6. **No ChatGPT. No Claude. No AI help**.
-    I want to train myself, not the LLM. I can look at other people's solutions, but only after I have given my best effort at solving the problem.
-7. **Follow the constraints of the input file**.
-    The solution doesn't have to work for all possible scenarios, but it should work for all other inputs; if the input file only contains 8-bit unsigned integers, it doesn't have to handle larger integer types.
-8. **Hardcoding is allowed**.
-    For example: size of the input, number of rows and columns, etc. Since the input is known at compile-time, we can skip runtime parsing and just embed it into the program using Zig's `@embedFile`.
-
-Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle's codebase.[^3] Lastly, I just thought it would make the experience more fun.
+![My Advent of Code page](aoc2024-zig-1.png)
 
 ## Project Setup
 
@@ -82,8 +60,8 @@ You can also pass the optimisation mode that you want to any of the commands abo
 
 Under the hood `build.zig` compiles `src/run.zig` when you call `zig build run`, and `src/bench.zig` when you call `zig build bench`. These files are templates that import the solution for a specific day from `src/days/dayXX.zig`. For example, here's what `src/run.zig` looks like:
 
+{% code "src/run.zig" %}
 ```zig
-// src/run.zig
 const std = @import("std");
 const puzzle = @import("day"); // Injected by build.zig
 
@@ -97,11 +75,12 @@ pub fn main() !void {
     std.debug.print("\n", .{});
 }
 ```
+{% endcode %}
 
 The `day` module imported is an [anonymous import](https://ziglang.org/learn/build-system/#generating-zig) dynamically injected by `build.zig` during compilation. This allows a single `run.zig` or `bench.zig` to be reused for all solutions. This avoids repeating boilerplate code in the solution files. Here's a simplified version of my `build.zig` file that shows how this works:
 
+{% code "build.zig" %}
 ```zig
-// build.zig
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
@@ -133,10 +112,34 @@ pub fn build(b: *std.Build) void {
     }
 }
 ```
+{% endcode %}
 
 My actual `build.zig` has some extra code that builds the binaries for all optimisation modes. 
 
 This setup is pretty barebones. I've seen [other templates](https://github.com/fspoettel/advent-of-code-rust) do cool things like scaffold files, download puzzle inputs, and even submitting answers automatically. Since I wrote `build.zig` after the event ended, I didn't get to use it when I was solving the puzzles. I might add more features to it if I decided to do Advent of Code again this year with Zig.
+
+## Self-Imposed Constraints
+
+While there are no rules to Advent of Code itself, to make things a little more interesting, I set a few constraints and rules for myself:
+
+1. **The code must be readable**.
+    By "readable", I mean the code should be straightforward and easy to follow. No unnecessary abstractions. I should be able to come back to the code months later and still understand (most of) it.
+2. **Solutions must be a single file**.
+    No external dependencies. No shared utilities module. Everything needed to solve the puzzle should be visible in that one solution file.
+3. **The total runtime must be under one second**.[^2]
+    All solutions when run sequentially should finish in under one second. I want to improve my performance engineering skills.
+4. **Parts should be solved separately**.
+    This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that make part two faster. The aim of this is to get a clear idea of how long each part takes on its own.
+5. **No concurrency or parallelism**.
+    Solutions must run sequentially on a single thread. This keeps the focus on the efficiency of the algorithm. I can't speed up slow solutions by using multiple CPU cores.
+6. **No ChatGPT. No Claude. No AI help**.
+    I want to train myself, not the LLM. I can look at other people's solutions, but only after I have given my best effort at solving the problem.
+7. **Follow the constraints of the input file**.
+    The solution doesn't have to work for all possible scenarios, but it should work for all other inputs; if the input file only contains 8-bit unsigned integers, it doesn't have to handle larger integer types.
+8. **Hardcoding is allowed**.
+    For example: size of the input, number of rows and columns, etc. Since the input is known at compile-time, we can skip runtime parsing and just embed it into the program using Zig's `@embedFile`.
+
+Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle's codebase.[^3] Lastly, I just thought it would make the experience more fun.
   
 ## Favourite Puzzles
 
@@ -161,8 +164,8 @@ Zig's flagship feature, [`comptime`](https://kristoff.it/blog/what-is-zig-compti
 
 My main use for `comptime` was to generate puzzle-specific types. All of my solution files follow the same structure, with a `DayXX` function that takes some parameters (usually the input length) and returns a puzzle-specific type, e.g.:
 
+{% code "src/days/day01.zig" %}
 ```zig
-// src/days/day01.zig
 fn Day01(comptime length: usize) type {
     return struct {
         const Self = @This();
@@ -176,11 +179,12 @@ fn Day01(comptime length: usize) type {
     };
 }
 ```
+{% endcode %}
 
 This lets me instantiate the type with a size that matches my input:
 
+{% code "src/days/day01.zig" %}
 ```zig
-// src/days/day01.zig
 // Here, `Day01` is called with the size of my actual input.
 pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     // ...
@@ -195,18 +199,22 @@ test "day 01 part 1 sample 1" {
     // ...
 }
 ```
+{% endcode %}
 
 This allows me to reuse logic across different inputs while still hardcoding the array sizes. Without `comptime`, I have to either create a separate function for all my different inputs or dynamically allocate memory because I can't hardcode the array size.
 
 I also used `comptime` to shift some computation to compile-time to reduce runtime overhead. For example, in day 4, I needed a function to check whether a string matches either `"XMAS"` or its reverse, `"SAMX"`. A pretty simple function that you can write as a one-liner in Python:
 
+{% code %}
 ```python
 def matches(pattern, target):
     return target == pattern or target == pattern[::-1]
 ```
+{% endcode %}
 
 Typically a function like this requires some dynamic allocation to create the reversed string, since the length of the string is only known at runtime.[^4] For this puzzle, since the words to reverse are known at compile-time, we can do something like this:
 
+{% code "src/days/day04.zig" %}
 ```zig
 fn matches(comptime word: []const u8, slice: []const u8) bool {
     var reversed: [word.len]u8 = undefined;
@@ -215,6 +223,7 @@ fn matches(comptime word: []const u8, slice: []const u8) bool {
     return std.mem.eql(u8, word, slice) or std.mem.eql(u8, &reversed, slice);
 }
 ```
+{% endcode %}
 
 This creates a separate function for each word I want to reverse.[^5] Each function has an array with the same size as the word to reverse. This removes the need for dynamic allocation and makes the code run faster. As a bonus, Zig also warns you when this word isn't compile-time known, so you get an immediate error if you pass in a runtime value.
 
@@ -222,6 +231,7 @@ This creates a separate function for each word I want to reverse.[^5] Each funct
 
 A common pattern in C is to return special sentinel values to denote missing values or errors, e.g. `-1`, `0`, or `NULL`. In fact, I did this on day 13 of the challenge:
 
+{% code "src/days/day13.zig" %}
 ```zig
 // We won't ever get 0 as a result, so we use it as a sentinel error value.
 fn count_tokens(a: [2]u8, b: [2]u8, p: [2]i64) u64 {
@@ -233,11 +243,13 @@ fn count_tokens(a: [2]u8, b: [2]u8, p: [2]i64) u64 {
 // Then in the caller, skip if the return value is 0.
 if (count_tokens(a, b, p) == 0) continue;
 ```
+{% endcode %}
 
 This works, but it’s easy to forget to check for those values, or worse, to accidentally treat them as valid results. Zig improves on this with [optional types](https://ziglang.org/documentation/master/#Optionals). If a function might not return a value, you can return `?T` instead of `T`. This also forces the caller to handle the `null` case. Unlike C, `null` isn't a pointer but a more general concept. Zig treats `null` as the absence of a value for any type, just like Rust's [`Option<T>`](https://doc.rust-lang.org/std/option/).
 
 The `count_tokens` function can be refactored to:
 
+{% code "src/days/day13.zig" %}
 ```zig
 // Return null instead if there's no valid result.
 fn count_tokens(a: [2]u8, b: [2]u8, p: [2]i64) ?u64 {
@@ -251,6 +263,7 @@ if (count_tokens(a, b, p)) |n_tokens| {
     // logic only runs when n_tokens is not null.
 }
 ```
+{% endcode %}
 
 Zig also has a concept of [error unions](https://ziglang.org/documentation/master/#Error-Union-Type), where a function can return either a value or an error. In Rust, this is [`Result<T>`](https://doc.rust-lang.org/std/result/). You could also use error unions instead of optionals for `count_tokens`, Zig doesn't force a single approach. I come from Clojure where returning `nil` for an error or missing value is common.
 
@@ -258,6 +271,7 @@ Zig also has a concept of [error unions](https://ziglang.org/documentation/maste
 
 This year has a lot of 2D grid puzzles (arguably too many). A common feature of grid-based algorithms is the out-of-bounds check. Here's how you would typically handle this:
 
+{% code %}
 ```zig
 fn dfs(map: [][]u8, position: [2]i8) u32 {
     const x, const y = position;
@@ -275,6 +289,7 @@ fn dfs(map: [][]u8, position: [2]i8) u32 {
     return result;
 }
 ```
+{% endcode %}
 
 This is a typical recursive DFS structure. After doing a lot of this, I discovered a nice trick that not only improves code readability, but also its performance. The trick here is to pad the grid with sentinel characters that mark out-of-bounds areas, i.e. add a border to the grid.
 
@@ -298,6 +313,7 @@ Original map:               With borders added:
 
 You can use any value as the border, as long as it doesn't conflict with valid in-grid values. With the borders in place, the bounds check becomes a simple equality comparison:
 
+{% code %}
 ```zig
 fn dfs(map: [][]u8, position: [2]i8) u32 {
     const x, const y = position;
@@ -307,6 +323,7 @@ fn dfs(map: [][]u8, position: [2]i8) u32 {
     // ...
 }
 ```
+{% endcode %}
 
 This is much more readable than the previous code and is also faster since we're only doing one comparison instead of four.
 
@@ -320,20 +337,25 @@ If you're not familiar with vectors, they are a special collection type used for
 
 My biggest use for vectors is to represent positions and directions, e.g. for traversing a grid. Instead of writing code like this:
 
+{% code %}
 ```zig
 next_position = .{ position[0] + direction[0], position[1] + direction[1] };
 ```
+{% endcode %}
 
 You can represent `position` and `direction` as 2-element vectors and write code like this:
 
+{% code %}
 ```zig
 next_position = position + direction;
 ```
+{% endcode %}
 
 This is much nicer than the previous version!
 
 Day 25 is another good example of a problem that can be solved elegantly using vectors: 
 
+{% code "src/days/day25.zig" %}
 ```zig
 var result: u64 = 0;
 for (self.locks.items) |lock| { // lock is a vector
@@ -344,6 +366,7 @@ for (self.locks.items) |lock| { // lock is a vector
     }
 }
 ```
+{% endcode %}
 
 Expressing the logic as vector operations makes the code cleaner since you don't have to write loops and conditionals as you typically would in a traditional approach.
 
@@ -361,6 +384,7 @@ That said, static allocation isn't always the right choice. Stack space is small
 
 A simple but effective trick I've learned is to reuse buffers whenever possible, whether they're statically or dynamically allocated. Here's an example from day 10. For each trail head, we want to create a set of trail ends reachable from it. The naive approach is to allocate a new set every iteration:
 
+{% code "src/days/day10.zig" %}
 ```zig
 for (self.trail_heads.items) |trail_head| {
     var trail_ends = std.AutoHashMap([2]u8, void).init(self.allocator);
@@ -369,9 +393,11 @@ for (self.trail_heads.items) |trail_head| {
     // Set building logic...
 }
 ```
+{% endcode %}
 
 What you can do instead is to allocate the set once before the loop. Then, each iteration, you reuse the set by emptying it without freeing the memory. For Zig's `std.AutoHashMap`, this can be done using the `clearRetainingCapacity` method:
 
+{% code "src/days/day10.zig" %}
 ```zig
 var trail_ends = std.AutoHashMap([2]u8, void).init(self.allocator);
 defer trail_ends.deinit();
@@ -382,6 +408,7 @@ for (self.trail_heads.items) |trail_head| {
     // Set building logic...
 }
 ```
+{% endcode %}
 
 Static allocation isn't always faster than dynamic allocation. Sometimes dynamic allocation performs better. I've seen this in several of my solutions. Over-avoiding dynamic allocation can also result in convoluted, unreadable code that you'll likely forget how it works after a few days. Remember to always benchmark your code to understand what works best for your specific case.
 
@@ -418,6 +445,7 @@ As you can see, the upper six bits are unused. We can store the direction metada
 
 If your language supports struct packing, you can express this layout directly:[^8]
 
+{% code "src/days/day06.zig" %}
 ```zig
 const Tile = packed struct(u8) {
     up: u1 = 0,
@@ -427,6 +455,7 @@ const Tile = packed struct(u8) {
     tile: enum(u4) { obstacle, path, visited, exit },
 }
 ```
+{% endcode %}
 
 Doing this avoids extra allocations and improves cache locality. Since the directions metadata is colocated with the tile type, all of them can fit together in cache. Accessing the directions just requires some bitwise operations instead of having to fetch it from another region of memory. 
 
@@ -445,20 +474,26 @@ I won't explain branchless programming here, instead read [the Algorithmica's pa
 
 Again, since performance is always context-dependent, I'll just show you some patterns I use. Here's one that comes up often:
 
+
+{% code "src/days/day02.zig" %}
 ```zig
 if (is_valid_report(report)) {
     result += 1;
 }
 ```
+{% endcode %}
 
 Instead of the branch, cast the bool into an integer directly:
 
+{% code "src/days/day02.zig" %}
 ```zig
 result += @intFromBool(is_valid_report(report))
 ```
+{% endcode %}
 
 Another example is from day 6 (again!). Recall that to know if a tile has been visited from a certain direction, we have to check its direction bit. Here's one way to do it:
 
+{% code "src/days/day06.zig" %}
 ```zig
 fn has_visited(self: Tile, direction: Direction) bool {
     switch (direction) {
@@ -469,9 +504,11 @@ fn has_visited(self: Tile, direction: Direction) bool {
     }
 }
 ```
+{% endcode %}
 
 This works, but it introduces a branch. We can make it branchless using bitwise operations:
 
+{% code "src/days/day06.zig" %}
 ```zig
 fn has_visited(tile: Tile, direction: Direction) bool {
     const int_tile = std.mem.nativeToBig(u8, @bitCast(tile));
@@ -480,6 +517,7 @@ fn has_visited(tile: Tile, direction: Direction) bool {
     return bits & mask == mask;
 }
 ```
+{% endcode %}
 
 While this is arguably cryptic and less readable, but it does perform better than the switch version.
 
@@ -501,6 +539,8 @@ As expected, `ReleaseFast` produced the best result with a total runtime of **85
 - **No concurrency or parallelism** - My slowest days are the compute-heavy days that are very easily parallelisable, e.g. day 6, day 19, and day 22. Without this constraint I can probably reach sub-20 milliseconds(?), but that's for another time.
 
 You can see the full benchmarks for `ReleaseFast` in the table below:
+
+{% table %}
 
 | Day | Title                  | Parsing (µs) | Part 1 (µs) | Part 2 (µs) | Total (µs)     |
 | --- | ---------------------- | -----------: | ----------: | ----------: | -------------: |
@@ -529,6 +569,7 @@ You can see the full benchmarks for `ReleaseFast` in the table below:
 | 23  | LAN Party              | 13.6         | 22.0        | 2.5         | **38.2**       |
 | 24  | Crossed Wires          | 5.0          | 41.3        | 14.3        | **60.7**       |
 | 25  | Code Chronicle         | 24.9         | 0.0         | 0.0         | **24.9**       |
+{% endtable %}
 
 A weird thing I found when benchmarking is that for day 6 part two, `ReleaseSafe` actually ran faster than `ReleaseFast` (13,189.0 µs vs 24,370.7 µs). Their outputs are the same, but for some reason `ReleaseSafe` is faster even with the safety checks still intact.
 

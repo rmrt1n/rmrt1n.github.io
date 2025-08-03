@@ -304,6 +304,7 @@ table {
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
+  font-size: 1rem;
 
   th, td {
     padding: 0.25rem 0.5rem;
@@ -370,6 +371,19 @@ table {
   }
 }
 
+#draft {
+  display: inline-block;
+  color: #dc2626;
+  border: 2.5px solid #dc2626;
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1;
+  padding: .125rem;
+  float: right;
+  rotate: 15deg;
+  user-select: none;
+}
 .codeblock {
   > div {
     display: flex;
