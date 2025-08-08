@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-08-08T08:57:21Z</updated>
+  <updated>2025-08-08T17:41:43Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-08-08T08:57:21Z</updated>
+    <updated>2025-08-08T17:41:43Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -856,7 +856,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-08-08T08:57:21Z</updated>
+    <updated>2025-08-08T17:41:43Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
@@ -1569,7 +1569,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-08-08T08:57:21Z</updated>
+    <updated>2025-08-08T17:41:43Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -2191,7 +2191,7 @@ Server started on port  8080
   <entry>
     <title>Advent of Code 2024 in Zig</title>
     <link href="https://ryanmartin.me/articles/aoc2024/" />
-    <updated>2025-08-08T08:57:21Z</updated>
+    <updated>2025-08-08T17:41:43Z</updated>
     <id>https://ryanmartin.me/articles/aoc2024/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;style id=&quot;MJX-SVG-styles&quot;&gt;
@@ -2729,7 +2729,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 &lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
 &lt;p&gt;Here we have two maps to count the frequencies of stones across iterations. Each iteration will build up &lt;code&gt;new_frequencies&lt;/code&gt; with the values from &lt;code&gt;old_frequencies&lt;/code&gt;. Doing this reduces the number of allocations to just 2 (the number of buffers). The tradeoff here is that it makes the code slightly more complex.&lt;/p&gt;
 &lt;h3 id=&quot;make-your-data-smaller&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#make-your-data-smaller&quot;&gt;Make Your Data Smaller&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;A performance tip people say is to have “mechanical empathy”. Understand how your code is processed by your computer. An example of this is to structure your data so it works better with your CPU. For example, keep related data close in memory to take advantage of &lt;a href=&quot;https://en.algorithmica.org/hpc/external-memory/locality/&quot;&gt;cache locality&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A performance tip people say is to have “mechanical sympathy”. Understand how your code is processed by your computer. An example of this is to structure your data so it works better with your CPU. For example, keep related data close in memory to take advantage of &lt;a href=&quot;https://en.algorithmica.org/hpc/external-memory/locality/&quot;&gt;cache locality&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Reducing the size of your data helps with this. Smaller data means more of it can fit in cache. One way to shrink your data is through &lt;a href=&quot;https://www.cs.cornell.edu/courses/cs3410/2024fa/notes/bitpack.html&quot;&gt;bit packing&lt;/a&gt;. This depends heavily on your specific data, so you’ll need to use your judgement to tell whether this would work for you. I’ll just share some examples that worked for me.&lt;/p&gt;
 &lt;p&gt;The first example is in day 6 part two, where you have to detect a loop, which happens when you revisit a tile from the same direction as before. To track this, you could use a map or a set to store the tiles and visited directions. A more efficient option is to store this direction metadata in the tile itself.&lt;/p&gt;
 &lt;p&gt;There are only four tile types, which means you only need two bits to represent the tile types as an enum. If the enum size is one byte, here’s what the tiles look like in memory:&lt;/p&gt;
