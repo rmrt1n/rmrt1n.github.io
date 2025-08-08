@@ -174,8 +174,6 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 <article>
   <header>
     
-      <p id="draft">DRAFT</p>
-    
     <h1>Advent of Code 2024 in Zig</h1>
     <p> <!-- wrap with p just to make the line height consistent -->
       <time>03 August 2025</time>
@@ -183,16 +181,16 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
     <ul class="tags"><li><a href="/tags/#advent-of-code">#advent-of-code</a></li><li><a href="/tags/#algorithms">#algorithms</a></li><li><a href="/tags/#optimization">#optimization</a></li><li><a href="/tags/#zig">#zig</a></li></ul>
   </header>
   <section id="content">
-    <p>This post is about <s>five</s> six months late, but here are my takeaways from <a href="https://adventofcode.com/">Advent of Code 2024</a>. It was my second time participating, and this time I actually managed to complete it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My goal in participating was to learn a new language, <a href="https://ziglang.org/">Zig</a>, and to improve my DSA and problem solving skills.</p>
-<p>In case you’re not familiar, Advent of Code is an annual programming challenge that runs every December. A new puzzle is released every day from December 1st to the 25th. There’s also a global leaderboard where people (and AI) race to get the fastest solves, but I personally don’t compete in it.</p>
-<p>I went with Zig because I have been curious about it for a while, mainly because of its promise of <a href="https://www.youtube.com/watch?v=Gv2I7qTux7g">being a better C</a> and because <a href="https://tigerbeetle.com/">TigerBeetle</a> is written in it. Learning Zig seems like a good way to get back into systems programming, something I’ve been wanting to do after a couple chaotic years of web development.</p>
-<p>This post is mostly about my setup, results, and the things I learned from doing the puzzles. If you’re more interested in my solutions, I’ve also uploaded my code and solution write-ups to my <a href="https://github.com/rmrt1n/advent-of-code">GitHub repository</a>.</p>
-<p><img loading="lazy" decoding="async" src="/drafts/f7abb9dbf8f2d0545d2385e7e65af7a2/FBG5iC0aoh-1394.webp" alt="My Advent of Code page" width="1394" height="1228"></p>
+    <p>This post is about <s>six</s> seven months late, but here are my takeaways from <a href="https://adventofcode.com/">Advent of Code 2024</a>. It was my second time participating, and this time I actually managed to complete it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My goal was to learn a new language, <a href="https://ziglang.org/">Zig</a>, and to improve my DSA and problem-solving skills.</p>
+<p>If you’re not familiar, Advent of Code is an annual programming challenge that runs every December. A new puzzle is released each day from December 1st to the 25th. There’s also a global leaderboard where people (and AI) race to get the fastest solves, but I personally don’t compete in it, mostly because I want to do it at my own pace.</p>
+<p>I went with Zig because I have been curious about it for a while, mainly because of its promise of <a href="https://www.youtube.com/watch?v=Gv2I7qTux7g">being a better C</a> and because <a href="https://tigerbeetle.com/">TigerBeetle</a> (one of the coolest databases now) is written in it. Learning Zig felt like a good way to get back into systems programming, something I’ve been wanting to do after a couple of chaotic years of web development.</p>
+<p>This post is mostly about my setup, results, and the things I learned from solving the puzzles. If you’re more interested in my solutions, I’ve also uploaded my code and solution write-ups to my <a href="https://github.com/rmrt1n/advent-of-code">GitHub repository</a>.</p>
+<p><img loading="lazy" decoding="async" src="/articles/aoc2024/FBG5iC0aoh-1394.webp" alt="My Advent of Code results page" width="1394" height="1228"></p>
 <aside class="toc"><div>
-      <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#self-imposed-constraints">Self-Imposed Constraints</a></li><li><a href="#favourite-puzzles">Favourite Puzzles</a></li><li><a href="#programming-patterns-and-zig-tricks">Programming patterns and Zig Tricks</a><ol><li><a href="#leverage-comptime">Leverage Comptime</a></li><li><a href="#use-optional-types">Use Optional Types</a></li><li><a href="#pad-your-2d-grids">Pad Your 2D Grids</a></li><li><a href="#use-vectors-and-simd">Use Vectors and SIMD</a></li></ol></li><li><a href="#performance-tips">Performance Tips</a><ol><li><a href="#minimise-allocations">Minimise Allocations</a></li><li><a href="#compact-your-data">Compact Your Data</a></li><li><a href="#reduce-branching">Reduce Branching</a></li><li><a href="#avoid-recursion">Avoid Recursion</a></li></ol></li><li><a href="#benchmarks">Benchmarks</a></li><li><a href="#reflections">Reflections</a></li><li><a href="#what%E2%80%99s-next%3F">What’s Next?</a></li></ol></div></aside>
+      <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#self-imposed-constraints">Self-Imposed Constraints</a></li><li><a href="#favourite-puzzles">Favourite Puzzles</a></li><li><a href="#programming-patterns-and-zig-tricks">Programming patterns and Zig Tricks</a><ol><li><a href="#comptime">Comptime</a></li><li><a href="#optional-types">Optional Types</a></li><li><a href="#grid-padding">Grid Padding</a></li><li><a href="#simd-vectors">SIMD Vectors</a></li></ol></li><li><a href="#performance-tips">Performance Tips</a><ol><li><a href="#minimise-allocations">Minimise Allocations</a></li><li><a href="#make-your-data-smaller">Make Your Data Smaller</a></li><li><a href="#reduce-branching">Reduce Branching</a></li><li><a href="#avoid-recursion">Avoid Recursion</a></li></ol></li><li><a href="#benchmarks">Benchmarks</a></li><li><a href="#reflections">Reflections</a></li><li><a href="#what%E2%80%99s-next%3F">What’s Next?</a></li></ol></div></aside>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
-<p>There were <a href="https://github.com/search?q=advent+of+code+template+lang%3Azig&amp;type=repositories">several project templates in Zig</a> that I looked at as a reference for my development setup. None of them really clicked for me, so for the duration of the event I just ran my solution code directly using <code>zig run</code>. It was until after the event was over that I properly learned <a href="https://ziglang.org/learn/build-system/">Zig’s build system</a> and reorganised my project.</p>
-<p>Here’s what the current project structure looks like:</p>
+<p>There were <a href="https://github.com/search?q=advent+of+code+template+lang%3Azig&amp;type=repositories">several Advent of Code templates in Zig</a> that I looked at as a reference for my development setup, but none of them really clicked with me. I ended up just running my solutions directly using <code>zig run</code> for the whole event. It wasn’t until after the event ended that I properly learned <a href="https://ziglang.org/learn/build-system/">Zig’s build system</a> and reorganised my project.</p>
+<p>Here’s what the project structure looks like now:</p>
 <pre class="language-plaintext"><code class="language-plaintext">.
 ├── src
 │   ├── days
@@ -206,7 +204,7 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 │   ├── bench.zig
 │   └── run.zig
 └── build.zig</code></pre>
-<p>The project is powered by <code>build.zig</code> which defines several commands:</p>
+<p>The project is powered by <code>build.zig</code>, which defines several commands:</p>
 <ol>
 <li><strong>Build</strong>
 <ul>
@@ -233,7 +231,7 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 </li>
 </ol>
 <p>You can also pass the optimisation mode that you want to any of the commands above with the <code>-Doptimize</code> flag.</p>
-<p>Under the hood <code>build.zig</code> compiles <code>src/run.zig</code> when you call <code>zig build run</code>, and <code>src/bench.zig</code> when you call <code>zig build bench</code>. These files are templates that import the solution for a specific day from <code>src/days/dayXX.zig</code>. For example, here’s what <code>src/run.zig</code> looks like:</p>
+<p>Under the hood, <code>build.zig</code> compiles <code>src/run.zig</code> when you call <code>zig build run</code>, and <code>src/bench.zig</code> when you call <code>zig build bench</code>. These files are templates that import the solution for a specific day from <code>src/days/dayXX.zig</code>. For example, here’s what <code>src/run.zig</code> looks like:</p>
 <div class="codeblock">
       <div>
         <span>src/run.zig</span>
@@ -290,7 +288,7 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>My actual <code>build.zig</code> has some extra code that builds the binaries for all optimisation modes.</p>
-<p>This setup is pretty barebones. I’ve seen <a href="https://github.com/fspoettel/advent-of-code-rust">other templates</a> do cool things like scaffold files, download puzzle inputs, and even submitting answers automatically. Since I wrote <code>build.zig</code> after the event ended, I didn’t get to use it when I was solving the puzzles. I might add more features to it if I decided to do Advent of Code again this year with Zig.</p>
+<p>This setup is pretty barebones. I’ve seen <a href="https://github.com/fspoettel/advent-of-code-rust">other templates</a> do cool things like scaffold files, download puzzle inputs, and even submit answers automatically. Since I wrote my <code>build.zig</code> after the event ended, I didn’t get to use it while solving the puzzles. I might add these features to it if I decided to do Advent of Code again this year with Zig.</p>
 <h2 id="self-imposed-constraints" tabindex="-1"><a class="header-anchor" href="#self-imposed-constraints">Self-Imposed Constraints</a></h2>
 <p>While there are no rules to Advent of Code itself, to make things a little more interesting, I set a few constraints and rules for myself:</p>
 <ol>
@@ -299,36 +297,35 @@ By “readable”, I mean the code should be straightforward and easy to follow.
 <li><strong>Solutions must be a single file</strong>.
 No external dependencies. No shared utilities module. Everything needed to solve the puzzle should be visible in that one solution file.</li>
 <li><strong>The total runtime must be under one second</strong>.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>
-All solutions when run sequentially should finish in under one second. I want to improve my performance engineering skills.</li>
+All solutions, when run sequentially, should finish in under one second. I want to improve my performance engineering skills.</li>
 <li><strong>Parts should be solved separately</strong>.
-This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that make part two faster. The aim of this is to get a clear idea of how long each part takes on its own.</li>
+This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that makes part two faster. The aim of this is to get a clear idea of how long each part takes on its own.</li>
 <li><strong>No concurrency or parallelism</strong>.
 Solutions must run sequentially on a single thread. This keeps the focus on the efficiency of the algorithm. I can’t speed up slow solutions by using multiple CPU cores.</li>
 <li><strong>No ChatGPT. No Claude. No AI help</strong>.
 I want to train myself, not the LLM. I can look at other people’s solutions, but only after I have given my best effort at solving the problem.</li>
 <li><strong>Follow the constraints of the input file</strong>.
-The solution doesn’t have to work for all possible scenarios, but it should work for all other inputs; if the input file only contains 8-bit unsigned integers, it doesn’t have to handle larger integer types.</li>
+The solution doesn’t have to work for all possible scenarios, but it should work for all valid inputs. If the input file only contains 8-bit unsigned integers, the solution doesn’t have to handle larger integer types.</li>
 <li><strong>Hardcoding is allowed</strong>.
 For example: size of the input, number of rows and columns, etc. Since the input is known at compile-time, we can skip runtime parsing and just embed it into the program using Zig’s <code>@embedFile</code>.</li>
 </ol>
-<p>Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle’s codebase.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> Lastly, I just thought it would make the experience more fun.</p>
+<p>Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle’s codebase (minus the assertions).<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> Lastly, I just thought it would make the experience more fun.</p>
 <h2 id="favourite-puzzles" tabindex="-1"><a class="header-anchor" href="#favourite-puzzles">Favourite Puzzles</a></h2>
 <p>From all of the puzzles, here are my top 3 favourites:</p>
 <ol>
-<li><strong>Day 6: Guard Gallivant</strong> - This is my slowest day (in benchmarks), but also the one I learned the most from. I’ve learned tricks while solving this day that helped me a lot in the rest of the event, e.g. using vectors to represent directions, padding 2D grids, metadata packing, system endianness, etc.</li>
-<li><strong>Day 17: Chronospatial Computer</strong> - I love reverse engineering puzzles. I used to do a lot of these in CTFs during my university days. The best thing I learned from this puzzle is the realisation that we can use different integer bases to optimise data representation. This helped improve my runtimes in the later days 22 and 23.</li>
-<li><strong>Day 21: Keypad Conundrum</strong> - This one was fun. My gut told me that it can be solved greedily by always choosing the best move. It was right. Though I did have to scroll Reddit for a bit to figure out the step I was missing, which was that you have to visit the farthest keypads first. This is also my longest solution (almost 400 lines) because I hardcoded the best-moves table.</li>
+<li><strong>Day 6: Guard Gallivant</strong> - This is my slowest day (in benchmarks), but also the one I learned the most from. Some of these learnings include: using vectors to represent directions, padding 2D grids, metadata packing, system endianness, etc.</li>
+<li><strong>Day 17: Chronospatial Computer</strong> - I love reverse engineering puzzles. I used to do a lot of these in CTFs during my university days. The best thing I learned from this day is the realisation that we can use different integer bases to optimise data representation. This helped improve my runtimes in the later days 22 and 23.</li>
+<li><strong>Day 21: Keypad Conundrum</strong> - This one was fun. My gut told me that it can be solved greedily by always choosing the best move. It was right. Though I did have to scroll Reddit for a bit to figure out the step I was missing, which was that you have to visit the farthest keypads first. This is also my longest solution file (almost 400 lines) because I hardcoded the best-moves table.</li>
 </ol>
-<p>Some honourable mentions:</p>
+<p>Honourable mention:</p>
 <ol>
-<li><strong>Day 24: Crossed Wires</strong> - Another reverse engineering puzzle. Confession: I didn’t solve this myself during the event. After 23 brutal days, my brain was too tired so I copied a random python solution from Reddit. When I retried it later, it turned out to be pretty fun. I still couldn’t find a solution I was satisfied with though.</li>
-<li><strong>Day 11: Plutonian Pebbles</strong> - This day introduced me to the <a href="https://www.reddit.com/r/adventofcode/comments/1hn2osp/note_to_self_always_ask_is_this_lanternfish/">lanternfish algorithm</a> (memoization). Without this, my solution will probably never finish computing. It’s definitely a useful technique, as it’s also used in later days, but I don’t particularly like the puzzle itself.</li>
+<li><strong>Day 24: Crossed Wires</strong> - Another reverse engineering puzzle. Confession: I didn’t solve this myself during the event. After 23 brutal days, my brain was too tired, so I copied a random Python solution from Reddit. When I retried it later, it turned out to be pretty fun. I still couldn’t find a solution I was satisfied with though.</li>
 </ol>
 <h2 id="programming-patterns-and-zig-tricks" tabindex="-1"><a class="header-anchor" href="#programming-patterns-and-zig-tricks">Programming patterns and Zig Tricks</a></h2>
-<p>Throughout the event, I’ve learned a lot about Zig and performance, and also developed some personal coding conventions. Some of these are Zig-specific, but most are universal and can be applied across languages. This section covers general programming and Zig patterns I found useful. The next section will focus on performance-related tips.</p>
-<h3 id="leverage-comptime" tabindex="-1"><a class="header-anchor" href="#leverage-comptime">Leverage Comptime</a></h3>
+<p>During the event, I learned a lot about Zig and performance, and also developed some personal coding conventions. Some of these are Zig-specific, but most are universal and can be applied across languages. This section covers general programming and Zig patterns I found useful. The next section will focus on performance-related tips.</p>
+<h3 id="comptime" tabindex="-1"><a class="header-anchor" href="#comptime">Comptime</a></h3>
 <p>Zig’s flagship feature, <a href="https://kristoff.it/blog/what-is-zig-comptime/"><code>comptime</code></a>, is surprisingly useful. I knew Zig uses it for generics and that people do clever metaprogramming with it, but I didn’t expect to be using it so often myself.</p>
-<p>My main use for <code>comptime</code> was to generate puzzle-specific types. All of my solution files follow the same structure, with a <code>DayXX</code> function that takes some parameters (usually the input length) and returns a puzzle-specific type, e.g.:</p>
+<p>My main use for <code>comptime</code> was to generate puzzle-specific types. All my solution files follow the same structure, with a <code>DayXX</code> function that takes some parameters (usually the input length) and returns a puzzle-specific type, e.g.:</p>
 <div class="codeblock">
       <div>
         <span>src/days/day01.zig</span>
@@ -368,10 +365,10 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>This allows me to reuse logic across different inputs while still hardcoding the array sizes. Without <code>comptime</code>, I have to either create a separate function for all my different inputs or dynamically allocate memory because I can’t hardcode the array size.</p>
-<p>I also used <code>comptime</code> to shift some computation to compile-time to reduce runtime overhead. For example, in day 4, I needed a function to check whether a string matches either <code>"XMAS"</code> or its reverse, <code>"SAMX"</code>. A pretty simple function that you can write as a one-liner in Python:</p>
+<p>I also used <code>comptime</code> to shift some computation to compile-time to reduce runtime overhead. For example, on day 4, I needed a function to check whether a string matches either <code>"XMAS"</code> or its reverse, <code>"SAMX"</code>. A pretty simple function that you can write as a one-liner in Python:</p>
 <div class="codeblock">
       <div>
-        <span></span>
+        <span>example.py</span>
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">matches</span><span class="token punctuation">(</span>pattern<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -391,7 +388,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>This creates a separate function for each word I want to reverse.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> Each function has an array with the same size as the word to reverse. This removes the need for dynamic allocation and makes the code run faster. As a bonus, Zig also warns you when this word isn’t compile-time known, so you get an immediate error if you pass in a runtime value.</p>
-<h3 id="use-optional-types" tabindex="-1"><a class="header-anchor" href="#use-optional-types">Use Optional Types</a></h3>
+<h3 id="optional-types" tabindex="-1"><a class="header-anchor" href="#optional-types">Optional Types</a></h3>
 <p>A common pattern in C is to return special sentinel values to denote missing values or errors, e.g. <code>-1</code>, <code>0</code>, or <code>NULL</code>. In fact, I did this on day 13 of the challenge:</p>
 <div class="codeblock">
       <div>
@@ -427,12 +424,12 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token comment">// logic only runs when n_tokens is not null.</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>Zig also has a concept of <a href="https://ziglang.org/documentation/master/#Error-Union-Type">error unions</a>, where a function can return either a value or an error. In Rust, this is <a href="https://doc.rust-lang.org/std/result/"><code>Result&lt;T&gt;</code></a>. You could also use error unions instead of optionals for <code>count_tokens</code>, Zig doesn’t force a single approach. I come from Clojure where returning <code>nil</code> for an error or missing value is common.</p>
-<h3 id="pad-your-2d-grids" tabindex="-1"><a class="header-anchor" href="#pad-your-2d-grids">Pad Your 2D Grids</a></h3>
-<p>This year has a lot of 2D grid puzzles (arguably too many). A common feature of grid-based algorithms is the out-of-bounds check. Here’s how you would typically handle this:</p>
+<p>Zig also has a concept of <a href="https://ziglang.org/documentation/master/#Error-Union-Type">error unions</a>, where a function can return either a value or an error. In Rust, this is <a href="https://doc.rust-lang.org/std/result/"><code>Result&lt;T&gt;</code></a>. You could also use error unions instead of optionals for <code>count_tokens</code>; Zig doesn’t force a single approach. I come from Clojure where returning <code>nil</code> for an error or missing value is common.</p>
+<h3 id="grid-padding" tabindex="-1"><a class="header-anchor" href="#grid-padding">Grid Padding</a></h3>
+<p>This year has a lot of 2D grid puzzles (arguably too many). A common feature of grid-based algorithms is the out-of-bounds check. Here’s what it usually looks like:</p>
 <div class="codeblock">
       <div>
-        <span></span>
+        <span>example.zig</span>
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-zig"><code class="language-zig"><span class="token keyword">fn</span> <span class="token function">dfs</span><span class="token punctuation">(</span>map<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin-type keyword">u8</span></span><span class="token punctuation">,</span> position<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token builtin-type keyword">i8</span></span><span class="token punctuation">)</span> <span class="token class-name"><span class="token builtin-type keyword">u32</span></span> <span class="token punctuation">{</span>
@@ -451,8 +448,8 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>This is a typical recursive DFS structure. After doing a lot of this, I discovered a nice trick that not only improves code readability, but also its performance. The trick here is to pad the grid with sentinel characters that mark out-of-bounds areas, i.e. add a border to the grid.</p>
-<p>Here’s an example of from day 6’:</p>
+<p>This is a typical recursive DFS function. After doing a lot of this, I discovered a nice trick that not only improves code readability, but also its performance. The trick here is to pad the grid with sentinel characters that mark out-of-bounds areas, i.e. add a border to the grid.</p>
+<p>Here’s an example from day 6:</p>
 <pre class="language-plaintext"><code class="language-plaintext">Original map:               With borders added:
                             ************
 ....#.....                  *....#.....*
@@ -466,29 +463,31 @@ For example: size of the input, number of rows and columns, etc. Since the input
 #.........                  *#.........*
 ......#...                  *......#...*
                             ************</code></pre>
-<p>You can use any value as the border, as long as it doesn’t conflict with valid in-grid values. With the borders in place, the bounds check becomes a simple equality comparison:</p>
+<p>You can use any value for the border, as long as it doesn’t conflict with valid values in the grid. With the border in place, the bounds check becomes a simple equality comparison:</p>
 <div class="codeblock">
       <div>
-        <span></span>
+        <span>example.zig</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-zig"><code class="language-zig"><span class="token keyword">fn</span> <span class="token function">dfs</span><span class="token punctuation">(</span>map<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin-type keyword">u8</span></span><span class="token punctuation">,</span> position<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token builtin-type keyword">i8</span></span><span class="token punctuation">)</span> <span class="token class-name"><span class="token builtin-type keyword">u32</span></span> <span class="token punctuation">{</span>
+<pre class="language-zig"><code class="language-zig"><span class="token keyword">const</span> border <span class="token operator">=</span> <span class="token char">'*'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">fn</span> <span class="token function">dfs</span><span class="token punctuation">(</span>map<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin-type keyword">u8</span></span><span class="token punctuation">,</span> position<span class="token punctuation">:</span> <span class="token class-name"><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token builtin-type keyword">i8</span></span><span class="token punctuation">)</span> <span class="token class-name"><span class="token builtin-type keyword">u32</span></span> <span class="token punctuation">{</span>
     <span class="token keyword">const</span> x<span class="token punctuation">,</span> <span class="token keyword">const</span> y <span class="token operator">=</span> position<span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">[</span>x<span class="token punctuation">]</span><span class="token punctuation">[</span>y<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token char">'*'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// We are out of bounds</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">[</span>x<span class="token punctuation">]</span><span class="token punctuation">[</span>y<span class="token punctuation">]</span> <span class="token operator">==</span> border<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// We are out of bounds</span>
         <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
     <span class="token comment">// ...</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>This is much more readable than the previous code and is also faster since we’re only doing one comparison instead of four.</p>
-<p>That said, this isn’t a one-size-fits-all solution. This only works for algorithms that traverse the grid one step at a time. If your logic jumps multiple tiles, it can still go out-of-bounds (except if you increase the width of your borders to account for this). This approach also uses a bit more memory than the regular approach as you have to store more characters.</p>
-<h3 id="use-vectors-and-simd" tabindex="-1"><a class="header-anchor" href="#use-vectors-and-simd">Use Vectors and SIMD</a></h3>
-<p>I guess this could also be in the performance tricks section, but I putting it here because the biggest benefit I get from using SIMD in Zig is code readability. Because Zig has first-class <a href="https://ziglang.org/documentation/master/#Vectors">support for vector types</a>, you can write elegant and readable code that also happens to be faster.</p>
+<p>This is much more readable than the previous code. Plus, it’s also faster since we’re only doing one equality check instead of four range checks.</p>
+<p>That said, this isn’t a one-size-fits-all solution. This only works for algorithms that traverse the grid one step at a time. If your logic jumps multiple tiles, it can still go out of bounds (except if you increase the width of the border to account for this). This approach also uses a bit more memory than the regular approach as you have to store more characters.</p>
+<h3 id="simd-vectors" tabindex="-1"><a class="header-anchor" href="#simd-vectors">SIMD Vectors</a></h3>
+<p>This could also go in the performance section, but I’m including it here because the biggest benefit I get from using SIMD in Zig is the improved code readability. Because Zig has first-class <a href="https://ziglang.org/documentation/master/#Vectors">support for vector types</a>, you can write elegant and readable code that also happens to be faster.</p>
 <p>If you’re not familiar with vectors, they are a special collection type used for <a href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_data">Single instruction, multiple data (SIMD)</a> operations. SIMD allows you to perform computation on multiple values in parallel using only a single CPU instruction, which often leads to some performance boosts.<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
-<p>My biggest use for vectors is to represent positions and directions, e.g. for traversing a grid. Instead of writing code like this:</p>
+<p>I mostly use vectors to represent positions and directions, e.g. for traversing a grid. Instead of writing code like this:</p>
 <div class="codeblock">
       <div>
-        <span></span>
+        <span>example.zig</span>
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-zig"><code class="language-zig">next_position <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">{</span> position<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> direction<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> position<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> direction<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
@@ -496,7 +495,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <p>You can represent <code>position</code> and <code>direction</code> as 2-element vectors and write code like this:</p>
 <div class="codeblock">
       <div>
-        <span></span>
+        <span>example.zig</span>
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-zig"><code class="language-zig">next_position <span class="token operator">=</span> position <span class="token operator">+</span> direction<span class="token punctuation">;</span></code></pre>
@@ -519,12 +518,12 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <p></p></div><p></p>
 <p>Expressing the logic as vector operations makes the code cleaner since you don’t have to write loops and conditionals as you typically would in a traditional approach.</p>
 <h2 id="performance-tips" tabindex="-1"><a class="header-anchor" href="#performance-tips">Performance Tips</a></h2>
-<p>The tips below are general performance tricks that often help, but like most things in software engineering, “it depends”. These techniques might improve performance 80% of the time, but performance is often context-specific. You should benchmark your own code instead of blindly following what other people say.</p>
+<p>The tips below are general performance techniques that often help, but like most things in software engineering, “it depends”. These might work 80% of the time, but performance is often highly context-specific. You should benchmark your code instead of blindly following what other people say.</p>
 <p>This section would’ve been more fun with concrete examples, step-by-step optimisations, and benchmarks, but that would’ve made the post way too long. Hopefully I’ll get to write something like that in the future.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup></p>
 <h3 id="minimise-allocations" tabindex="-1"><a class="header-anchor" href="#minimise-allocations">Minimise Allocations</a></h3>
-<p>Whenever possible, prefer static allocation. If you must use a heap allocator, allocate enough memory upfront. Dynamically allocating memory has more overhead from the allocator machinery vs stack allocation which just involves moving the stack pointer.</p>
-<p>That said, static allocation isn’t always the right choice. Stack space is smaller than the heap, so allocating too much can cause a stack overflow. Repeated stack allocations, e.g. in tight loops, also has overhead, especially if the buffers are zeroed out each time.</p>
-<p>A simple but effective trick I’ve learned is to reuse buffers whenever possible, whether they’re statically or dynamically allocated. Here’s an example from day 10. For each trail head, we want to create a set of trail ends reachable from it. The naive approach is to allocate a new set every iteration:</p>
+<p>Whenever possible, prefer static allocation. Static allocation is cheaper since it just involves moving the stack pointer vs dynamic allocation which has more overhead from the allocator machinery. That said, it’s not always the right choice since it has some limitations, e.g. stack size is limited, memory size must be compile-time known, its lifetime is tied to the current stack frame, etc.</p>
+<p>If you need to do dynamic allocations, try to reduce the number of times you call the allocator. The number of allocations you do matters more than the amount of memory you allocate. More allocations mean more bookkeeping, synchronisation, and sometimes syscalls.</p>
+<p>A simple but effective way to reduce allocations is to reuse buffers, whether they’re statically or dynamically allocated. Here’s an example from day 10. For each trail head, we want to create a set of trail ends reachable from it. The naive approach is to allocate a new set every iteration:</p>
 <div class="codeblock">
       <div>
         <span>src/days/day10.zig</span>
@@ -552,13 +551,37 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token comment">// Set building logic...</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>Static allocation isn’t always faster than dynamic allocation. Sometimes dynamic allocation performs better. I’ve seen this in several of my solutions. Over-avoiding dynamic allocation can also result in convoluted, unreadable code that you’ll likely forget how it works after a few days. Remember to always benchmark your code to understand what works best for your specific case.</p>
-<h3 id="compact-your-data" tabindex="-1"><a class="header-anchor" href="#compact-your-data">Compact Your Data</a></h3>
-<p>A performance tip people often say is to have “mechanical empathy”. Avoid leaving CPU cache, prefer arrays over linked-lists because of cache locality, etc. These are good tips, but how do you apply this in practice?</p>
-<p>A simple approach is to reduce the size of your data. Smaller data means more of it can fit in cache, which improves <a href="https://stackoverflow.com/a/7812002/950912">spatial locality</a> and speeds up access.</p>
-<p>One way to do this is <a href="https://www.cs.cornell.edu/courses/cs3410/2024fa/notes/bitpack.html">bit packing</a>. This depends heavily on your specific data, so you’ll need to use your own judgement to tell whether this would work for you. I’ll just share an example that worked for me on day 6.</p>
-<p>In day 6 part two, you have to detect a loop, which happens when you revisit a tile from the same direction as before. To track this, you could use a map or a set to store the tiles and visited directions. A more efficient option is to store this direction metadata in the tile itself.</p>
-<p>There are only four tile types, which means you only need two bits to represent the tile types as an enum. If the enum size is one byte, here’s what the tiles looks like in memory:</p>
+<p>If you use static arrays, you can also just overwrite existing data instead of clearing it.</p>
+<p>A step up from this is to <a href="https://en.wikipedia.org/wiki/Multiple_buffering">reuse multiple buffers</a>. The simplest form of this is to reuse two buffers, i.e. double buffering. Here’s an example from day 11:</p>
+<div class="codeblock">
+      <div>
+        <span>src/days/day11.zig</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-zig"><code class="language-zig"><span class="token comment">// Initialize two hash maps that we'll alternate between.</span>
+<span class="token keyword">var</span> frequencies<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>std<span class="token punctuation">.</span><span class="token function">AutoHashMap</span><span class="token punctuation">(</span><span class="token builtin-type keyword">u64</span><span class="token punctuation">,</span> <span class="token builtin-type keyword">u64</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">undefined</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token operator">..</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">|</span>i<span class="token operator">|</span> frequencies<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> std<span class="token punctuation">.</span><span class="token function">AutoHashMap</span><span class="token punctuation">(</span><span class="token builtin-type keyword">u64</span><span class="token punctuation">,</span> <span class="token builtin-type keyword">u64</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>allocator<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">defer</span> <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token operator">..</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">|</span>i<span class="token operator">|</span> frequencies<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">deinit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> id<span class="token punctuation">:</span> <span class="token class-name"><span class="token builtin-type keyword">usize</span></span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>stones<span class="token punctuation">)</span> <span class="token operator">|</span>stone<span class="token operator">|</span> <span class="token keyword">try</span> frequencies<span class="token punctuation">[</span>id<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>stone<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token operator">..</span>n_blinks<span class="token punctuation">)</span> <span class="token operator">|</span>_<span class="token operator">|</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> old_frequencies <span class="token operator">=</span> <span class="token operator">&amp;</span>frequencies<span class="token punctuation">[</span>id <span class="token operator">%</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> new_frequencies <span class="token operator">=</span> <span class="token operator">&amp;</span>frequencies<span class="token punctuation">[</span><span class="token punctuation">(</span>id <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    id <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">defer</span> old_frequencies<span class="token punctuation">.</span><span class="token function">clearRetainingCapacity</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Do stuff with both maps...</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>Here we have two maps to count the frequencies of stones across iterations. Each iteration will build up <code>new_frequencies</code> with the values from <code>old_frequencies</code>. Doing this reduces the number of allocations to just 2 (the number of buffers). The tradeoff here is that it makes the code slightly more complex.</p>
+<h3 id="make-your-data-smaller" tabindex="-1"><a class="header-anchor" href="#make-your-data-smaller">Make Your Data Smaller</a></h3>
+<p>A performance tip people say is to have “mechanical empathy”. Understand how your code is processed by your computer. An example of this is to structure your data so it works better with your CPU. For example, keep related data close in memory to take advantage of <a href="https://en.algorithmica.org/hpc/external-memory/locality/">cache locality</a>.</p>
+<p>Reducing the size of your data helps with this. Smaller data means more of it can fit in cache. One way to shrink your data is through <a href="https://www.cs.cornell.edu/courses/cs3410/2024fa/notes/bitpack.html">bit packing</a>. This depends heavily on your specific data, so you’ll need to use your judgement to tell whether this would work for you. I’ll just share some examples that worked for me.</p>
+<p>The first example is in day 6 part two, where you have to detect a loop, which happens when you revisit a tile from the same direction as before. To track this, you could use a map or a set to store the tiles and visited directions. A more efficient option is to store this direction metadata in the tile itself.</p>
+<p>There are only four tile types, which means you only need two bits to represent the tile types as an enum. If the enum size is one byte, here’s what the tiles look like in memory:</p>
 <pre class="language-plaintext"><code class="language-plaintext">.obstacle -&gt; 00000000
 .path     -&gt; 00000001
 .visited  -&gt; 00000010
@@ -578,24 +601,28 @@ For example: size of the input, number of rows and columns, etc. Since the input
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-zig"><code class="language-zig"><span class="token keyword">const</span> <span class="token class-name">Tile</span> <span class="token operator">=</span> <span class="token keyword">packed</span> <span class="token keyword">struct</span><span class="token punctuation">(</span><span class="token builtin-type keyword">u8</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token class-name">TileType</span> <span class="token operator">=</span> <span class="token keyword">enum</span><span class="token punctuation">(</span>u4<span class="token punctuation">)</span> <span class="token punctuation">{</span> obstacle<span class="token punctuation">,</span> path<span class="token punctuation">,</span> visited<span class="token punctuation">,</span> exit <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
     up<span class="token punctuation">:</span> <span class="token class-name">u1</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
     right<span class="token punctuation">:</span> <span class="token class-name">u1</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
     down<span class="token punctuation">:</span> <span class="token class-name">u1</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
     left<span class="token punctuation">:</span> <span class="token class-name">u1</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
-    tile<span class="token punctuation">:</span> <span class="token keyword">enum</span><span class="token punctuation">(</span>u4<span class="token punctuation">)</span> <span class="token punctuation">{</span> obstacle<span class="token punctuation">,</span> path<span class="token punctuation">,</span> visited<span class="token punctuation">,</span> exit <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    tile<span class="token punctuation">:</span> <span class="token class-name">TileType</span><span class="token punctuation">,</span>
+
+    <span class="token comment">// ...</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>Doing this avoids extra allocations and improves cache locality. Since the directions metadata is colocated with the tile type, all of them can fit together in cache. Accessing the directions just requires some bitwise operations instead of having to fetch it from another region of memory.</p>
+<p>Doing this avoids extra allocations and improves cache locality. Since the directions metadata is colocated with the tile type, all of them can fit together in cache. Accessing the directions just requires some bitwise operations instead of having to fetch them from another region of memory.</p>
 <p>Another way to do this is to represent your data using <a href="https://en.wikipedia.org/wiki/Numeral_system#Positional_systems_in_detail">alternate number bases</a>. Here’s an example from day 23. Computers are represented as two character strings made up of only lowercase letters, e.g. <code>"bc"</code>, <code>"xy"</code>, etc. Instead of storing this as a <code>[2]u8</code> array, you can convert it into a base-26 number and store it as a <code>u16</code>.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
 <p>Here’s the idea: map <code>'a'</code> to 0, <code>'b'</code> to 1, up to <code>'z'</code> as 25. Each character in the string becomes a digit in the base-26 number. For example,  <code>"bc"</code> ( <code>[2]u8{ 'b', 'c' }</code>) becomes the base-10 number 28 (<mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="14.33ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 6334 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g><g data-mml-node="mi" transform="translate(500,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="mn" transform="translate(1278,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mo" transform="translate(2500.2,0)"><use data-c="2B" xlink:href="#MJX-TEX-N-2B"></use></g><g data-mml-node="mn" transform="translate(3500.4,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="mo" transform="translate(4278.2,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(5334,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="38" xlink:href="#MJX-TEX-N-38" transform="translate(500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mi>×</mi><mn>26</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>28</mn></math></mjx-assistive-mml></mjx-container>). If we represent this using the base-64 character set, it becomes 12 (<code>'b'</code> = 1, <code>'c'</code> = 2).</p>
 <p>While they take the same amount of space (2 bytes), a <code>u16</code> has some benefits over a <code>[2]u8</code>:</p>
 <ol>
-<li>It fits in a single register whereas you need two for an the array.</li>
+<li>It fits in a single register, whereas you need two for the array.</li>
 <li>Comparison is faster as there is only a single value to compare.</li>
 </ol>
 <h3 id="reduce-branching" tabindex="-1"><a class="header-anchor" href="#reduce-branching">Reduce Branching</a></h3>
-<p>I won’t explain branchless programming here, instead read <a href="https://en.algorithmica.org/hpc/pipelining/branchless/">the Algorithmica’s page</a> which explains it way better than I can. While modern compilers are smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of <a href="https://www.rfleury.com/p/the-codepath-combinatoric-explosion">codepaths in your program</a>.</p>
-<p>Again, since performance is always context-dependent, I’ll just show you some patterns I use. Here’s one that comes up often:</p>
+<p>I won’t explain branchless programming here; <a href="https://en.algorithmica.org/hpc/pipelining/branchless/">the Algorithmica’s page</a> explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of <a href="https://www.rfleury.com/p/the-codepath-combinatoric-explosion">codepaths in your program</a>.</p>
+<p>Again, since performance is very context-dependent, I’ll just show you some patterns I use. Here’s one that comes up often:</p>
 <div class="codeblock">
       <div>
         <span>src/days/day02.zig</span>
@@ -619,7 +646,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
         <span>src/days/day06.zig</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-zig"><code class="language-zig"><span class="token keyword">fn</span> <span class="token function">has_visited</span><span class="token punctuation">(</span>self<span class="token punctuation">:</span> <span class="token class-name">Tile</span><span class="token punctuation">,</span> direction<span class="token punctuation">:</span> <span class="token class-name">Direction</span><span class="token punctuation">)</span> <span class="token class-name"><span class="token builtin-type keyword">bool</span></span> <span class="token punctuation">{</span>
+<pre class="language-zig"><code class="language-zig"><span class="token keyword">fn</span> <span class="token function">has_visited</span><span class="token punctuation">(</span>tile<span class="token punctuation">:</span> <span class="token class-name">Tile</span><span class="token punctuation">,</span> direction<span class="token punctuation">:</span> <span class="token class-name">Direction</span><span class="token punctuation">)</span> <span class="token class-name"><span class="token builtin-type keyword">bool</span></span> <span class="token punctuation">{</span>
     <span class="token keyword">switch</span> <span class="token punctuation">(</span>direction<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token punctuation">.</span>up <span class="token operator">=&gt;</span> <span class="token keyword">return</span> self<span class="token punctuation">.</span>up <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">,</span>
         <span class="token punctuation">.</span>right <span class="token operator">=&gt;</span> <span class="token keyword">return</span> self<span class="token punctuation">.</span>right <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">,</span>
@@ -628,7 +655,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>This works, but it introduces a branch. We can make it branchless using bitwise operations:</p>
+<p>This works, but it introduces a few branches. We can make it branchless using bitwise operations:</p>
 <div class="codeblock">
       <div>
         <span>src/days/day06.zig</span>
@@ -641,17 +668,17 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token keyword">return</span> bits <span class="token operator">&amp;</span> mask <span class="token operator">==</span> mask<span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>While this is arguably cryptic and less readable, but it does perform better than the switch version.</p>
+<p>While this is arguably cryptic and less readable, it does perform better than the switch version.</p>
 <h3 id="avoid-recursion" tabindex="-1"><a class="header-anchor" href="#avoid-recursion">Avoid Recursion</a></h3>
-<p>The final performance tip is to prefer iterative code over recursion. Recursive functions brings the overhead allocating a new stack frames. While recursive code is more elegant, it’s also often slower unless your language’s compiler can optimise it away, e.g. via tail-call optimisation. As far as I know, Zig doesn’t have this, though I might be wrong.</p>
-<p>Recursion also has the risk of causing a stack overflow if the execution isn’t bounded. This is why code that are mission- or safety-critical avoid recursion entirely. It’s in TigerBeetle’s <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md">TIGERSTYLE</a> and also NASA’s <a href="https://spinroot.com/gerard/pdf/P10.pdf">Power of Ten</a>.</p>
-<p>While iterative code can be harder to write in some cases, e.g. DFS maps naturally to recursion, but in almost all cases iterative code is significantly faster and more predictable than the recursive alternative.</p>
+<p>The final performance tip is to prefer iterative code over recursion. Recursive functions bring the overhead of allocating stack frames. While recursive code is more elegant, it’s also often slower unless your language’s compiler can optimise it away, e.g. via tail-call optimisation. As far as I know, Zig doesn’t have this, though I might be wrong.</p>
+<p>Recursion also has the risk of causing a stack overflow if the execution isn’t bounded. This is why code that is mission- or safety-critical avoids recursion entirely. It’s in TigerBeetle’s <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md">TIGERSTYLE</a> and also NASA’s <a href="https://spinroot.com/gerard/pdf/P10.pdf">Power of Ten</a>.</p>
+<p>Iterative code can be harder to write in some cases, e.g. DFS maps naturally to recursion, but most of the time it is significantly faster, more predictable, and safer than the recursive alternative.</p>
 <h2 id="benchmarks" tabindex="-1"><a class="header-anchor" href="#benchmarks">Benchmarks</a></h2>
 <p>I ran benchmarks for all 25 solutions in each of Zig’s optimisation modes. You can find the full results and the benchmark script in my <a href="https://github.com/rmrt1n/advent-of-code">GitHub repository</a>. All benchmarks were done on an <a href="https://en.wikipedia.org/wiki/Apple_M3">Apple M3 Pro</a>.</p>
 <p>As expected, <code>ReleaseFast</code> produced the best result with a total runtime of <strong>85.1 ms</strong>. I’m quite happy with this, considering the two constraints that limited the number of optimisations I can do to the code:</p>
 <ul>
 <li><strong>Parts should be solved separately</strong> - Some days can be solved in a single go, e.g. day 10 and day 13, which could’ve saved a few milliseconds.</li>
-<li><strong>No concurrency or parallelism</strong> - My slowest days are the compute-heavy days that are very easily parallelisable, e.g. day 6, day 19, and day 22. Without this constraint I can probably reach sub-20 milliseconds(?), but that’s for another time.</li>
+<li><strong>No concurrency or parallelism</strong> - My slowest days are the compute-heavy days that are very easily parallelisable, e.g. day 6, day 19, and day 22. Without this constraint, I can probably reach sub-20 milliseconds total(?), but that’s for another time.</li>
 </ul>
 <p>You can see the full benchmarks for <code>ReleaseFast</code> in the table below:</p>
 <div style="overflow-x: auto">
@@ -871,7 +898,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 </table>
 </div>
 <p>A weird thing I found when benchmarking is that for day 6 part two, <code>ReleaseSafe</code> actually ran faster than <code>ReleaseFast</code> (13,189.0 µs vs 24,370.7 µs). Their outputs are the same, but for some reason <code>ReleaseSafe</code> is faster even with the safety checks still intact.</p>
-<p>The Zig compiler is still very much a moving target, so I don’t want to dig too deep into this as this is probably a bug in the compiler. This weird behaviour might just disappear after a few compiler version updates.</p>
+<p>The Zig compiler is still very much a moving target, so I don’t want to dig too deep into this, as I’m guessing this might be a bug in the compiler. This weird behaviour might just disappear after a few compiler version updates.</p>
 <h2 id="reflections" tabindex="-1"><a class="header-anchor" href="#reflections">Reflections</a></h2>
 <p>Looking back, I’m really glad I decided to do Advent of Code and followed through to the end. I learned a lot of things. Some are useful in my professional work, some are more like random bits of trivia. Going with Zig was a good choice too. The language is small, simple, and gets out of your way. I learned more about algorithms and concepts than the language itself.</p>
 <p>Besides what I’ve already mentioned earlier, here are some examples of the things I learned:</p>
@@ -880,46 +907,79 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <li><a href="https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm">Cliques</a> and the <a href="https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm">Bron-Kerbosch algorithm</a>.</li>
 <li>The <a href="https://en.wikipedia.org/wiki/Adder_(electronics)#Ripple-carry_adder">ripple-carry adder circuit</a>.</li>
 <li>LaTeX math syntax with <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions">MathJax</a>, which I used in my write-ups.</li>
-<li>In Python you can use <a href="https://www.alpinewerk.com/posts/complex/">complex numbers to traverse 2D grids</a>!</li>
+<li>In Python, you can use <a href="https://www.alpinewerk.com/posts/complex/">complex numbers to traverse 2D grids</a>!</li>
 </ul>
 <p>Some of my self-imposed constraints and rules ended up being helpful. I can still (mostly) understand the code I wrote a few months ago. Putting all of the code in a single file made it easier to read since I don’t have to context switch to other files all the time.</p>
-<p>However, some of them did backfire a bit, e.g. the two constraints that limit how I can optimise my code. Another one is the “hardcoding allowed” rule. I used a lot of magic numbers, which helped to improve performance, but I didn’t document them so after a while I don’t even know how I got them. I’ve since gone back and added explanations in my write-ups, but next time I’ll remember to at least leave a comment.</p>
+<p>However, some of them did backfire a bit, e.g. the two constraints that limit how I can optimise my code. Another one is the “hardcoding allowed” rule. I used a lot of magic numbers, which helped to improve performance, but I didn’t document them so after a while I don’t even remember how I got them. I’ve since gone back and added explanations in my write-ups, but next time I’ll remember to at least leave comments.</p>
 <p>One constraint I’ll probably remove next time is the no concurrency rule. It’s the biggest contributor to the total runtime of my solutions. I don’t do a lot of concurrent programming, even though my main language at work is Go, so next time it might be a good idea to use Advent of Code to level up my concurrency skills.</p>
-<p>I also spent way more time on these puzzles than I originally expected. I optimised and rewrote my code multiple times. I also rewrote my write-ups a few times to make them easier to read. This is by far my longest side project yet. It’s a lot of fun, but it also takes a lot of time and effort to do. I almost gave up on the write-ups (and this blog post) because I don’t want to explain my awful day 15 and day 16 code. I ended up taking a break for a few months before finishing it, which is why this post was published on August lol.</p>
-<p>Just for fun here’s a photo of some of my notebook sketches that helped me visualise my solutions. See if you can guess which days these are from:</p>
-<p><img loading="lazy" decoding="async" src="/drafts/f7abb9dbf8f2d0545d2385e7e65af7a2/hWE070SOvc-1600.webp" alt="" width="1600" height="1600"></p>
+<p>I also spent way more time on these puzzles than I originally expected. I optimised and rewrote my code multiple times. I also rewrote my write-ups a few times to make them easier to read. This is by far my longest side project yet. It’s a lot of fun, but it also takes a lot of time and effort. I almost gave up on the write-ups (and this blog post) because I don’t want to explain my awful day 15 and day 16 code. I ended up taking a break for a few months before finishing it, which is why this post is published in August lol.</p>
+<p>Just for fun, here’s a photo of some of my notebook sketches that helped me visualise my solutions. See if you can guess which days these are from:</p>
+<p><img loading="lazy" decoding="async" src="/articles/aoc2024/hWE070SOvc-1600.webp" alt="Photos of my notebook sketches" width="1600" height="1600"></p>
 <h2 id="what%E2%80%99s-next%3F" tabindex="-1"><a class="header-anchor" href="#what%E2%80%99s-next%3F">What’s Next?</a></h2>
 <p>So… would I do it again? Probably, though I’m not making any promises. If I do join this year, I’ll probably stick with Zig. I had my eyes on Zig since the start of 2024, so Advent of Code was the perfect excuse to learn it. This year, there aren’t any languages in particular that caught my eye, so I’ll just keep using Zig, especially since I have a proper setup ready.</p>
-<p>If you haven’t tried Advent of Code, I highly recommend checking it out this year. It’s a great excuse to learn a new language, improve your problem solving skills, or just to learn something new. If you’re really eager, you can also do the <a href="https://adventofcode.com/2024/events">previous years’ puzzles</a> as they’re still available.</p>
+<p>If you haven’t tried Advent of Code, I highly recommend checking it out this year. It’s a great excuse to learn a new language, improve your problem-solving skills, or just to learn something new. If you’re eager, you can also do the <a href="https://adventofcode.com/2024/events">previous years’ puzzles</a> as they’re still available.</p>
 <p>One of the best aspects of Advent of Code is the community. The <a href="https://adventofcode.com/2024/events">Advent of Code subreddit</a> is a great place for discussion. You can ask questions and also see other people’s solutions. Some people also post really cool visualisations like <a href="https://www.reddit.com/r/adventofcode/s/nylBX7xFbp">this one</a>. They also have <a href="https://www.reddit.com/r/adventofcode/?f=flair_name%3A%22Meme%2FFunny%22">memes!</a></p>
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>I failed my first attempt horribly with <a href="https://clojure.org/">Clojure</a> during Advent of Code 2023. Once I reached the later half of the event I just couldn’t solve the problems with a purely functional style. I could’ve pushed through using imperative code, but I stubbornly chose not to and gave up… <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p>I failed my first attempt horribly with <a href="https://clojure.org/">Clojure</a> during Advent of Code 2023. Once I reached the later half of the event, I just couldn’t solve the problems with a purely functional style. I could’ve pushed through using imperative code, but I stubbornly chose not to and gave up… <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn2" class="footnote-item"><p>The original constraint was each solution must run in under one second. As it turned out, the code was faster than I expected, so I increased the difficulty. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+<li id="fn2" class="footnote-item"><p>The original constraint was that each solution must run in under one second. As it turned out, the code was faster than I expected, so I increased the difficulty. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn3" class="footnote-item"><p>TigerBeetle’s code quality and <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md">engineering principles</a> are just wonderful. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn4" class="footnote-item"><p>You can implement this function without any allocation by mutating the string in place or by iterating over it twice, which is probably faster than my current implementation. I kept it as-is as a reminder of what <code>comptime</code> can do. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn5" class="footnote-item"><p>As a bonus, I was curious as to how this looks like compiled so I listed all the functions in this binary in GDB and found:</p>
+<li id="fn5" class="footnote-item"><p>As a bonus, I was curious as to what this looks like compiled so I listed all the functions in this binary in GDB and found:</p>
 <pre class="language-plaintext"><code class="language-plaintext">72:     static bool day04.Day04(140).matches__anon_19741;
 72:     static bool day04.Day04(140).matches__anon_19750;</code></pre>
 <p>It does generate separate functions! <a href="#fnref5" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn6" class="footnote-item"><p>Well, not always. The number of SIMD instructions depend on the machine’s native SIMD size. If the length of the vector exceeds it, Zig will compile it into multiple SIMD instructions. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+<li id="fn6" class="footnote-item"><p>Well, not always. The number of SIMD instructions depends on the machine’s native SIMD size. If the length of the vector exceeds it, Zig will compile it into multiple SIMD instructions. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn7" class="footnote-item"><p>Here’s a nice <a href="https://cprimozic.net/blog/optimizing-advent-of-code-2024/">post on optimising day 9’s solution with Rust</a>. It’s a good read if you’re into performance engineering or Rust techniques. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn8" class="footnote-item"><p>One thing about packed structs is that their layout is dependent on the system endianness. Most modern systems are little-endian, so the memory layout I showed is actually reversed. Thankfully Zig has some useful functions to convert between endianness like <code>std.mem.nativeToBig</code>, which makes working with packed structs easier. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+<li id="fn8" class="footnote-item"><p>One thing about packed structs is that their layout is dependent on the system endianness. Most modern systems are little-endian, so the memory layout I showed is actually reversed. Thankfully, Zig has some useful functions to convert between endianness like <code>std.mem.nativeToBig</code>, which makes working with packed structs easier. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn9" class="footnote-item"><p>Technically you can store 2-digit base 26 numbers in a <code>u10</code>, as there are only <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="3.25ex" height="2.005ex" role="img" focusable="false" viewBox="0 -864 1436.6 886" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mn" transform="translate(1033,393.1) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>26</mn><mn>2</mn></msup></math></mjx-assistive-mml></mjx-container> possible numbers. Most systems usually pad values by byte size, so <code>u10</code> will still be stored as <code>u16</code>, which is why I just went straight for it. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+<li id="fn9" class="footnote-item"><p>Technically, you can store 2-digit base 26 numbers in a <code>u10</code>, as there are only <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="3.25ex" height="2.005ex" role="img" focusable="false" viewBox="0 -864 1436.6 886" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mn" transform="translate(1033,393.1) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>26</mn><mn>2</mn></msup></math></mjx-assistive-mml></mjx-container> possible numbers. Most systems usually pad values by byte size, so <code>u10</code> will still be stored as <code>u16</code>, which is why I just went straight for it. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
 </li>
 </ol>
 </section>
 
   </section>
+  
+    <section id="hey">
+      <p>
+
+      Hi 👋. If you like this post, consider
+      <a href="https://twitter.com/intent/tweet/?text=Advent of Code 2024 in Zig @gud_mornign&url=https://ryanmartin.me/articles/aoc2024/">
+        sharing it on X
+      </a> or
+      <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/aoc2024/&t=Advent of Code 2024 in Zig">
+        Hacker News
+      </a>.
+      Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email me</a>
+      or <a href="https://x.com/gud_mornign">tweet me</a>.
+      You can also subscribe to new articles via <a href="/feed.xml">RSS</a>.
+      </p>
+
+      <p>Continue reading:</p>
+
+      
+        
+      
+
+      
+        
+        
+        <ul>
+          
+            <li><strong>Back: </strong><a href="/articles/clojure-fly/">Build and Deploy Web Apps With Clojure and FLy.io</a></li>
+          
+          
+        </ul>
+      
+    </section>
   
 </article>
 

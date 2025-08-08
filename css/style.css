@@ -14,12 +14,14 @@
   --color-border: #737373;
   --color-links: blue;
   --color-code: #e5e5e5;
+  --color-danger: #dc2626;
 
   @media (prefers-color-scheme: dark) {
     --color-bg: #0a0a0a;
     --color-fg: #e5e5e5;
     --color-links: skyblue;
     --color-code: #262626;
+    --color-danger: #ef4444;
   }
 }
 
@@ -373,8 +375,8 @@ table {
 
 #draft {
   display: inline-block;
-  color: #dc2626;
-  border: 2.5px solid #dc2626;
+  color: var(--color-danger);
+  border: 2.5px solid var(--color-danger);
   font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
   font-size: 1.125rem;
   font-weight: bold;

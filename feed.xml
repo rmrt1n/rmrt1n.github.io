@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-08-03T09:51:31Z</updated>
+  <updated>2025-08-08T08:57:21Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-08-03T09:51:31Z</updated>
+    <updated>2025-08-08T08:57:21Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -856,7 +856,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-08-03T09:51:31Z</updated>
+    <updated>2025-08-08T08:57:21Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
@@ -1569,7 +1569,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-08-03T09:51:31Z</updated>
+    <updated>2025-08-08T08:57:21Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -2186,6 +2186,917 @@ Server started on port  8080
 &lt;/ol&gt;
 &lt;/section&gt;
 &lt;/body&gt;&lt;/html&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Advent of Code 2024 in Zig</title>
+    <link href="https://ryanmartin.me/articles/aoc2024/" />
+    <updated>2025-08-08T08:57:21Z</updated>
+    <id>https://ryanmartin.me/articles/aoc2024/</id>
+    <content type="html">
+&lt;html&gt;&lt;head&gt;&lt;style id=&quot;MJX-SVG-styles&quot;&gt;
+mjx-container[jax=&quot;SVG&quot;] {
+  direction: ltr;
+}
+
+mjx-container[jax=&quot;SVG&quot;] &gt; svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax=&quot;SVG&quot;] &gt; svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display=&quot;block&quot;] {
+  width: 100% !important;
+}
+
+mjx-container[jax=&quot;SVG&quot;][display=&quot;true&quot;] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax=&quot;SVG&quot;][display=&quot;true&quot;][width=&quot;full&quot;] {
+  display: flex;
+}
+
+mjx-container[jax=&quot;SVG&quot;][justify=&quot;left&quot;] {
+  text-align: left;
+}
+
+mjx-container[jax=&quot;SVG&quot;][justify=&quot;right&quot;] {
+  text-align: right;
+}
+
+g[data-mml-node=&quot;merror&quot;] &gt; g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node=&quot;merror&quot;] &gt; rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node=&quot;mtable&quot;] &gt; line[data-line], svg[data-table] &gt; g &gt; line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node=&quot;mtable&quot;] &gt; rect[data-frame], svg[data-table] &gt; g &gt; rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node=&quot;mtable&quot;] &gt; .mjx-dashed, svg[data-table] &gt; g &gt; .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node=&quot;mtable&quot;] &gt; .mjx-dotted, svg[data-table] &gt; g &gt; .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node=&quot;mtable&quot;] &gt; g &gt; svg {
+  overflow: visible;
+}
+
+[jax=&quot;SVG&quot;] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax=&quot;SVG&quot;] mjx-tool &gt; mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool &gt; mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node=&quot;maction&quot;][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax=&quot;SVG&quot;] path[data-c], mjx-container[jax=&quot;SVG&quot;] use[data-c] {
+  stroke-width: 3;
+}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post is about &lt;s&gt;six&lt;/s&gt; seven months late, but here are my takeaways from &lt;a href=&quot;https://adventofcode.com/&quot;&gt;Advent of Code 2024&lt;/a&gt;. It was my second time participating, and this time I actually managed to complete it.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn1&quot; id=&quot;fnref1&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; My goal was to learn a new language, &lt;a href=&quot;https://ziglang.org/&quot;&gt;Zig&lt;/a&gt;, and to improve my DSA and problem-solving skills.&lt;/p&gt;
+&lt;p&gt;If you’re not familiar, Advent of Code is an annual programming challenge that runs every December. A new puzzle is released each day from December 1st to the 25th. There’s also a global leaderboard where people (and AI) race to get the fastest solves, but I personally don’t compete in it, mostly because I want to do it at my own pace.&lt;/p&gt;
+&lt;p&gt;I went with Zig because I have been curious about it for a while, mainly because of its promise of &lt;a href=&quot;https://www.youtube.com/watch?v=Gv2I7qTux7g&quot;&gt;being a better C&lt;/a&gt; and because &lt;a href=&quot;https://tigerbeetle.com/&quot;&gt;TigerBeetle&lt;/a&gt; (one of the coolest databases now) is written in it. Learning Zig felt like a good way to get back into systems programming, something I’ve been wanting to do after a couple of chaotic years of web development.&lt;/p&gt;
+&lt;p&gt;This post is mostly about my setup, results, and the things I learned from solving the puzzles. If you’re more interested in my solutions, I’ve also uploaded my code and solution write-ups to my &lt;a href=&quot;https://github.com/rmrt1n/advent-of-code&quot;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/articles/aoc2024/FBG5iC0aoh-1394.webp&quot; alt=&quot;My Advent of Code results page&quot; width=&quot;1394&quot; height=&quot;1228&quot;&gt;&lt;/p&gt;
+&lt;aside class=&quot;toc&quot;&gt;&lt;div&gt;
+      &lt;h2 id=&quot;toc&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#toc&quot; class=&quot;header-anchor&quot;&gt;Table of Contents&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#self-imposed-constraints&quot;&gt;Self-Imposed Constraints&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#favourite-puzzles&quot;&gt;Favourite Puzzles&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#programming-patterns-and-zig-tricks&quot;&gt;Programming patterns and Zig Tricks&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#comptime&quot;&gt;Comptime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#optional-types&quot;&gt;Optional Types&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#grid-padding&quot;&gt;Grid Padding&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#simd-vectors&quot;&gt;SIMD Vectors&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#performance-tips&quot;&gt;Performance Tips&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#minimise-allocations&quot;&gt;Minimise Allocations&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#make-your-data-smaller&quot;&gt;Make Your Data Smaller&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#reduce-branching&quot;&gt;Reduce Branching&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#avoid-recursion&quot;&gt;Avoid Recursion&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#benchmarks&quot;&gt;Benchmarks&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#reflections&quot;&gt;Reflections&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#what%E2%80%99s-next%3F&quot;&gt;What’s Next?&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;/aside&gt;
+&lt;h2 id=&quot;project-setup&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#project-setup&quot;&gt;Project Setup&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;There were &lt;a href=&quot;https://github.com/search?q=advent+of+code+template+lang%3Azig&amp;amp;type=repositories&quot;&gt;several Advent of Code templates in Zig&lt;/a&gt; that I looked at as a reference for my development setup, but none of them really clicked with me. I ended up just running my solutions directly using &lt;code&gt;zig run&lt;/code&gt; for the whole event. It wasn’t until after the event ended that I properly learned &lt;a href=&quot;https://ziglang.org/learn/build-system/&quot;&gt;Zig’s build system&lt;/a&gt; and reorganised my project.&lt;/p&gt;
+&lt;p&gt;Here’s what the project structure looks like now:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;.
+├── src
+│   ├── days
+│   │   ├── data
+│   │   │   ├── day01.txt
+│   │   │   ├── day02.txt
+│   │   │   └── ...
+│   │   ├── day01.zig
+│   │   ├── day02.zig
+│   │   └── ...
+│   ├── bench.zig
+│   └── run.zig
+└── build.zig&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The project is powered by &lt;code&gt;build.zig&lt;/code&gt;, which defines several commands:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Build&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;zig build&lt;/code&gt; - Builds all of the binaries for all optimisation modes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Run&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;zig build run&lt;/code&gt; - Runs all solutions sequentially.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;zig build run -Day=XX&lt;/code&gt; - Runs the solution of the specified day only.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Benchmark&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;zig build bench&lt;/code&gt; - Runs all benchmarks sequentially.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;zig build bench -Day=XX&lt;/code&gt; - Runs the benchmark of the specified day only.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Test&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;zig build test&lt;/code&gt; - Runs all tests sequentially.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;zig build test -Day=XX&lt;/code&gt; - Runs the tests of the specified day only.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You can also pass the optimisation mode that you want to any of the commands above with the &lt;code&gt;-Doptimize&lt;/code&gt; flag.&lt;/p&gt;
+&lt;p&gt;Under the hood, &lt;code&gt;build.zig&lt;/code&gt; compiles &lt;code&gt;src/run.zig&lt;/code&gt; when you call &lt;code&gt;zig build run&lt;/code&gt;, and &lt;code&gt;src/bench.zig&lt;/code&gt; when you call &lt;code&gt;zig build bench&lt;/code&gt;. These files are templates that import the solution for a specific day from &lt;code&gt;src/days/dayXX.zig&lt;/code&gt;. For example, here’s what &lt;code&gt;src/run.zig&lt;/code&gt; looks like:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/run.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; std &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@import&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;std&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; puzzle &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@import&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;day&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// Injected by build.zig&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token operator&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;void&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; arena &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;heap&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;ArenaAllocator&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;heap&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;page_allocator&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;defer&lt;/span&gt; arena&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;deinit&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; allocator &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; arena&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;allocator&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;debug&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;{s}&#92;n&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;puzzle&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;title&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    _ &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;try&lt;/span&gt; puzzle&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;allocator&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;debug&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&#92;n&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;day&lt;/code&gt; module imported is an &lt;a href=&quot;https://ziglang.org/learn/build-system/#generating-zig&quot;&gt;anonymous import&lt;/a&gt; dynamically injected by &lt;code&gt;build.zig&lt;/code&gt; during compilation. This allows a single &lt;code&gt;run.zig&lt;/code&gt; or &lt;code&gt;bench.zig&lt;/code&gt; to be reused for all solutions. This avoids repeating boilerplate code in the solution files. Here’s a simplified version of my &lt;code&gt;build.zig&lt;/code&gt; file that shows how this works:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;build.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; std &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@import&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;std&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;b&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Build&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;void&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; target &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;standardTargetOptions&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; optimize &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;standardOptimizeOption&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; run_all &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;step&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;run&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;Run all days&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; day_option &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;usize&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ay&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// The `-Day` option&lt;/span&gt;
+
+    &lt;span class=&quot;token comment&quot;&gt;// Generate build targets for all 25 days.&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;26&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;day&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; day_zig_file &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;src/days/day{d:0&amp;gt;2}.zig&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;day&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;token comment&quot;&gt;// Create an executable for running this specific day.&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; run_exe &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;addExecutable&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;run-day{d:0&amp;gt;2}&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;day&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;root_source_file &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;src/run.zig&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;target &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; target&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;optimize &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; optimize&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;token comment&quot;&gt;// Inject the day-specific solution file as the anonymous module `day`.&lt;/span&gt;
+        run_exe&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;root_module&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;addAnonymousImport&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;day&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;root_source_file &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; day_zig_file &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;token comment&quot;&gt;// Install the executable so it can be run.&lt;/span&gt;
+        b&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;installArtifact&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;run_exe&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;My actual &lt;code&gt;build.zig&lt;/code&gt; has some extra code that builds the binaries for all optimisation modes.&lt;/p&gt;
+&lt;p&gt;This setup is pretty barebones. I’ve seen &lt;a href=&quot;https://github.com/fspoettel/advent-of-code-rust&quot;&gt;other templates&lt;/a&gt; do cool things like scaffold files, download puzzle inputs, and even submit answers automatically. Since I wrote my &lt;code&gt;build.zig&lt;/code&gt; after the event ended, I didn’t get to use it while solving the puzzles. I might add these features to it if I decided to do Advent of Code again this year with Zig.&lt;/p&gt;
+&lt;h2 id=&quot;self-imposed-constraints&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#self-imposed-constraints&quot;&gt;Self-Imposed Constraints&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;While there are no rules to Advent of Code itself, to make things a little more interesting, I set a few constraints and rules for myself:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;The code must be readable&lt;/strong&gt;.
+By “readable”, I mean the code should be straightforward and easy to follow. No unnecessary abstractions. I should be able to come back to the code months later and still understand (most of) it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Solutions must be a single file&lt;/strong&gt;.
+No external dependencies. No shared utilities module. Everything needed to solve the puzzle should be visible in that one solution file.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The total runtime must be under one second&lt;/strong&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn2&quot; id=&quot;fnref2&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;
+All solutions, when run sequentially, should finish in under one second. I want to improve my performance engineering skills.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Parts should be solved separately&lt;/strong&gt;.
+This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that makes part two faster. The aim of this is to get a clear idea of how long each part takes on its own.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No concurrency or parallelism&lt;/strong&gt;.
+Solutions must run sequentially on a single thread. This keeps the focus on the efficiency of the algorithm. I can’t speed up slow solutions by using multiple CPU cores.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No ChatGPT. No Claude. No AI help&lt;/strong&gt;.
+I want to train myself, not the LLM. I can look at other people’s solutions, but only after I have given my best effort at solving the problem.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Follow the constraints of the input file&lt;/strong&gt;.
+The solution doesn’t have to work for all possible scenarios, but it should work for all valid inputs. If the input file only contains 8-bit unsigned integers, the solution doesn’t have to handle larger integer types.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hardcoding is allowed&lt;/strong&gt;.
+For example: size of the input, number of rows and columns, etc. Since the input is known at compile-time, we can skip runtime parsing and just embed it into the program using Zig’s &lt;code&gt;@embedFile&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle’s codebase (minus the assertions).&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn3&quot; id=&quot;fnref3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt; Lastly, I just thought it would make the experience more fun.&lt;/p&gt;
+&lt;h2 id=&quot;favourite-puzzles&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#favourite-puzzles&quot;&gt;Favourite Puzzles&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;From all of the puzzles, here are my top 3 favourites:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Day 6: Guard Gallivant&lt;/strong&gt; - This is my slowest day (in benchmarks), but also the one I learned the most from. Some of these learnings include: using vectors to represent directions, padding 2D grids, metadata packing, system endianness, etc.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Day 17: Chronospatial Computer&lt;/strong&gt; - I love reverse engineering puzzles. I used to do a lot of these in CTFs during my university days. The best thing I learned from this day is the realisation that we can use different integer bases to optimise data representation. This helped improve my runtimes in the later days 22 and 23.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Day 21: Keypad Conundrum&lt;/strong&gt; - This one was fun. My gut told me that it can be solved greedily by always choosing the best move. It was right. Though I did have to scroll Reddit for a bit to figure out the step I was missing, which was that you have to visit the farthest keypads first. This is also my longest solution file (almost 400 lines) because I hardcoded the best-moves table.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Honourable mention:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Day 24: Crossed Wires&lt;/strong&gt; - Another reverse engineering puzzle. Confession: I didn’t solve this myself during the event. After 23 brutal days, my brain was too tired, so I copied a random Python solution from Reddit. When I retried it later, it turned out to be pretty fun. I still couldn’t find a solution I was satisfied with though.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;programming-patterns-and-zig-tricks&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#programming-patterns-and-zig-tricks&quot;&gt;Programming patterns and Zig Tricks&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;During the event, I learned a lot about Zig and performance, and also developed some personal coding conventions. Some of these are Zig-specific, but most are universal and can be applied across languages. This section covers general programming and Zig patterns I found useful. The next section will focus on performance-related tips.&lt;/p&gt;
+&lt;h3 id=&quot;comptime&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#comptime&quot;&gt;Comptime&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Zig’s flagship feature, &lt;a href=&quot;https://kristoff.it/blog/what-is-zig-comptime/&quot;&gt;&lt;code&gt;comptime&lt;/code&gt;&lt;/a&gt;, is surprisingly useful. I knew Zig uses it for generics and that people do clever metaprogramming with it, but I didn’t expect to be using it so often myself.&lt;/p&gt;
+&lt;p&gt;My main use for &lt;code&gt;comptime&lt;/code&gt; was to generate puzzle-specific types. All my solution files follow the same structure, with a &lt;code&gt;DayXX&lt;/code&gt; function that takes some parameters (usually the input length) and returns a puzzle-specific type, e.g.:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day01.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;Day01&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;comptime&lt;/span&gt; length&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;usize&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;type&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; Self &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@This&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        
+        left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;length&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u32&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;length&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u32&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;input&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token operator&quot;&gt;!&lt;/span&gt;Self&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+        &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This lets me instantiate the type with a size that matches my input:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day01.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// Here, `Day01` is called with the size of my actual input.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;_&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mem&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Allocator&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; is_run&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;bool&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token operator&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; input &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@embedFile&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;./data/day01.txt&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; puzzle &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;Day01&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;input&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;// Here, `Day01` is called with the size of my test input.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;day 01 part 1 sample 1&quot;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; puzzle &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;Day01&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;sample_input&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This allows me to reuse logic across different inputs while still hardcoding the array sizes. Without &lt;code&gt;comptime&lt;/code&gt;, I have to either create a separate function for all my different inputs or dynamically allocate memory because I can’t hardcode the array size.&lt;/p&gt;
+&lt;p&gt;I also used &lt;code&gt;comptime&lt;/code&gt; to shift some computation to compile-time to reduce runtime overhead. For example, on day 4, I needed a function to check whether a string matches either &lt;code&gt;&quot;XMAS&quot;&lt;/code&gt; or its reverse, &lt;code&gt;&quot;SAMX&quot;&lt;/code&gt;. A pretty simple function that you can write as a one-liner in Python:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;example.py&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;matches&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;pattern&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; target&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; target &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; pattern &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; target &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; pattern&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Typically a function like this requires some dynamic allocation to create the reversed string, since the length of the string is only known at runtime.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn4&quot; id=&quot;fnref4&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt; For this puzzle, since the words to reverse are known at compile-time, we can do something like this:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day04.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;matches&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;comptime&lt;/span&gt; word&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; slice&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;bool&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; reversed&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;word&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;len&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token builtin&quot;&gt;@memcpy&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt;reversed&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; word&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mem&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;reverse&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt;reversed&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mem&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;eql&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; word&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; slice&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mem&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;eql&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt;reversed&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; slice&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This creates a separate function for each word I want to reverse.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn5&quot; id=&quot;fnref5&quot;&gt;[5]&lt;/a&gt;&lt;/sup&gt; Each function has an array with the same size as the word to reverse. This removes the need for dynamic allocation and makes the code run faster. As a bonus, Zig also warns you when this word isn’t compile-time known, so you get an immediate error if you pass in a runtime value.&lt;/p&gt;
+&lt;h3 id=&quot;optional-types&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#optional-types&quot;&gt;Optional Types&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A common pattern in C is to return special sentinel values to denote missing values or errors, e.g. &lt;code&gt;-1&lt;/code&gt;, &lt;code&gt;0&lt;/code&gt;, or &lt;code&gt;NULL&lt;/code&gt;. In fact, I did this on day 13 of the challenge:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day13.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// We won&#39;t ever get 0 as a result, so we use it as a sentinel error value.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;count_tokens&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;a&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i64&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; numerator &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@abs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;p&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; denumerator &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@abs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;@as&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; a&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@as&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; a&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;numerator &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt; denumerator &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt; numerator &lt;span class=&quot;token operator&quot;&gt;/&lt;/span&gt; denumerator&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;// Then in the caller, skip if the return value is 0.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;count_tokens&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;a&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;continue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This works, but it’s easy to forget to check for those values, or worse, to accidentally treat them as valid results. Zig improves on this with &lt;a href=&quot;https://ziglang.org/documentation/master/#Optionals&quot;&gt;optional types&lt;/a&gt;. If a function might not return a value, you can return &lt;code&gt;?T&lt;/code&gt; instead of &lt;code&gt;T&lt;/code&gt;. This also forces the caller to handle the &lt;code&gt;null&lt;/code&gt; case. Unlike C, &lt;code&gt;null&lt;/code&gt; isn’t a pointer but a more general concept. Zig treats &lt;code&gt;null&lt;/code&gt; as the absence of a value for any type, just like Rust’s &lt;a href=&quot;https://doc.rust-lang.org/std/option/&quot;&gt;&lt;code&gt;Option&amp;lt;T&amp;gt;&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;count_tokens&lt;/code&gt; function can be refactored to:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day13.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// Return null instead if there&#39;s no valid result.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;count_tokens&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;a&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i64&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; numerator &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@abs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;p&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; denumerator &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@abs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;@as&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; a&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@as&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; a&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;numerator &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt; denumerator &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;null&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt; numerator &lt;span class=&quot;token operator&quot;&gt;/&lt;/span&gt; denumerator&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token comment&quot;&gt;// The caller is now forced to handle the null case.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;count_tokens&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;a&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; b&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;n_tokens&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;// logic only runs when n_tokens is not null.&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Zig also has a concept of &lt;a href=&quot;https://ziglang.org/documentation/master/#Error-Union-Type&quot;&gt;error unions&lt;/a&gt;, where a function can return either a value or an error. In Rust, this is &lt;a href=&quot;https://doc.rust-lang.org/std/result/&quot;&gt;&lt;code&gt;Result&amp;lt;T&amp;gt;&lt;/code&gt;&lt;/a&gt;. You could also use error unions instead of optionals for &lt;code&gt;count_tokens&lt;/code&gt;; Zig doesn’t force a single approach. I come from Clojure where returning &lt;code&gt;nil&lt;/code&gt; for an error or missing value is common.&lt;/p&gt;
+&lt;h3 id=&quot;grid-padding&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#grid-padding&quot;&gt;Grid Padding&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This year has a lot of 2D grid puzzles (arguably too many). A common feature of grid-based algorithms is the out-of-bounds check. Here’s what it usually looks like:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;example.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;map&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u32&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; x&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; y &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&quot;token comment&quot;&gt;// Bounds check here.&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;x &lt;span class=&quot;token operator&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; y &lt;span class=&quot;token operator&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; x &lt;span class=&quot;token operator&quot;&gt;&amp;gt;=&lt;/span&gt; map&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;len &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; y &lt;span class=&quot;token operator&quot;&gt;&amp;gt;=&lt;/span&gt; map&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;len&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;map&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;x&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;y&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;visited&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    map&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;x&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;y&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;visited&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; result&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u32&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;directions&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; direction&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        result &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;map&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; position &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; result&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This is a typical recursive DFS function. After doing a lot of this, I discovered a nice trick that not only improves code readability, but also its performance. The trick here is to pad the grid with sentinel characters that mark out-of-bounds areas, i.e. add a border to the grid.&lt;/p&gt;
+&lt;p&gt;Here’s an example from day 6:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;Original map:               With borders added:
+                            ************
+....#.....                  *....#.....*
+.........#                  *.........#*
+..........                  *..........*
+..#.......                  *..#.......*
+.......#..        -&amp;gt;        *.......#..*
+..........                  *..........*
+.#..^.....                  *.#..^.....*
+........#.                  *........#.*
+#.........                  *#.........*
+......#...                  *......#...*
+                            ************&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can use any value for the border, as long as it doesn’t conflict with valid values in the grid. With the border in place, the bounds check becomes a simple equality comparison:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;example.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; border &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token char&quot;&gt;&#39;*&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;map&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;i8&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u32&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; x&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; y &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;map&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;x&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;y&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; border&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// We are out of bounds&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This is much more readable than the previous code. Plus, it’s also faster since we’re only doing one equality check instead of four range checks.&lt;/p&gt;
+&lt;p&gt;That said, this isn’t a one-size-fits-all solution. This only works for algorithms that traverse the grid one step at a time. If your logic jumps multiple tiles, it can still go out of bounds (except if you increase the width of the border to account for this). This approach also uses a bit more memory than the regular approach as you have to store more characters.&lt;/p&gt;
+&lt;h3 id=&quot;simd-vectors&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#simd-vectors&quot;&gt;SIMD Vectors&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This could also go in the performance section, but I’m including it here because the biggest benefit I get from using SIMD in Zig is the improved code readability. Because Zig has first-class &lt;a href=&quot;https://ziglang.org/documentation/master/#Vectors&quot;&gt;support for vector types&lt;/a&gt;, you can write elegant and readable code that also happens to be faster.&lt;/p&gt;
+&lt;p&gt;If you’re not familiar with vectors, they are a special collection type used for &lt;a href=&quot;https://en.wikipedia.org/wiki/Single_instruction,_multiple_data&quot;&gt;Single instruction, multiple data (SIMD)&lt;/a&gt; operations. SIMD allows you to perform computation on multiple values in parallel using only a single CPU instruction, which often leads to some performance boosts.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn6&quot; id=&quot;fnref6&quot;&gt;[6]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;I mostly use vectors to represent positions and directions, e.g. for traversing a grid. Instead of writing code like this:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;example.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;next_position &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; position&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;You can represent &lt;code&gt;position&lt;/code&gt; and &lt;code&gt;direction&lt;/code&gt; as 2-element vectors and write code like this:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;example.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;next_position &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; position &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This is much nicer than the previous version!&lt;/p&gt;
+&lt;p&gt;Day 25 is another good example of a problem that can be solved elegantly using vectors:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day25.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; result&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;locks&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;items&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;lock&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// lock is a vector&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;keys&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;items&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;key&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// key is also a vector&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; fitted &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; lock &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; key &lt;span class=&quot;token operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@as&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;@Vector&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@splat&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; is_overlap &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@reduce&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Or&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; fitted&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        result &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@intFromBool&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;!&lt;/span&gt;is_overlap&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Expressing the logic as vector operations makes the code cleaner since you don’t have to write loops and conditionals as you typically would in a traditional approach.&lt;/p&gt;
+&lt;h2 id=&quot;performance-tips&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#performance-tips&quot;&gt;Performance Tips&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The tips below are general performance techniques that often help, but like most things in software engineering, “it depends”. These might work 80% of the time, but performance is often highly context-specific. You should benchmark your code instead of blindly following what other people say.&lt;/p&gt;
+&lt;p&gt;This section would’ve been more fun with concrete examples, step-by-step optimisations, and benchmarks, but that would’ve made the post way too long. Hopefully I’ll get to write something like that in the future.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn7&quot; id=&quot;fnref7&quot;&gt;[7]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;h3 id=&quot;minimise-allocations&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#minimise-allocations&quot;&gt;Minimise Allocations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Whenever possible, prefer static allocation. Static allocation is cheaper since it just involves moving the stack pointer vs dynamic allocation which has more overhead from the allocator machinery. That said, it’s not always the right choice since it has some limitations, e.g. stack size is limited, memory size must be compile-time known, its lifetime is tied to the current stack frame, etc.&lt;/p&gt;
+&lt;p&gt;If you need to do dynamic allocations, try to reduce the number of times you call the allocator. The number of allocations you do matters more than the amount of memory you allocate. More allocations mean more bookkeeping, synchronisation, and sometimes syscalls.&lt;/p&gt;
+&lt;p&gt;A simple but effective way to reduce allocations is to reuse buffers, whether they’re statically or dynamically allocated. Here’s an example from day 10. For each trail head, we want to create a set of trail ends reachable from it. The naive approach is to allocate a new set every iteration:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day10.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;trail_heads&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;items&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;trail_head&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; trail_ends &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AutoHashMap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;allocator&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;defer&lt;/span&gt; trail_ends&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;deinit&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&quot;token comment&quot;&gt;// Set building logic...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;What you can do instead is to allocate the set once before the loop. Then, each iteration, you reuse the set by emptying it without freeing the memory. For Zig’s &lt;code&gt;std.AutoHashMap&lt;/code&gt;, this can be done using the &lt;code&gt;clearRetainingCapacity&lt;/code&gt; method:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day10.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; trail_ends &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AutoHashMap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;allocator&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;defer&lt;/span&gt; trail_ends&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;deinit&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;trail_heads&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;items&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;trail_head&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    trail_ends&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;clearRetainingCapacity&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&quot;token comment&quot;&gt;// Set building logic...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;If you use static arrays, you can also just overwrite existing data instead of clearing it.&lt;/p&gt;
+&lt;p&gt;A step up from this is to &lt;a href=&quot;https://en.wikipedia.org/wiki/Multiple_buffering&quot;&gt;reuse multiple buffers&lt;/a&gt;. The simplest form of this is to reuse two buffers, i.e. double buffering. Here’s an example from day 11:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day11.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;// Initialize two hash maps that we&#39;ll alternate between.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; frequencies&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AutoHashMap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;i&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; frequencies&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;i&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;AutoHashMap&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin-type keyword&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;allocator&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;defer&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;i&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; frequencies&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;i&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;deinit&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; id&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;usize&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;stones&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;stone&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;try&lt;/span&gt; frequencies&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;id&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;stone&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;..&lt;/span&gt;n_blinks&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt;_&lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; old_frequencies &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt;frequencies&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;id &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;var&lt;/span&gt; new_frequencies &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt;frequencies&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;id &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    id &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;defer&lt;/span&gt; old_frequencies&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;clearRetainingCapacity&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token comment&quot;&gt;// Do stuff with both maps...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Here we have two maps to count the frequencies of stones across iterations. Each iteration will build up &lt;code&gt;new_frequencies&lt;/code&gt; with the values from &lt;code&gt;old_frequencies&lt;/code&gt;. Doing this reduces the number of allocations to just 2 (the number of buffers). The tradeoff here is that it makes the code slightly more complex.&lt;/p&gt;
+&lt;h3 id=&quot;make-your-data-smaller&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#make-your-data-smaller&quot;&gt;Make Your Data Smaller&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A performance tip people say is to have “mechanical empathy”. Understand how your code is processed by your computer. An example of this is to structure your data so it works better with your CPU. For example, keep related data close in memory to take advantage of &lt;a href=&quot;https://en.algorithmica.org/hpc/external-memory/locality/&quot;&gt;cache locality&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Reducing the size of your data helps with this. Smaller data means more of it can fit in cache. One way to shrink your data is through &lt;a href=&quot;https://www.cs.cornell.edu/courses/cs3410/2024fa/notes/bitpack.html&quot;&gt;bit packing&lt;/a&gt;. This depends heavily on your specific data, so you’ll need to use your judgement to tell whether this would work for you. I’ll just share some examples that worked for me.&lt;/p&gt;
+&lt;p&gt;The first example is in day 6 part two, where you have to detect a loop, which happens when you revisit a tile from the same direction as before. To track this, you could use a map or a set to store the tiles and visited directions. A more efficient option is to store this direction metadata in the tile itself.&lt;/p&gt;
+&lt;p&gt;There are only four tile types, which means you only need two bits to represent the tile types as an enum. If the enum size is one byte, here’s what the tiles look like in memory:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;.obstacle -&amp;gt; 00000000
+.path     -&amp;gt; 00000001
+.visited  -&amp;gt; 00000010
+.path     -&amp;gt; 00000011&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As you can see, the upper six bits are unused. We can store the direction metadata in the upper four bits. One bit for each direction. If a bit is set, it means that we’ve already visited the tile in this direction. Here’s an illustration of the memory layout:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;        direction metadata   tile type
+           ┌─────┴─────┐   ┌─────┴─────┐
+┌────────┬─┴─┬───┬───┬─┴─┬─┴─┬───┬───┬─┴─┐
+│ Tile:  │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 1 │ 0 │
+└────────┴─┬─┴─┬─┴─┬─┴─┬─┴───┴───┴───┴───┘
+   up bit ─┘   │   │   └─ left bit
+    right bit ─┘ down bit&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If your language supports struct packing, you can express this layout directly:&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn8&quot; id=&quot;fnref8&quot;&gt;[8]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day06.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Tile&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;packed&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;struct&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TileType&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;enum&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;u4&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; obstacle&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; path&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; visited&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; exit &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    up&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;u1&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    right&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;u1&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    down&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;u1&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    left&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;u1&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    tile&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TileType&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+
+    &lt;span class=&quot;token comment&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Doing this avoids extra allocations and improves cache locality. Since the directions metadata is colocated with the tile type, all of them can fit together in cache. Accessing the directions just requires some bitwise operations instead of having to fetch them from another region of memory.&lt;/p&gt;
+&lt;p&gt;Another way to do this is to represent your data using &lt;a href=&quot;https://en.wikipedia.org/wiki/Numeral_system#Positional_systems_in_detail&quot;&gt;alternate number bases&lt;/a&gt;. Here’s an example from day 23. Computers are represented as two character strings made up of only lowercase letters, e.g. &lt;code&gt;&quot;bc&quot;&lt;/code&gt;, &lt;code&gt;&quot;xy&quot;&lt;/code&gt;, etc. Instead of storing this as a &lt;code&gt;[2]u8&lt;/code&gt; array, you can convert it into a base-26 number and store it as a &lt;code&gt;u16&lt;/code&gt;.&lt;sup class=&quot;footnote-ref&quot;&gt;&lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fn9&quot; id=&quot;fnref9&quot;&gt;[9]&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Here’s the idea: map &lt;code&gt;&#39;a&#39;&lt;/code&gt; to 0, &lt;code&gt;&#39;b&#39;&lt;/code&gt; to 1, up to &lt;code&gt;&#39;z&#39;&lt;/code&gt; as 25. Each character in the string becomes a digit in the base-26 number. For example,  &lt;code&gt;&quot;bc&quot;&lt;/code&gt; ( &lt;code&gt;[2]u8{ &#39;b&#39;, &#39;c&#39; }&lt;/code&gt;) becomes the base-10 number 28 (&lt;mjx-container class=&quot;MathJax&quot; jax=&quot;SVG&quot; style=&quot;position: relative;&quot;&gt;&lt;svg style=&quot;vertical-align: -0.186ex;&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;14.33ex&quot; height=&quot;1.692ex&quot; role=&quot;img&quot; focusable=&quot;false&quot; viewBox=&quot;0 -666 6334 748&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; aria-hidden=&quot;true&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stroke-width=&quot;0&quot; transform=&quot;scale(1,-1)&quot;&gt;&lt;g data-mml-node=&quot;math&quot;&gt;&lt;g data-mml-node=&quot;mn&quot;&gt;&lt;use data-c=&quot;31&quot; xlink:href=&quot;#MJX-TEX-N-31&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mi&quot; transform=&quot;translate(500,0)&quot;&gt;&lt;use data-c=&quot;D7&quot; xlink:href=&quot;#MJX-TEX-I-D7&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mn&quot; transform=&quot;translate(1278,0)&quot;&gt;&lt;use data-c=&quot;32&quot; xlink:href=&quot;#MJX-TEX-N-32&quot;&gt;&lt;/use&gt;&lt;use data-c=&quot;36&quot; xlink:href=&quot;#MJX-TEX-N-36&quot; transform=&quot;translate(500,0)&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mo&quot; transform=&quot;translate(2500.2,0)&quot;&gt;&lt;use data-c=&quot;2B&quot; xlink:href=&quot;#MJX-TEX-N-2B&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mn&quot; transform=&quot;translate(3500.4,0)&quot;&gt;&lt;use data-c=&quot;32&quot; xlink:href=&quot;#MJX-TEX-N-32&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mo&quot; transform=&quot;translate(4278.2,0)&quot;&gt;&lt;use data-c=&quot;3D&quot; xlink:href=&quot;#MJX-TEX-N-3D&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mn&quot; transform=&quot;translate(5334,0)&quot;&gt;&lt;use data-c=&quot;32&quot; xlink:href=&quot;#MJX-TEX-N-32&quot;&gt;&lt;/use&gt;&lt;use data-c=&quot;38&quot; xlink:href=&quot;#MJX-TEX-N-38&quot; transform=&quot;translate(500,0)&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt;&lt;mjx-assistive-mml unselectable=&quot;on&quot; display=&quot;inline&quot;&gt;&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mi&gt;×&lt;/mi&gt;&lt;mn&gt;26&lt;/mn&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;28&lt;/mn&gt;&lt;/math&gt;&lt;/mjx-assistive-mml&gt;&lt;/mjx-container&gt;). If we represent this using the base-64 character set, it becomes 12 (&lt;code&gt;&#39;b&#39;&lt;/code&gt; = 1, &lt;code&gt;&#39;c&#39;&lt;/code&gt; = 2).&lt;/p&gt;
+&lt;p&gt;While they take the same amount of space (2 bytes), a &lt;code&gt;u16&lt;/code&gt; has some benefits over a &lt;code&gt;[2]u8&lt;/code&gt;:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It fits in a single register, whereas you need two for the array.&lt;/li&gt;
+&lt;li&gt;Comparison is faster as there is only a single value to compare.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;reduce-branching&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#reduce-branching&quot;&gt;Reduce Branching&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I won’t explain branchless programming here; &lt;a href=&quot;https://en.algorithmica.org/hpc/pipelining/branchless/&quot;&gt;the Algorithmica’s page&lt;/a&gt; explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of &lt;a href=&quot;https://www.rfleury.com/p/the-codepath-combinatoric-explosion&quot;&gt;codepaths in your program&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Again, since performance is very context-dependent, I’ll just show you some patterns I use. Here’s one that comes up often:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day02.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;is_valid_report&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;report&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    result &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Instead of the branch, cast the bool into an integer directly:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day02.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;result &lt;span class=&quot;token operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@intFromBool&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;is_valid_report&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;report&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Another example is from day 6 (again!). Recall that to know if a tile has been visited from a certain direction, we have to check its direction bit. Here’s one way to do it:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day06.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;has_visited&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tile&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Tile&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;bool&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;direction&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;up &lt;span class=&quot;token operator&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;up &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right &lt;span class=&quot;token operator&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;right &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;down &lt;span class=&quot;token operator&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;down &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left &lt;span class=&quot;token operator&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;left &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This works, but it introduces a few branches. We can make it branchless using bitwise operations:&lt;/p&gt;
+&lt;div class=&quot;codeblock&quot;&gt;
+      &lt;div&gt;
+        &lt;span&gt;src/days/day06.zig&lt;/span&gt;
+        &lt;button onclick=&quot;copy(this)&quot;&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+&lt;pre class=&quot;language-zig&quot;&gt;&lt;code class=&quot;language-zig&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;has_visited&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tile&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Tile&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;Direction&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;bool&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; int_tile &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; std&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mem&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;nativeToBig&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin-type keyword&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;@bitCast&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;tile&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; mask &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; direction&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;mask&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; bits &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; int_tile &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0xff&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;// Get only the direction bits&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; bits &lt;span class=&quot;token operator&quot;&gt;&amp;amp;&lt;/span&gt; mask &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; mask&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;While this is arguably cryptic and less readable, it does perform better than the switch version.&lt;/p&gt;
+&lt;h3 id=&quot;avoid-recursion&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#avoid-recursion&quot;&gt;Avoid Recursion&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The final performance tip is to prefer iterative code over recursion. Recursive functions bring the overhead of allocating stack frames. While recursive code is more elegant, it’s also often slower unless your language’s compiler can optimise it away, e.g. via tail-call optimisation. As far as I know, Zig doesn’t have this, though I might be wrong.&lt;/p&gt;
+&lt;p&gt;Recursion also has the risk of causing a stack overflow if the execution isn’t bounded. This is why code that is mission- or safety-critical avoids recursion entirely. It’s in TigerBeetle’s &lt;a href=&quot;https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md&quot;&gt;TIGERSTYLE&lt;/a&gt; and also NASA’s &lt;a href=&quot;https://spinroot.com/gerard/pdf/P10.pdf&quot;&gt;Power of Ten&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Iterative code can be harder to write in some cases, e.g. DFS maps naturally to recursion, but most of the time it is significantly faster, more predictable, and safer than the recursive alternative.&lt;/p&gt;
+&lt;h2 id=&quot;benchmarks&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#benchmarks&quot;&gt;Benchmarks&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I ran benchmarks for all 25 solutions in each of Zig’s optimisation modes. You can find the full results and the benchmark script in my &lt;a href=&quot;https://github.com/rmrt1n/advent-of-code&quot;&gt;GitHub repository&lt;/a&gt;. All benchmarks were done on an &lt;a href=&quot;https://en.wikipedia.org/wiki/Apple_M3&quot;&gt;Apple M3 Pro&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As expected, &lt;code&gt;ReleaseFast&lt;/code&gt; produced the best result with a total runtime of &lt;strong&gt;85.1 ms&lt;/strong&gt;. I’m quite happy with this, considering the two constraints that limited the number of optimisations I can do to the code:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Parts should be solved separately&lt;/strong&gt; - Some days can be solved in a single go, e.g. day 10 and day 13, which could’ve saved a few milliseconds.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No concurrency or parallelism&lt;/strong&gt; - My slowest days are the compute-heavy days that are very easily parallelisable, e.g. day 6, day 19, and day 22. Without this constraint, I can probably reach sub-20 milliseconds total(?), but that’s for another time.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can see the full benchmarks for &lt;code&gt;ReleaseFast&lt;/code&gt; in the table below:&lt;/p&gt;
+&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Day&lt;/th&gt;
+&lt;th&gt;Title&lt;/th&gt;
+&lt;th style=&quot;text-align:right&quot;&gt;Parsing (µs)&lt;/th&gt;
+&lt;th style=&quot;text-align:right&quot;&gt;Part 1 (µs)&lt;/th&gt;
+&lt;th style=&quot;text-align:right&quot;&gt;Part 2 (µs)&lt;/th&gt;
+&lt;th style=&quot;text-align:right&quot;&gt;Total (µs)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Historian Hysteria&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;23.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;15.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;41.8&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Red-Nosed Reports&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;42.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;11.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;54.4&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Mull it Over&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;7.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;16.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;23.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Ceres Search&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;5.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;5.9&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;Print Queue&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;22.3&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;4.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;26.9&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;Guard Gallivant&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;14.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;25.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;24,331.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;24,370.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;Bridge Repair&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;72.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;321.4&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;9,620.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;10,014.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;Resonant Collinearity&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;3.3&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;13.4&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;19.4&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;Disk Fragmenter&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;12.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;137.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;151.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;Hoof It&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;29.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;27.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;59.9&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;11&lt;/td&gt;
+&lt;td&gt;Plutonian Pebbles&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.1&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;43.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2,115.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;2,159.1&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;12&lt;/td&gt;
+&lt;td&gt;Garden Groups&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;6.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;164.4&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;249.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;420.3&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;13&lt;/td&gt;
+&lt;td&gt;Claw Contraption&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;14.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;14.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;14&lt;/td&gt;
+&lt;td&gt;Restroom Redoubt&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;13.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;13.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;Warehouse Woes&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;14.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;228.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;458.3&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;701.5&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16&lt;/td&gt;
+&lt;td&gt;Reindeer Maze&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;12.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2,480.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;9,010.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;11,504.1&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;17&lt;/td&gt;
+&lt;td&gt;Chronospatial Computer&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.1&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;44.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;44.8&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;18&lt;/td&gt;
+&lt;td&gt;RAM Run&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;35.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;15.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;33.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;85.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;19&lt;/td&gt;
+&lt;td&gt;Linen Layout&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;10.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;11,890.8&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;11,908.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;23,810.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;20&lt;/td&gt;
+&lt;td&gt;Race Condition&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;48.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;54.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;54.2&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;157.4&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;21&lt;/td&gt;
+&lt;td&gt;Keypad Conundrum&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;1.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;22.4&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;24.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;22&lt;/td&gt;
+&lt;td&gt;Monkey Market&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;20.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;11,227.7&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;11,248.4&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;23&lt;/td&gt;
+&lt;td&gt;LAN Party&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;13.6&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;22.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;2.5&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;38.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;24&lt;/td&gt;
+&lt;td&gt;Crossed Wires&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;5.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;41.3&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;14.3&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;60.7&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;25&lt;/td&gt;
+&lt;td&gt;Code Chronicle&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;24.9&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;0.0&lt;/td&gt;
+&lt;td style=&quot;text-align:right&quot;&gt;&lt;strong&gt;24.9&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;A weird thing I found when benchmarking is that for day 6 part two, &lt;code&gt;ReleaseSafe&lt;/code&gt; actually ran faster than &lt;code&gt;ReleaseFast&lt;/code&gt; (13,189.0 µs vs 24,370.7 µs). Their outputs are the same, but for some reason &lt;code&gt;ReleaseSafe&lt;/code&gt; is faster even with the safety checks still intact.&lt;/p&gt;
+&lt;p&gt;The Zig compiler is still very much a moving target, so I don’t want to dig too deep into this, as I’m guessing this might be a bug in the compiler. This weird behaviour might just disappear after a few compiler version updates.&lt;/p&gt;
+&lt;h2 id=&quot;reflections&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#reflections&quot;&gt;Reflections&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Looking back, I’m really glad I decided to do Advent of Code and followed through to the end. I learned a lot of things. Some are useful in my professional work, some are more like random bits of trivia. Going with Zig was a good choice too. The language is small, simple, and gets out of your way. I learned more about algorithms and concepts than the language itself.&lt;/p&gt;
+&lt;p&gt;Besides what I’ve already mentioned earlier, here are some examples of the things I learned:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The concept of &lt;a href=&quot;https://en.wikipedia.org/wiki/Taxicab_geometry&quot;&gt;Manhattan distance&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm&quot;&gt;Cliques&lt;/a&gt; and the &lt;a href=&quot;https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm&quot;&gt;Bron-Kerbosch algorithm&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;a href=&quot;https://en.wikipedia.org/wiki/Adder_(electronics)#Ripple-carry_adder&quot;&gt;ripple-carry adder circuit&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;LaTeX math syntax with &lt;a href=&quot;https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions&quot;&gt;MathJax&lt;/a&gt;, which I used in my write-ups.&lt;/li&gt;
+&lt;li&gt;In Python, you can use &lt;a href=&quot;https://www.alpinewerk.com/posts/complex/&quot;&gt;complex numbers to traverse 2D grids&lt;/a&gt;!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some of my self-imposed constraints and rules ended up being helpful. I can still (mostly) understand the code I wrote a few months ago. Putting all of the code in a single file made it easier to read since I don’t have to context switch to other files all the time.&lt;/p&gt;
+&lt;p&gt;However, some of them did backfire a bit, e.g. the two constraints that limit how I can optimise my code. Another one is the “hardcoding allowed” rule. I used a lot of magic numbers, which helped to improve performance, but I didn’t document them so after a while I don’t even remember how I got them. I’ve since gone back and added explanations in my write-ups, but next time I’ll remember to at least leave comments.&lt;/p&gt;
+&lt;p&gt;One constraint I’ll probably remove next time is the no concurrency rule. It’s the biggest contributor to the total runtime of my solutions. I don’t do a lot of concurrent programming, even though my main language at work is Go, so next time it might be a good idea to use Advent of Code to level up my concurrency skills.&lt;/p&gt;
+&lt;p&gt;I also spent way more time on these puzzles than I originally expected. I optimised and rewrote my code multiple times. I also rewrote my write-ups a few times to make them easier to read. This is by far my longest side project yet. It’s a lot of fun, but it also takes a lot of time and effort. I almost gave up on the write-ups (and this blog post) because I don’t want to explain my awful day 15 and day 16 code. I ended up taking a break for a few months before finishing it, which is why this post is published in August lol.&lt;/p&gt;
+&lt;p&gt;Just for fun, here’s a photo of some of my notebook sketches that helped me visualise my solutions. See if you can guess which days these are from:&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/articles/aoc2024/hWE070SOvc-1600.webp&quot; alt=&quot;Photos of my notebook sketches&quot; width=&quot;1600&quot; height=&quot;1600&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;what%E2%80%99s-next%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#what%E2%80%99s-next%3F&quot;&gt;What’s Next?&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So… would I do it again? Probably, though I’m not making any promises. If I do join this year, I’ll probably stick with Zig. I had my eyes on Zig since the start of 2024, so Advent of Code was the perfect excuse to learn it. This year, there aren’t any languages in particular that caught my eye, so I’ll just keep using Zig, especially since I have a proper setup ready.&lt;/p&gt;
+&lt;p&gt;If you haven’t tried Advent of Code, I highly recommend checking it out this year. It’s a great excuse to learn a new language, improve your problem-solving skills, or just to learn something new. If you’re eager, you can also do the &lt;a href=&quot;https://adventofcode.com/2024/events&quot;&gt;previous years’ puzzles&lt;/a&gt; as they’re still available.&lt;/p&gt;
+&lt;p&gt;One of the best aspects of Advent of Code is the community. The &lt;a href=&quot;https://adventofcode.com/2024/events&quot;&gt;Advent of Code subreddit&lt;/a&gt; is a great place for discussion. You can ask questions and also see other people’s solutions. Some people also post really cool visualisations like &lt;a href=&quot;https://www.reddit.com/r/adventofcode/s/nylBX7xFbp&quot;&gt;this one&lt;/a&gt;. They also have &lt;a href=&quot;https://www.reddit.com/r/adventofcode/?f=flair_name%3A%22Meme%2FFunny%22&quot;&gt;memes!&lt;/a&gt;&lt;/p&gt;
+&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;section class=&quot;footnotes&quot;&gt;
+&lt;ol class=&quot;footnotes-list&quot;&gt;
+&lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I failed my first attempt horribly with &lt;a href=&quot;https://clojure.org/&quot;&gt;Clojure&lt;/a&gt; during Advent of Code 2023. Once I reached the later half of the event, I just couldn’t solve the problems with a purely functional style. I could’ve pushed through using imperative code, but I stubbornly chose not to and gave up… &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn2&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The original constraint was that each solution must run in under one second. As it turned out, the code was faster than I expected, so I increased the difficulty. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref2&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn3&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;TigerBeetle’s code quality and &lt;a href=&quot;https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md&quot;&gt;engineering principles&lt;/a&gt; are just wonderful. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref3&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn4&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;You can implement this function without any allocation by mutating the string in place or by iterating over it twice, which is probably faster than my current implementation. I kept it as-is as a reminder of what &lt;code&gt;comptime&lt;/code&gt; can do. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref4&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn5&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;As a bonus, I was curious as to what this looks like compiled so I listed all the functions in this binary in GDB and found:&lt;/p&gt;
+&lt;pre class=&quot;language-plaintext&quot;&gt;&lt;code class=&quot;language-plaintext&quot;&gt;72:     static bool day04.Day04(140).matches__anon_19741;
+72:     static bool day04.Day04(140).matches__anon_19750;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It does generate separate functions! &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref5&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn6&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Well, not always. The number of SIMD instructions depends on the machine’s native SIMD size. If the length of the vector exceeds it, Zig will compile it into multiple SIMD instructions. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref6&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn7&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Here’s a nice &lt;a href=&quot;https://cprimozic.net/blog/optimizing-advent-of-code-2024/&quot;&gt;post on optimising day 9’s solution with Rust&lt;/a&gt;. It’s a good read if you’re into performance engineering or Rust techniques. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref7&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn8&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;One thing about packed structs is that their layout is dependent on the system endianness. Most modern systems are little-endian, so the memory layout I showed is actually reversed. Thankfully, Zig has some useful functions to convert between endianness like &lt;code&gt;std.mem.nativeToBig&lt;/code&gt;, which makes working with packed structs easier. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref8&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn9&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Technically, you can store 2-digit base 26 numbers in a &lt;code&gt;u10&lt;/code&gt;, as there are only &lt;mjx-container class=&quot;MathJax&quot; jax=&quot;SVG&quot; style=&quot;position: relative;&quot;&gt;&lt;svg style=&quot;vertical-align: -0.05ex;&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;3.25ex&quot; height=&quot;2.005ex&quot; role=&quot;img&quot; focusable=&quot;false&quot; viewBox=&quot;0 -864 1436.6 886&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; aria-hidden=&quot;true&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stroke-width=&quot;0&quot; transform=&quot;scale(1,-1)&quot;&gt;&lt;g data-mml-node=&quot;math&quot;&gt;&lt;g data-mml-node=&quot;msup&quot;&gt;&lt;g data-mml-node=&quot;mn&quot;&gt;&lt;use data-c=&quot;32&quot; xlink:href=&quot;#MJX-TEX-N-32&quot;&gt;&lt;/use&gt;&lt;use data-c=&quot;36&quot; xlink:href=&quot;#MJX-TEX-N-36&quot; transform=&quot;translate(500,0)&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;g data-mml-node=&quot;mn&quot; transform=&quot;translate(1033,393.1) scale(0.707)&quot;&gt;&lt;use data-c=&quot;32&quot; xlink:href=&quot;#MJX-TEX-N-32&quot;&gt;&lt;/use&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt;&lt;mjx-assistive-mml unselectable=&quot;on&quot; display=&quot;inline&quot;&gt;&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;msup&gt;&lt;mn&gt;26&lt;/mn&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msup&gt;&lt;/math&gt;&lt;/mjx-assistive-mml&gt;&lt;/mjx-container&gt; possible numbers. Most systems usually pad values by byte size, so &lt;code&gt;u10&lt;/code&gt; will still be stored as &lt;code&gt;u16&lt;/code&gt;, which is why I just went straight for it. &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref9&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+&lt;svg style=&quot;display: none;&quot; id=&quot;MJX-SVG-global-cache&quot;&gt;&lt;defs&gt;&lt;path id=&quot;MJX-TEX-N-31&quot; d=&quot;M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-I-D7&quot; d=&quot;M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-N-32&quot; d=&quot;M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-N-36&quot; d=&quot;M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-N-2B&quot; d=&quot;M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-N-3D&quot; d=&quot;M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z&quot;&gt;&lt;/path&gt;&lt;path id=&quot;MJX-TEX-N-38&quot; d=&quot;M70 417T70 494T124 618T248 666Q319 666 374 624T429 515Q429 485 418 459T392 417T361 389T335 371T324 363L338 354Q352 344 366 334T382 323Q457 264 457 174Q457 95 399 37T249 -22Q159 -22 101 29T43 155Q43 263 172 335L154 348Q133 361 127 368Q70 417 70 494ZM286 386L292 390Q298 394 301 396T311 403T323 413T334 425T345 438T355 454T364 471T369 491T371 513Q371 556 342 586T275 624Q268 625 242 625Q201 625 165 599T128 534Q128 511 141 492T167 463T217 431Q224 426 228 424L286 386ZM250 21Q308 21 350 55T392 137Q392 154 387 169T375 194T353 216T330 234T301 253T274 270Q260 279 244 289T218 306L210 311Q204 311 181 294T133 239T107 157Q107 98 150 60T250 21Z&quot;&gt;&lt;/path&gt;&lt;/defs&gt;&lt;/svg&gt;&lt;/body&gt;&lt;/html&gt;
 </content>
   </entry>
 </feed>
