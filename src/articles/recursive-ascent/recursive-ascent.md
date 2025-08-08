@@ -550,15 +550,27 @@ The `eval` function will run any Python expression. Since Python can also evalua
 And that's all. You can find the complete code on [this GitHub repo](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent). Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won't ever use this technique when building a real compiler, but at least you learned something new. If you'd like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.
 
 [^1]: This [blog post](https://www.abubalay.com/blog/2018/04/08/recursive-ascent) by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It's probably the only blog post about recursive ascent on the internet besides this one.
+
 [^2]: Here are [some](https://dl.acm.org/doi/pdf/10.1145/47907.47909) [papers](https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf) [about recursive ascent parsers](https://ceur-ws.org/Vol-2951/paper2.pdf) that you could read if you're interested in the theory.
+
 [^3]: [Crafting Interpreters](https://craftinginterpreters.com/) is a really good introductory book on writing compilers, and their section on parsing is all about implementing a recursive descent parser. It's also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you're in software engineering.
+
 [^4]: I found this analogy from [this blog post](https://blog.reverberate.org/2013/07/ll-and-lr-parsing-demystified.html) by Josh Haberman. He went deep into the details of both LL and LR algorithms in his blog post while keeping it easy to read.
+
 [^5]: Here's a [nice overview of parsing algorithm literature](https://dev.to/stereobooster/an-overview-of-parsing-algorithms-3lo2) you can explore if you are interested in the different variants of LR.
+
 [^6]: This is done to show that the parser can handle operator precedence based on the grammar rules. Subtraction is removed to keep the section short and readable. The number of possible states will grow exponentially the more complex your grammar is. This is why it is inconvenient to write a bottom-up parser by hand, and why people create parser generators.
+
 [^7]: A grammar rule is often called as a "production" in academic literature. I just use the term "grammar rules" because it's more intuitive.
+
 [^8]: My explanation of the algorithm for creating the parse table might not click with you, so here are [some](<https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables>) [other](https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf) [resources](https://chatgpt.com) you can read if you're still confused.
+
 [^9]: Note that the order of the states doesn't matter. The parser will still work if the states were created in a different order, e.g. state 1 = state 0 + `term`.
+
 [^10]: You can read more about why this is on [this Wikipedia page](https://en.wikipedia.org/wiki/LR_parser#Parse_table_for_the_example_grammar). It should be a good starting point to explore the different variants of LR and the types of parse conflicts. For this article, I intentionally chose a grammar that is accepted by LR(0) to keep it simple.
+
 [^11]: You can read [Crafting Interpreters](https://craftinginterpreters.com/scanning.html) for a better idea of what production lexers do.
+
 [^12]: This is a very basic approach to handling parse errors. Production-grade parsers will usually report errors, ignore them, and continue parsing. This is to catch as many errors as it can so that the programmer doesn't have to recompile to find more errors.
+
 [^13]: What better way to visualise AST than with s-expressions? When you read a lisp program, you're looking directly at the program's AST, which is just a lisp data structures! This is what clojurists often mean when they say "It's just data".

@@ -658,9 +658,15 @@ You can also see the decrypted token is the same as the token in the database.
 You can find the code for this project [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login). I've only covered the minimum required to implement automatic CLI login with encryption. There's always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!
 
 [^1]: I learned about how this works mostly by digging into the [Supabase CLI code](https://github.com/supabase/cli), so I'm biased toward this approach. You can also see [Supabase's blog post about this](https://supabase.com/blog/automatic-cli-login) and [Fly's guide on implementing this in Laravel](https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/).
+
 [^2]: I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach where both participants are sending requests to each other.
+
 [^3]: 450,000 is the number of registered developers on [their website](https://supabase.com/company). It's a vanity metric, but it's still an impressive number.
+
 [^4]: I made this choice just to keep the code as small as possible. You shouldn't do this in a real app unless you have a really specific reason. This UX is unfamiliar and can confuse users.
+
 [^5]: Check out [the section on ECDH](https://cryptobook.nakov.com/asymmetric-key-ciphers/ecdh-key-exchange) from the [Practical Cryptography for Developers](https://cryptobook.nakov.com/) book for more details on how the algorithm works. It's also a great resource for learning about cryptography in general without going too deep into the maths.
+
 [^6]: This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good [introduction to cryptography article](https://www.comparitech.com/blog/information-security/cryptography-guide/) that explains the basic concepts as well as resources if you want to learn further.
+
 [^7]: If I'm using a third-party library like [@noble/curves](https://github.com/paulmillr/noble-curves), I'll use [X25519](https://en.wikipedia.org/wiki/Curve25519) for ECDH. I'm not an expert in ECC, and most of my algorithm/curve choices are based on [this blog post on choosing an elliptic curve signature algorithm](https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/). Although it's about digital signatures ([ECDSA](https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages)), I still find it helpful for ECDH.

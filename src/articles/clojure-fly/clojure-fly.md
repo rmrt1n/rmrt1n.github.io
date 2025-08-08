@@ -734,12 +734,21 @@ As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1
 - [Brave Clojure's Deploy Quest](https://www.braveclojure.com/quests/deploy/)
 
 [^1]: The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and "loaded" into a VM. See [this video explanation](https://www.youtube.com/watch?v=7iypMRKniPU) for more details.
+
 [^2]: If you're interested in learning Clojure, my recommendation is to follow [the official getting started guide](https://clojure.org/guides/getting_started) and join the [Clojurians Slack](https://clojurians.slack.com/). Also, read through this [list of introductory resources](https://gist.github.com/yogthos/be323be0361c589570a6da4ccc85f58f).
+
 [^3]: Kit was a big influence on me when I first started learning web development in Clojure. I never used it directly, but I did use their library choices and project structure as a base for my own projects.
+
 [^4]: There's no "Rails" for the Clojure ecosystem (yet?). The prevailing opinion is to build your own "framework" by composing different libraries together. Most of these libraries are stable and are already used in production by big companies, so don't let this discourage you from doing web development in Clojure!
+
 [^5]: There might be some keys that you add or remove, but the structure of the config file stays the same.
+
 [^6]: "assoc" (associate) is a Clojure slang that means to add or update a key-value pair in a map.
+
 [^7]: For more details on how basic authentication works, check out [the specification](https://www.rfc-editor.org/rfc/rfc7617.html).
+
 [^8]: Here's a cool resource I found when researching Java Dockerfiles: [WhichJDK](https://whichjdk.com). It provides a comprehensive comparison on the different JDKs available and recommendations on which one you should use.
+
 [^9]: Another (non-technically important) argument for live/production REPLs is just because it's cool. Ever since I read the story about [NASA's programmers debugging a spacecraft through a live REPL](https://news.ycombinator.com/item?id=31234338), I've always wanted to try it at least once.
+
 [^10]: If you encounter errors related to Wireguard when running `fly proxy`, you can run `fly doctor` which will hopefully detect issues with your local setup and also suggest fixes for them.
