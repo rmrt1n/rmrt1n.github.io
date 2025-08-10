@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2025-08-08T17:41:43Z</updated>
+  <updated>2025-08-10T16:04:38Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2025-08-08T17:41:43Z</updated>
+    <updated>2025-08-10T16:04:38Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -856,7 +856,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2025-08-08T17:41:43Z</updated>
+    <updated>2025-08-10T16:04:38Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects but presented in a more structured format.&lt;/p&gt;
@@ -1569,7 +1569,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2025-08-08T17:41:43Z</updated>
+    <updated>2025-08-10T16:04:38Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -2191,7 +2191,7 @@ Server started on port  8080
   <entry>
     <title>Advent of Code 2024 in Zig</title>
     <link href="https://ryanmartin.me/articles/aoc2024/" />
-    <updated>2025-08-08T17:41:43Z</updated>
+    <updated>2025-08-10T16:04:38Z</updated>
     <id>https://ryanmartin.me/articles/aoc2024/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;style id=&quot;MJX-SVG-styles&quot;&gt;
@@ -2772,7 +2772,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 &lt;li&gt;Comparison is faster as there is only a single value to compare.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h3 id=&quot;reduce-branching&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/aoc2024/#reduce-branching&quot;&gt;Reduce Branching&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;I won’t explain branchless programming here; &lt;a href=&quot;https://en.algorithmica.org/hpc/pipelining/branchless/&quot;&gt;the Algorithmica’s page&lt;/a&gt; explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of &lt;a href=&quot;https://www.rfleury.com/p/the-codepath-combinatoric-explosion&quot;&gt;codepaths in your program&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I won’t explain branchless programming here; &lt;a href=&quot;https://en.algorithmica.org/hpc/pipelining/branchless/&quot;&gt;the Algorithmica&lt;/a&gt; explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of &lt;a href=&quot;https://www.rfleury.com/p/the-codepath-combinatoric-explosion&quot;&gt;codepaths in your program&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Again, since performance is very context-dependent, I’ll just show you some patterns I use. Here’s one that comes up often:&lt;/p&gt;
 &lt;div class=&quot;codeblock&quot;&gt;
       &lt;div&gt;

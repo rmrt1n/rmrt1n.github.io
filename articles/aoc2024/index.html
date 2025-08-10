@@ -621,7 +621,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <li>Comparison is faster as there is only a single value to compare.</li>
 </ol>
 <h3 id="reduce-branching" tabindex="-1"><a class="header-anchor" href="#reduce-branching">Reduce Branching</a></h3>
-<p>I won’t explain branchless programming here; <a href="https://en.algorithmica.org/hpc/pipelining/branchless/">the Algorithmica’s page</a> explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of <a href="https://www.rfleury.com/p/the-codepath-combinatoric-explosion">codepaths in your program</a>.</p>
+<p>I won’t explain branchless programming here; <a href="https://en.algorithmica.org/hpc/pipelining/branchless/">the Algorithmica</a> explains it way better than I can. While modern compilers are often smart enough to compile away branches, they don’t catch everything. I still recommend writing branchless code whenever it makes sense. It also has the added benefit of reducing the number of <a href="https://www.rfleury.com/p/the-codepath-combinatoric-explosion">codepaths in your program</a>.</p>
 <p>Again, since performance is very context-dependent, I’ll just show you some patterns I use. Here’s one that comes up often:</p>
 <div class="codeblock">
       <div>
