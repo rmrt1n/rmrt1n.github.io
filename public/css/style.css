@@ -61,7 +61,7 @@ body {
 body > header {
   max-width: 42rem;
   margin-inline: auto;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 4px double var(--color-border);
 
   > nav {
     display: flex;
@@ -91,7 +91,7 @@ body > header {
 footer {
   max-width: 42rem;
   margin-inline: auto;
-  border-top: 1px solid var(--color-border);
+  border-top: 4px double var(--color-border);
   padding-top: .5rem;
   display: flex;
   flex-direction: column;
@@ -189,7 +189,7 @@ main > article {
   }
 
   > #hey {
-    border-top: 1px solid var(--color-border);
+    border-top: 4px double var(--color-border);
     padding-top: 2rem;
 
     > * + * { margin-top: 1rem; }
