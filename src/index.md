@@ -1,6 +1,6 @@
 ---
 layout: base.liquid
-title: About
+title: About Me
 ---
 
 Hi there 👋,
