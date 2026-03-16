@@ -15,7 +15,6 @@ export default function (eleventyConfig) {
     html: true,
     typographer: true,
   }))
-  eleventyConfig.amendLibrary('md', (md) => md.use(footnote))
   eleventyConfig.amendLibrary('md', (md) => md.use(anchor, {
     permalink: anchor.permalink.headerLink(),
   }))
@@ -27,6 +26,57 @@ export default function (eleventyConfig) {
       <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2>`,
     transformContainerClose: () => `</div></aside>`,
   }))
+  eleventyConfig.amendLibrary('md', (md) => {
+    md.use(footnote)
+
+    md.core.ruler.after('footnote_tail', 'sidenote_content', (state) => {
+      const sidenotes = Object.fromEntries(state.tokens
+        .map((token, i) => ({ token, i }))
+        .filter(({ token }) => token.type === 'footnote_open')
+        .map(({ token, i }) => {
+          const id = token.meta.id
+          const end = state.tokens
+            .slice(i + 1)
+            .findIndex((t) => t.type === 'footnote_close') + i + 1
+          console.assert(end !== -1)
+
+          const footnoteTokens = state.tokens.slice(i + 1, end)
+          const html = state.md.renderer.render(footnoteTokens, state.md.options, state.env)
+
+          return [id, html]
+        }))
+      state.env.sidenotes = sidenotes
+    })
+
+    md.core.ruler.after('sidenote_content', 'sidenote_paragraph_inject', (state) => {
+      state.tokens = state.tokens.flatMap((token, i, tokens) => {
+        if (
+          token.type !== 'paragraph_open' ||
+          tokens[i + 1]?.type !== 'inline' ||
+          tokens[i + 2]?.type !== 'paragraph_close' ||
+          !tokens[i + 1].children?.length
+        ) {
+          return [token]
+        }
+
+        const footnotes = tokens[i + 1].children
+          .filter((token) => token.type === 'footnote_ref')
+          .map((token) => token.meta)
+        if (footnotes.length === 0) return [token]
+
+        const sidenote = new state.Token('html_block', '', 0)
+        sidenote.content = footnotes
+          .map(({ id, label }) =>
+            `<aside id="fn${label}" class="sidenote">
+               <span class="sidenote-number">${label}.</span>
+               <div class="sidenote-content">${state.env.sidenotes[id]}</div>
+            </aside>`)
+          .join('\n')
+
+        return [sidenote, token]
+      })
+    })
+  })
 
   eleventyConfig.addPlugin(InputPathToUrlTransformPlugin)
   eleventyConfig.addPlugin(syntaxHighlight)

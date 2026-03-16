@@ -31,7 +31,7 @@ const patterns = {
 const canvas = document.getElementById('conway');
 const context = canvas.getContext('2d');
 
-const cellSize = 3
+const cellSize = 4
 const nRows = 2 + Math.floor(canvas.height / cellSize);
 const nCols = 2 + Math.floor(canvas.width / cellSize);
 
@@ -57,11 +57,13 @@ loop(0)
 function draw(map) {
   const fill = getComputedStyle(document.documentElement).getPropertyValue('--color-bg')
   context.clearRect(0, 0, canvas.width, canvas.height);
+
+  context.fillStyle = fill;
+  const innerSize = cellSize - 1 // Leaves a 1 cell border on all sides
   for (let i = 0; i < nRows; i++) {
     for (let j = 0; j < nCols; j++) {
       if (map[i][j] === Tile.ALIVE) {
-        context.fillStyle = fill
-        context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize)
+        context.fillRect((j * cellSize) + 1, (i * cellSize) + 1, innerSize, innerSize);
       }
     }
   }
