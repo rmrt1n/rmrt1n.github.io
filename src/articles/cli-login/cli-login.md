@@ -8,7 +8,7 @@ tags:
   - SvelteKit
   - Web Development
 published: 2024-06-10
-updated: 2025-07-28
+updated: 2026-03-17
 ---
 
 I've recently had the chance to work on an "automatic CLI login" feature for a [CLI tool](https://github.com/Argus-Labs/world-cli) at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.
@@ -23,7 +23,7 @@ There are probably many different ways to implement this, each with different tr
 
 ## How it Works
 
-At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you'll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page like the diagram below?
+At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you'll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page, like the diagram below?
 
 ![Two-way communication scheme](./cli-login-1.png)
 
@@ -35,7 +35,7 @@ How it works in Supabase CLI and `flyctl` is that it uses a "one-way" communicat
 
 The CLI will provide a session ID and ask the server to create a "CLI login session" when the user logs in successfully. An access token will be created for this specific session. Then, the CLI will request this access token from the server and store it for future requests.
 
-Since this approach uses [regular HTTP polling](https://javascript.info/long-polling#regular-polling), it's a potential source of [DDOS attacks](https://en.wikipedia.org/wiki/Denial-of-service_attack). In a perfect world, a user needs to login to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it's not a perfect defence.
+Since this approach uses [regular HTTP polling](https://javascript.info/long-polling#regular-polling), it's a potential source of [DDOS attacks](https://en.wikipedia.org/wiki/Denial-of-service_attack). In a perfect world, a user needs to log in to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it's not a perfect defence.
 
 This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) or [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). This might not work for you depending on your [threat model](https://en.wikipedia.org/wiki/Threat_model). But hey, if it works for Supabase, which has around 450,000 users,[^3] it'll probably work for me too.
 
@@ -43,7 +43,7 @@ Now that we know how it works, let's get into the code implementation. I'll buil
 
 ## Project Setup
 
-I'll use [SvelteKit](https://kit.svelte.dev) for this project, but the concepts apply to any web framework. I'll try to avoid using any svelte-specific features or terminologies so that you can apply this to any language or web framework you like.
+I'll use [SvelteKit](https://kit.svelte.dev) for this project, but the concepts apply to any web framework. I'll try to avoid using any Svelte-specific features or terminologies so that you can apply this to any language or web framework you like.
 
 {% code %}
 ```bash
@@ -267,15 +267,15 @@ export const cliSessions = sqliteTable('cli_sessions', {
 ```
 {% endcode %}
 
-The `access_tokens` table will store the users' access tokens, while the `cli_sessions` table will store the "login sessions" triggered by the CLI tool. When a user runs the command `acme login`, it will trigger a login session and an access token to be created in the server.
+The `access_tokens` table will store the users' access tokens, while the `cli_sessions` table will store the "login sessions" triggered by the CLI tool. When a user runs the command `acme login`, it will trigger a login session and an access token to be created on the server.
 
-Run `pnpm drizzle-kit push` again to apply the changes to the database. If you encounter a SQLite read-only error in the SvelteKit, just restart the dev server.
+Run `pnpm drizzle-kit push` again to apply the changes to the database. If you encounter a SQLite read-only error in SvelteKit, just restart the dev server.
 
 We'll also need to add new endpoints, `/cli/login` and `cli/login/:session`. Before we implement these endpoints, we'll need a page to show the "Your CLI is now connected" message once the user has logged in.
 
 {% code "src/routes/cli/login/+page.svelte" %}
 ```html
-<p>You're CLI is connected now. you can close this tab</p>
+<p>Your CLI is connected now. You can close this tab.</p>
 ```
 {% endcode %}
 
@@ -331,7 +331,7 @@ export async function load({ cookies, url }) {
 ```
 {% endcode %}
 
-This function first checks if the user is logged in using the cookie. The mechanism is the almost same as in the home page, with the only difference being that we're setting the `next` search parameter to point back to this URL. This will redirect the user back to `/cli/login` after they have logged in.
+This function first checks if the user is logged in using the cookie. The mechanism is almost the same as on the home page, with the only difference being that we're setting the `next` search parameter to point back to this URL. This will redirect the user back to `/cli/login` after they have logged in.
 
 If the user is already logged in,  a CLI session and an access token will be inserted into the database. Then, it'll render the success message page from before. Note, in SvelteKit, after the `load` function in `+page.server.js` is called, the page in `+page.svelte` will be rendered. That's why we don't have to tell this function to render the page.
 
@@ -361,7 +361,7 @@ export async function GET({ params }) {
 ```
 {% endcode %}
 
-This function checks if the session in the URL's path param is a valid CLI session in the database. If it is, it'll return the access token in the response body. This token will then be stored by the CLI tool and used in subsequent requests.
+This function checks if the session in the URL's path parameter is a valid CLI session in the database. If it is, it'll return the access token in the response body. This token will then be stored by the CLI tool and used in subsequent requests.
 
 ## Writing the CLI Tool
 
@@ -422,9 +422,9 @@ __$ acme login
 
 ## Security Considerations
 
-I've mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I'll mention a few more and also explain the ways to mitigate it. This isn't a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.
+I've mentioned DDOS attacks before as one of the vulnerabilities of this login flow. I'll mention a few more and also explain the ways to mitigate them. This isn't a comprehensive list of security vulnerabilities though. You might need to conduct security tests or assessments depending on your threat model.
 
-One type of attack we're vulnerable to is the [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack). A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.
+One type of attack we're vulnerable to is the [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack). A man-in-the-middle attack can happen when we try to log in over an insecure connection. An attacker can listen to your network traffic and steal your access tokens. Thankfully, this kind of attack is easy to mitigate by using a secure connection like HTTPS. HTTPS encrypts your network traffic, preventing a third party from reading your network activity.
 
 Another kind of attack is a [brute force attack](https://en.wikipedia.org/wiki/Brute-force_attack). Since the endpoints to poll for the access tokens don't require authentication, attackers can brute force UUID values until they get an access token. This can be mitigated by expiring the CLI sessions and applying the same strategies as with DDOS attacks.
 
@@ -441,9 +441,9 @@ Here's a high-level explanation of how ECDH works:[^6]
 1. Alice generates a random ECC key pair: **alicePriv** & **alicePub**.
 2. Bob generates a random ECC key pair: **bobPriv** & **bobPub**.
 3. Alice and Bob exchange their public keys over an insecure channel like the Internet.
-4. Alice calculates the **secret** = **alicePriv** \* **bobPub**
-5. Bob calculates the **secret** = **bobPriv** \* **alicePub**
-6. Alice and Bob now have the same shared **secret**
+4. Alice calculates the **secret** = **alicePriv** \* **bobPub**.
+5. Bob calculates the **secret** = **bobPriv** \* **alicePub**.
+6. Alice and Bob now have the same shared **secret**.
 
 This works because, in the ECDH algorithm, **alicePriv** \* **bobPub** is equal to **bobPriv** \* **alicePub**.
 
@@ -452,10 +452,10 @@ Unlike RSA, ECC doesn't directly provide a way to do asymmetric encryption. Inst
 1. Alice generates a random ECC key pair: **alicePriv** & **alicePub**.
 2. Bob generates a random ECC key pair: **bobPriv** & **bobPub**.
 3. Alice and Bob exchange their public keys over the internet.
-4. Alice calculates the **secret** = **alicePriv** \* **bobPub**
+4. Alice calculates the **secret** = **alicePriv** \* **bobPub**.
 5. Alice encrypts a **plaintext** using the **secret** as the symmetric encryption key.
 6. Alice sends the **ciphertext** to Bob over the Internet.
-7. Bob calculates the **secret** = **bobPriv** \* **alicePub**
+7. Bob calculates the **secret** = **bobPriv** \* **alicePub**.
 8. Bob decrypts the **ciphertext** using the **secret** as the decryption key.
 
 While the underlying maths might be complex, the encryption scheme is straightforward. Now, let's implement this in our code. We'll use the [WebCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) as the cryptography library.
@@ -560,11 +560,11 @@ export async function GET({ params }) {
 ```
 {% endcode %}
 
-Now, this function will generate a random ECC key pair to calculate the secret using the public key provided by the CLI. I'm using the [NIST P-256](https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf) curve as the basis of the ECC key pair as the [WebCrypto API only supports NIST curves](https://developer.mozilla.org/en-US/docs/Web/API/EcKeyGenParams) at the moment.[^7]
+Now, this function will generate a random ECC key pair to calculate the secret using the public key provided by the CLI. I'm using the [NIST P-256](https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf) curve as the basis of the ECC key pair, as the [WebCrypto API only supports NIST curves](https://developer.mozilla.org/en-US/docs/Web/API/EcKeyGenParams) at the moment.[^7]
 
 This secret is then used as the key for the symmetric encryption algorithm. I use AES-GCM here because it's also directly supported in WebCrypto. The secret here is 32 bytes long, which means we'll use a 256-bit key. AES-GCM encryption with a 256-bit key requires a nonce value (`iv`) of 12 bytes, which we also need to send to the user along with the server's public key.
 
-The private and public keys are byte arrays here, so we also need some helper functions here to decode byte arrays from/to hex strings:
+The private and public keys are byte arrays here, so we also need some helper functions to decode byte arrays from/to hex strings:
 
 {% code "src/lib/utils.js" %}
 ```javascript
@@ -651,7 +651,7 @@ The `decrypt` function follows the same steps as the encryption process, just re
 
 ![Checking the new CLI login flow](./cli-login-5.webp)
 
-You can also see the decrypted token is the same as the token in the database.
+You can also see that the decrypted token is the same as the token in the database.
 
 ## What's Next?
 
@@ -659,7 +659,7 @@ You can find the code for this project [on GitHub](https://github.com/rmrt1n/rmr
 
 [^1]: I learned about how this works mostly by digging into the [Supabase CLI code](https://github.com/supabase/cli), so I'm biased toward this approach. You can also see [Supabase's blog post about this](https://supabase.com/blog/automatic-cli-login) and [Fly's guide on implementing this in Laravel](https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/).
 
-[^2]: I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach where both participants are sending requests to each other.
+[^2]: I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach, where both participants are sending requests to each other.
 
 [^3]: 450,000 is the number of registered developers on [their website](https://supabase.com/company). It's a vanity metric, but it's still an impressive number.
 
@@ -667,6 +667,6 @@ You can find the code for this project [on GitHub](https://github.com/rmrt1n/rmr
 
 [^5]: Check out [the section on ECDH](https://cryptobook.nakov.com/asymmetric-key-ciphers/ecdh-key-exchange) from the [Practical Cryptography for Developers](https://cryptobook.nakov.com/) book for more details on how the algorithm works. It's also a great resource for learning about cryptography in general without going too deep into the maths.
 
-[^6]: This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good [introduction to cryptography article](https://www.comparitech.com/blog/information-security/cryptography-guide/) that explains the basic concepts as well as resources if you want to learn further.
+[^6]: This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good [introduction to cryptography article](https://www.comparitech.com/blog/information-security/cryptography-guide/) that explains the basic concepts, as well as resources if you want to learn further.
 
 [^7]: If I'm using a third-party library like [@noble/curves](https://github.com/paulmillr/noble-curves), I'll use [X25519](https://en.wikipedia.org/wiki/Curve25519) for ECDH. I'm not an expert in ECC, and most of my algorithm/curve choices are based on [this blog post on choosing an elliptic curve signature algorithm](https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/). Although it's about digital signatures ([ECDSA](https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages)), I still find it helpful for ECDH.

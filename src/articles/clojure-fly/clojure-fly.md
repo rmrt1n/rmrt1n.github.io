@@ -7,12 +7,12 @@ tags:
   - Networking
   - Web Development
 published: 2024-10-20
-updated: 2025-07-28
+updated: 2026-03-17
 ---
 
-This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It's a collection of insights and tips I've learned from building my Clojure side projects but presented in a more structured format.
+This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It's a collection of insights and tips I've learned from building my Clojure side projects, but presented in a more structured format.
 
-As the title suggests, we'll be deploying the app to [Fly.io](https://fly.io). It's a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.[^1] My experience with it has been good, it's easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.
+As the title suggests, we'll be deploying the app to [Fly.io](https://fly.io). It's a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.[^1] My experience with it has been good; it's easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.
 
 This isn't a tutorial on Clojure, so I'll assume you already have some familiarity with the language as well as some of its libraries.[^2]
 
@@ -84,7 +84,7 @@ The `user` namespace in `dev/user.clj` contains helper functions from [Integrant
 
 ## Systems and Configuration
 
-If you're new to Integrant or other dependency injection libraries like [Component](https://github.com/stuartsierra/component), I'd suggest reading ["How to Structure a Clojure Web"](https://mccue.dev/pages/12-7-22-clojure-web-primer). It's a great explanation about the reasoning behind these libraries. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a `.edn` file. I usually name mine as `resources/config.edn`. Here's what it looks like:
+If you're new to Integrant or other dependency injection libraries like [Component](https://github.com/stuartsierra/component), I'd suggest reading ["How to Structure a Clojure Web"](https://mccue.dev/pages/12-7-22-clojure-web-primer). It's a great explanation of the reasoning behind these libraries. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a `.edn` file. I usually name mine as `resources/config.edn`. Here's what it looks like:
 
 {% code "resources/config.edn" %}
 ```clojure
@@ -128,7 +128,7 @@ This config file is then "expanded" into the Integrant system map using the `exp
 
 The system map is created in code instead of being in the configuration file. This makes refactoring your system simpler as you only need to change this method while leaving the config file (mostly) untouched.[^5]
 
-My current approach to Integrant + Aero config files is mostly inspired by the blog post ["Rethinking Config with Aero & Integrant"](https://robjohnson.dev/posts/aero-and-integrant/) and Laravel's configuration. The config file follows a similar structure to Laravel's config files and contains the app configurations without describing the structure of the system. Previously I had a key for each Integrant component, which led to the config file being littered with `#ig/ref` and more difficult to refactor.
+My current approach to Integrant + Aero config files is mostly inspired by the blog post ["Rethinking Config with Aero & Integrant"](https://robjohnson.dev/posts/aero-and-integrant/) and Laravel's configuration. The config file follows a similar structure to Laravel's config files and contains the app configurations without describing the structure of the system. Previously, I had a key for each Integrant component, which led to the config file being littered with `#ig/ref` and more difficult to refactor.
 
 Also, if you haven't already, start a REPL and connect to it from your editor. Run `clj -M:dev` if your editor doesn't automatically start a REPL. Next, we'll implement the `init-key` and `halt-key!` methods for each of the components:
 
@@ -275,7 +275,7 @@ If you remember the `:handler/ring` from earlier, you'll notice that it has two 
 
 The `components-middleware` function takes in a map of components and creates a middleware function that "assocs" each component into the request map.[^6] If you have more components such as a Redis cache or a mail service, you can add them here.
 
-We'll also need a middleware to handle HTTP basic authentication.[^7] This middleware will check if the username and password from the request map matche the values in the `auth` map injected by `components-middleware`. If they match, then the request is authenticated and the user can view the site.
+We'll also need a middleware to handle HTTP basic authentication.[^7] This middleware will check if the username and password from the request map match the values in the `auth` map injected by `components-middleware`. If they match, then the request is authenticated and the user can view the site.
 
 {% code "src/acme/handler.clj" %}
 ```clojure
@@ -339,7 +339,7 @@ Finally, we need to add them to the router. Since we'll be handling form request
 
 ### Implementing the Route Handlers
 
-We now have everything we need to implement the route handlers or the business logic of the app. First, we'll implement the `index-page` function which renders a page that:
+We now have everything we need to implement the route handlers or the business logic of the app. First, we'll implement the `index-page` function, which renders a page that:
 
 1. Shows all of the user's bookmarks in the database, and
 2. Shows a form that allows the user to insert new bookmarks into the database
@@ -468,7 +468,7 @@ While there are [many ways to package a Clojure app](https://www.metosin.fi/blog
 1. Build an uberjar and run it using Java in the container, or
 2. Load the source code and run it using Clojure in the container
 
-Both are valid approaches. I prefer the first since its only dependency is the JVM. We'll use the [tools.build]( https://github.com/clojure/tools.build) library to build the uberjar. Check out the [official guide](https://clojure.org/guides/tools_build) for more information on building Clojure programs. Since it's a library, to use it we can add it to our `deps.edn` file with an alias:
+Both are valid approaches. I prefer the first since its only dependency is the JVM. We'll use the [tools.build]( https://github.com/clojure/tools.build) library to build the uberjar. Check out the [official guide](https://clojure.org/guides/tools_build) for more information on building Clojure programs. Since it's a library, to use it, we can add it to our `deps.edn` file with an alias:
 
 {% code "deps.edn" %}
 ```clojure
@@ -637,7 +637,7 @@ __$ fly deploy
 ```
 {% endcode %}
 
-The first deployment will take longer since it's building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run `fly open` which will do the same thing. Here's the app in action:
+The first deployment will take longer since it's building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run `fly open`, which will do the same thing. Here's the app in action:
 
 ![The app in action](./clojure-fly-2.webp)
 
@@ -645,9 +645,9 @@ If you made additional changes to the app or `fly.toml`, you can redeploy the ap
 
 ## Adding a Production REPL
 
-This is an interesting topic in the Clojure community, with varying opinions on whether or not it's a good idea. Personally I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.[^9] Since we're using SQLite, we don't have a database server we can directly connect to, unlike Postgres or MySQL.
+This is an interesting topic in the Clojure community, with varying opinions on whether or not it's a good idea. Personally, I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.[^9] Since we're using SQLite, we don't have a database server we can directly connect to, unlike Postgres or MySQL.
 
-If you're brave, you can even restart the app directly without redeploying from the REPL. You can easily go wrong with it, which is why some prefer to not use it.
+If you're brave, you can even restart the app directly without redeploying from the REPL. You can easily go wrong with it, which is why some prefer not to use it.
 
 For this project, we're gonna add a [socket REPL](https://clojure.org/reference/repl_and_main#_launching_a_socket_server). It's very simple to add (you just need to add a JVM option) and it doesn't require additional dependencies like [nREPL](https://nrepl.org/). Let's update the Dockerfile:
 
@@ -659,11 +659,11 @@ ENTRYPOINT ["java", "-Dclojure.server.repl={:port 7888 :accept clojure.core.serv
 ```
 {% endcode %}
 
-The socket REPL will be listening on port 7888. If we redeploy the app now, the REPL will be started but we won't be able to connect to it. That's because we haven't exposed the service through [Fly proxy](https://fly.io/docs/reference/fly-proxy/). We can do this by adding the socket REPL as a service in the `[services]` section in `fly.toml`.
+The socket REPL will be listening on port 7888. If we redeploy the app now, the REPL will be started, but we won't be able to connect to it. That's because we haven't exposed the service through [Fly proxy](https://fly.io/docs/reference/fly-proxy/). We can do this by adding the socket REPL as a service in the `[services]` section in `fly.toml`.
 
 However, doing this will also expose the REPL port to the public. This means that anyone can connect to your REPL and possibly mess with your app. Instead, what we want to do is to configure the socket REPL as a private service.
 
-By default, all Fly apps in your organisation live in the same [private network](https://fly.io/docs/networking/private-networking/). This private network, called 6PN, connects the apps in your organisation through [Wireguard tunnels](https://www.wireguard.com/) (a VPN) using IPv6. Fly private services aren't exposed to the public internet but can be reached from this private network. We can then use Wireguard to connect to this private network to reach our socket REPL.
+By default, all Fly apps in your organisation live in the same [private network](https://fly.io/docs/networking/private-networking/). This private network, called 6PN, connects the apps in your organisation through [WireGuard tunnels](https://www.wireguard.com/) (a VPN) using IPv6. Fly private services aren't exposed to the public internet but can be reached from this private network. We can then use Wireguard to connect to this private network to reach our socket REPL.
 
 Fly VMs are also configured with the hostname `fly-local-6pn`, which maps to its 6PN address. This is analogous to `localhost`, which points to your loopback address `127.0.0.1`. To expose a service to 6PN, all we have to do is bind or serve it to `fly-local-6pn` instead of the usual `0.0.0.0`. We have to update the socket REPL options to:
 
@@ -692,7 +692,7 @@ __$ rlwrap nc localhost 7888
 ```
 {% endcode %}
 
-Now we have a REPL connected to the production app! `rlwrap` is used for [readline](https://en.wikipedia.org/wiki/GNU_Readline) functionality, e.g. up/down arrow keys, vi bindings. Of course you can also connect to it from your editor.
+Now we have a REPL connected to the production app! `rlwrap` is used for [readline](https://en.wikipedia.org/wiki/GNU_Readline) functionality, e.g. up/down arrow keys, vi bindings. Of course, you can also connect to it from your editor.
 
 ## Deploy with GitHub Actions
 
@@ -726,7 +726,7 @@ To get this to work, you'll need to create a [deploy token](https://fly.io/docs/
 
 ## End
 
-As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Originally, this post was just about deploying to Fly.io, but along the way I kept adding on more stuff until it essentially became my version of the [user manager example app](https://github.com/seancorfield/usermanager-example/). Anyway, hope this post provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:
+As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/clojure-fly). Originally, this post was just about deploying to Fly.io, but along the way, I kept adding on more stuff until it essentially became my version of the [user manager example app](https://github.com/seancorfield/usermanager-example/). Anyway, hope this post provided a good view into web development with Clojure. As a bonus, here are some additional resources on deploying Clojure apps:
 
 - [Deploying a Full-Stack Clojure App With Kamal on a Single Server](https://bogoyavlensky.com/blog/deploying-full-stack-clojure-app-with-kamal/)
 - [JVM Deployment Options](https://ericnormand.me/article/jvm-deployment-options)
@@ -747,8 +747,8 @@ As always, all the code is available [on GitHub](https://github.com/rmrt1n/rmrt1
 
 [^7]: For more details on how basic authentication works, check out [the specification](https://www.rfc-editor.org/rfc/rfc7617.html).
 
-[^8]: Here's a cool resource I found when researching Java Dockerfiles: [WhichJDK](https://whichjdk.com). It provides a comprehensive comparison on the different JDKs available and recommendations on which one you should use.
+[^8]: Here's a cool resource I found when researching Java Dockerfiles: [WhichJDK](https://whichjdk.com). It provides a comprehensive comparison of the different JDKs available and recommendations on which one you should use.
 
 [^9]: Another (non-technically important) argument for live/production REPLs is just because it's cool. Ever since I read the story about [NASA's programmers debugging a spacecraft through a live REPL](https://news.ycombinator.com/item?id=31234338), I've always wanted to try it at least once.
 
-[^10]: If you encounter errors related to Wireguard when running `fly proxy`, you can run `fly doctor` which will hopefully detect issues with your local setup and also suggest fixes for them.
+[^10]: If you encounter errors related to WireGuard when running `fly proxy`, you can run `fly doctor`, which will hopefully detect issues with your local setup and also suggest fixes for them.

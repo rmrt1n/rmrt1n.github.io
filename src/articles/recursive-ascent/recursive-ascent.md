@@ -5,7 +5,7 @@ tags:
   - Compilers
   - Python
 published: 2024-05-28
-updated: 2025-06-22
+updated: 2026-03-16
 ---
 
 Recursive ascent is an obscure parsing technique I researched about a few years ago. It's an interesting approach to bottom-up parsing, the parsing method used by parser generators like [Bison](https://www.gnu.org/software/bison/) or [ANTLR](https://www.antlr.org/). If you're familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.
@@ -16,13 +16,13 @@ I'm writing this post to share what I've learned about recursive ascent parsing;
 
 The first half of this post will cover the theory behind bottom-up parsing, and the second half will delve into the code implementation of a recursive ascent parser.
 
-**Disclaimer**: I'm not an expert. I didn't take any classes on compiler theory and I haven't read [the dragon book](https://suif.stanford.edu/dragonbook/). Please [reach out](mailto:hi@ryanmartin.me) If you noticed any mistakes in this post, especially in the first half!
+**Disclaimer**: I'm not an expert. I didn't take any classes on compiler theory, and I haven't read [the Dragon Book](https://suif.stanford.edu/dragonbook/). Please [reach out](mailto:hi@ryanmartin.me) If you notice any mistakes in this post, especially in the first half!
 
 ## Bottom-Up vs Top-Down Parsing
 
-Parsing techniques can be roughly grouped into 2 types, [top-down](https://en.wikipedia.org/wiki/Top-down_parsing) and [bottom-up](https://en.wikipedia.org/wiki/Bottom-up_parsing). Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.
+Parsing techniques can be roughly grouped into 2 types: [top-down](https://en.wikipedia.org/wiki/Top-down_parsing) and [bottom-up](https://en.wikipedia.org/wiki/Bottom-up_parsing). Top-down parsers start from the highest level of the grammar rules, while bottom-up parsers start from the lowest level. Generally, top-down parsing algorithms are easier to understand and implement, but are less powerful and accept a smaller set of grammars than bottom-up algorithms.
 
-A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the [Polish notation](https://en.wikipedia.org/wiki/Polish_notation), and bottom-up parsing with the [reversed Polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation).[^4] In Polish notation, the operators come before the operands. In reversed Polish notation, it's the opposite, the operands come before the operators.
+A nice way to visualise the difference between top-down and bottom-up approaches, which I just found recently, is to correspond top-down parsing with the [Polish notation](https://en.wikipedia.org/wiki/Polish_notation), and bottom-up parsing with the [reversed Polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation).[^4] In Polish notation, the operators come before the operands. In reversed Polish notation, it's the opposite; the operands come before the operators.
 
 Let's use this math expression `1 + 2 * 3` as an example. We can also represent this expression as a tree:
 
@@ -32,11 +32,11 @@ A top-down parser builds the parse tree starting from the root node and ending i
 
 On the other hand, a bottom-up parser builds the parse tree starting from the leaf nodes up to the root node, aka, post-order traversal. The order the nodes are traversed will form the reversed Polish notation of the original expression: `2 3 * 1 +`.
 
-You're probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?
+You're probably already familiar with the top-down approach, as that is how recursive descent parsers work. Personally, I find it difficult to reverse this logic and understand how a bottom-up approach works. Unlike top-down algorithms, which determine what to do next based on the current grammar rule, how does a bottom-up algorithm know what rule it is in and what it should do next?
 
 ## LR Algorithm
 
-[LR](https://en.wikipedia.org/wiki/LR_parser) is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants such as LR(k), SLR, LALR, etc.,[^5] but all of them are based on the same two fundamental actions: **shift** and **reduce**.
+[LR](https://en.wikipedia.org/wiki/LR_parser) is a bottom-up parsing algorithm used in most parser generators. More accurately, it is a family of parsing algorithms that follow a similar approach. Recursive ascent parsers also use this algorithm. There are many variants, such as LR(k), SLR, LALR, etc.,[^5] but all of them are based on the same two fundamental actions: **shift** and **reduce**.
 
 Shift means to advance or "shift" to the next token from the input stream. If the shifted tokens match one of the rules of the grammar, they will be converted or "reduced" into that rule. An LR parser will continue shifting and reducing until the entire input is consumed and transformed into a single parse tree. This concept may sound abstract, so let's use an example to illustrate it.
 
@@ -49,7 +49,7 @@ expr -> term
 term -> INTEGER
 ```
 
-This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing this input `1 + 2 - 3` according to the grammar above:
+This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing the input `1 + 2 - 3` according to the grammar above:
 
 {% table %}
 
@@ -69,7 +69,7 @@ This grammar defines a language that consists only of additions and subtractions
 | expr        |           | Accept                                                   |
 {% endtable %}
 
-Here, I used the term "parse stack" for the shifted inputs. That's because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and push the corresponding rule to the stack.
+Here, I used the term "parse stack" for the shifted inputs. That's because most LR parsers use a stack to keep track of the shifted tokens. A shift is a push to the stack, and a reduce pops tokens that match a rule and pushes the corresponding rule to the stack.
 
 How does the parser know which rule it should reduce to? Most LR parsers construct a **parse table**, which is a table of parser instructions based on the grammar. Entries in the table tell the parser whether to shift or reduce based on the current token in the input stream. The entire combination of actions a parser can take based on any input fits in this one table. This is possible because there are only a finite number of possible states an LR parser can assume for a given grammar. These are called the **LR states**.
 
@@ -96,7 +96,7 @@ factor -> INTEGER
 
 Note the extra rule `S` (start), which will be used for a reduction when the parser has accepted the whole input. `eof` indicates the end of the input stream.
 
-Next, we'll need to construct the **LR(0) items**, which are grammar rules with a dot (•) to mark the current position of the parser.[^7] E.g., the rule `S -> expr eof` contains one LR(0) item: `S -> • expr eof`. Everything to the left of the dot has already been parsed or shifted.[^8] For brevity's sake, I'll shorten "LR(0) item" to just "item" going forward.
+Next, we'll need to construct the **LR(0) items**, which are grammar rules with a dot (•) to mark the current position of the parser.[^7] E.g. the rule `S -> expr eof` contains one LR(0) item: `S -> • expr eof`. Everything to the left of the dot has already been parsed or shifted.[^8] For brevity's sake, I'll shorten "LR(0) item" to just "item" going forward.
 
 For each item, we then need to compute its **closure**. The closure of an item is the set of all possible items that can be derived from applying the appropriate grammar rules to it. Here's how it works:
 
@@ -177,7 +177,7 @@ And we're done! Here's a diagram to help you visualise the state transitions:
 
 ## The Action and Goto Table
 
-Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to given a non-terminal. Here's what the action and goto table looks like for our grammar:
+Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to, given a non-terminal. Here's what the action and goto table looks like for our grammar:
 
 {% table %}
 
@@ -238,7 +238,7 @@ This program will receive a string as an argument and print out the evaluated st
 
 ### A Simple Lexer
 
-Since we don't have a complex grammar, our lexer can just scan tokens separated by whitespace. This works but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.[^11]
+Since we don't have a complex grammar, our lexer can just scan tokens separated by whitespace. This works, but it also means that we need to separate the terminals in our input string with spaces. A better lexer knows whether a token can be scanned regardless of whitespaces.[^11]
 
 {% code "recursive-ascent.py" %}
 ```python
@@ -505,7 +505,7 @@ __$ python3 recursive-ascent.py '1 + 2 * 3 + 4'
 ```
 {% endcode %}
 
-Good, it works! Now let's write some generated tests to have more confidence in the program. Here's a function that would generate random numbers and combinations of operators (`+` and `*`), run the `evaluate` function on them, and compare the result to Python's `eval` function:
+Good, it works! Now, let's write some generated tests to have more confidence in the program. Here's a function that would generate random numbers and combinations of operators (`+` and `*`), run the `evaluate` function on them, and compare the result to Python's `eval` function:
 
 {% code "recursive-ascent.py" %}
 ```python
@@ -553,7 +553,7 @@ And that's all. You can find the complete code on [this GitHub repo](https://git
 
 [^2]: Here are [some](https://dl.acm.org/doi/pdf/10.1145/47907.47909) [papers](https://3e8.org/pub/scheme/doc/CPS%20Recursive%20Ascent%20Parsing.pdf) [about recursive ascent parsers](https://ceur-ws.org/Vol-2951/paper2.pdf) that you could read if you're interested in the theory.
 
-[^3]: [Crafting Interpreters](https://craftinginterpreters.com/) is a really good introductory book on writing compilers, and their section on parsing is all about implementing a recursive descent parser. It's also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you're in software engineering.
+[^3]: [Crafting Interpreters](https://craftinginterpreters.com/) is a really good introductory book on writing compilers, and its section on parsing is all about implementing a recursive descent parser. It's also probably the most influential book in my programming journey. I learned a lot from it, which I applied in areas other than in writing compilers. Highly recommend reading it if you're in software engineering.
 
 [^4]: I found this analogy from [this blog post](https://blog.reverberate.org/2013/07/ll-and-lr-parsing-demystified.html) by Josh Haberman. He went deep into the details of both LL and LR algorithms in his blog post while keeping it easy to read.
 
@@ -561,7 +561,7 @@ And that's all. You can find the complete code on [this GitHub repo](https://git
 
 [^6]: This is done to show that the parser can handle operator precedence based on the grammar rules. Subtraction is removed to keep the section short and readable. The number of possible states will grow exponentially the more complex your grammar is. This is why it is inconvenient to write a bottom-up parser by hand, and why people create parser generators.
 
-[^7]: A grammar rule is often called as a "production" in academic literature. I just use the term "grammar rules" because it's more intuitive.
+[^7]: A grammar rule is often called a "production" in academic literature. I just use the term "grammar rules" because it's more intuitive.
 
 [^8]: My explanation of the algorithm for creating the parse table might not click with you, so here are [some](<https://en.wikipedia.org/wiki/LR_parser#Constructing_LR(0)_parsing_tables>) [other](https://suif.stanford.edu/dragonbook/lecture-notes/Stanford-CS143/08-Bottom-Up-Parsing.pdf) [resources](https://chatgpt.com) you can read if you're still confused.
 
@@ -573,4 +573,4 @@ And that's all. You can find the complete code on [this GitHub repo](https://git
 
 [^12]: This is a very basic approach to handling parse errors. Production-grade parsers will usually report errors, ignore them, and continue parsing. This is to catch as many errors as it can so that the programmer doesn't have to recompile to find more errors.
 
-[^13]: What better way to visualise AST than with s-expressions? When you read a lisp program, you're looking directly at the program's AST, which is just a lisp data structures! This is what clojurists often mean when they say "It's just data".
+[^13]: What better way to visualise AST than with s-expressions? When you read a lisp program, you're looking directly at the program's AST, which is just a lisp data structure! This is what clojurists often mean when they say "It's just data".
