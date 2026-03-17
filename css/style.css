@@ -9,6 +9,10 @@
   --font-sans: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+  --content-width: 42rem;
+  --rail-width: 20rem;
+  --rail-gap: 1.5rem;
+
   --color-bg: #fafafa;
   --color-fg: #262626;
   --color-border: #737373;
@@ -59,7 +63,7 @@ body {
 }
 
 body > header {
-  max-width: 42rem;
+  max-width: var(--content-width);
   margin-inline: auto;
   border-bottom: 4px double var(--color-border);
 
@@ -89,7 +93,7 @@ body > header {
 }
 
 footer {
-  max-width: 42rem;
+  max-width: var(--content-width);
   margin-inline: auto;
   border-top: 4px double var(--color-border);
   padding-top: .5rem;
@@ -107,11 +111,16 @@ footer {
 }
 
 main {
-  max-width: 42rem;
+  max-width: var(--content-width);
   margin-inline: auto;
   padding: 2rem 0;
+  container: main-layout / inline-size;
 
   > * + * { margin-top: 1rem; }
+
+  &:has(> article) {
+    max-width: 100rem; /* Increase max width for toc and sidenotes */
+  }
 }
 
 /* /articles and /snippets */
@@ -132,6 +141,8 @@ main > .archive {
 
 /* base.liquid */
 main > article {
+  max-width: var(--content-width);
+  margin-inline: auto;
   position: relative; /* for toc */
 
   > * + * { margin-top: 1.5rem; }
@@ -146,6 +157,8 @@ main > article {
 
   > #content {
     > * + * { margin-top: 1rem; }
+
+    > h2 { margin-top: 2rem; }
 
     ol, ul {
       /* use margin instead of list-style-position: inside so that lists that span */
@@ -177,13 +190,43 @@ main > article {
       font-size: 0.875rem;
       line-height: 1.25;
 
-      ol > * + * { margin-top: .5rem; }
+      ol > * + * { margin-top: .75rem; }
 
       li pre code {
-        background-color: transparent;
         padding: 0;
-        font-size: 0.75rem;
         line-height: 1;
+      }
+    }
+
+    .sidenote {
+      display: none;
+      font-size: 0.875rem;
+      line-height: 1.25;
+    }
+
+    /* content-width + 2 * rail-width + 2 * rail-gap */
+    @container main-layout (min-width: 85rem) {
+      .footnotes, .footnotes-sep {
+        display: none;
+      }
+
+      .sidenote {
+        display: flex;
+        gap: 2px;
+        width: var(--rail-width);
+        max-width: var(--rail-width);
+        float: right;
+        clear: right; /* so they don't overlap */
+        margin-right: calc(-1 * (var(--rail-width) + var(--rail-gap)));
+
+        > .sidenote-content {
+          min-width: 0; /* don't stretch parent */
+        }
+
+        pre code {
+          padding: 0;
+          line-height: 1;
+        }
       }
     }
   }
@@ -209,15 +252,15 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-  font-size: 1.375rem;
+  font-size: 1.5rem;
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
 }
 
 h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 
 small {
@@ -347,11 +390,12 @@ table {
     }
   }
 
-  @media (min-width: 1356px) {
+  /* content-width + 2 * rail-width + 2 * rail-gap */
+  @container main-layout (min-width: 85rem) {
     position: absolute;
-    width: 20rem;
+    width: var(--rail-width);
     top: 0;
-    right: -22rem;
+    left: calc(-1 * (var(--rail-width) + var(--rail-gap)));
     height: 100%;
 
     > div {
