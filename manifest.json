@@ -1,0 +1,16 @@
+{
+  "short_name": "rmrt1n",
+  "name": "Ryan Martin's Website",
+  "start_url": ".",
+  "description": "sPsdgZv5kz412XHmntpt8XZGsKpujs9QhyB8BoiGCJpoZvKjJ",
+  "display": "minimal-ui",
+  "background_color": "white",
+  "theme_color": "blue",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.2">
+    <meta name="generator" content="Eleventy v3.1.5">
     <meta name="description" content="true">
-    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <script src="/js/analytics.js" defer=""></script>
     <title>Ryan Martin | How to Implement Automatic CLI Login</title>
     <script src="/js/script.js" defer=""></script>
   </head>
@@ -17,6 +19,7 @@
     <a href="#main" id="skip-link">Skip to main content</a>
     <header>
       <a href="/">ryanmartin.me</a>
+      <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
             <a href="/articles/">Articles</a>
           
@@ -45,30 +48,39 @@
 <p>It usually works like this. When you type a command like <code>cli login</code> in your terminal, a login page will open in your web browser. After you log in, the page will show a message like “Your CLI is connected now”. When you go back to the terminal, it will say that it’s “connected” and you can now perform commands that require authentication.</p>
 <p>The connection here is often in the form of an access token or an API key. This allows the CLI to stay logged in and perform authenticated requests to a remote server.</p>
 <p>You’ve probably experienced this type of interaction before. Many modern CLI tools have some sort of command to allow you to log in from the command line. Examples include <a href="https://supabase.com/docs/reference/cli/introduction">Supabase CLI</a>, <a href="https://cli.github.com/">GitHub CLI</a>, <a href="https://graphite.dev/features/cli">Graphite CLI</a>, and Fly.io’s <a href="https://fly.io/docs/flyctl/"><code>flyctl</code></a>. It’s a UX pattern that I like, as it hides a lot of complexity from the user.</p>
-<aside id="fn1" class="sidenote">
+<aside id="sn1" class="sidenote">
                <span class="sidenote-number">1.</span>
-               <div class="sidenote-content"><p>I learned about how this works mostly by digging into the <a href="https://github.com/supabase/cli">Supabase CLI code</a>, so I'm biased toward this approach. You can also see <a href="https://supabase.com/blog/automatic-cli-login">Supabase's blog post about this</a> and <a href="https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/">Fly's guide on implementing this in Laravel</a>. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>I learned about how this works mostly by digging into the <a href="https://github.com/supabase/cli">Supabase CLI code</a>, so I'm biased toward this approach. You can also see <a href="https://supabase.com/blog/automatic-cli-login">Supabase's blog post about this</a> and <a href="https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/">Fly's guide on implementing this in Laravel</a>. <a href="#snref1" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>There are probably many different ways to implement this, each with different trade-offs. In this post, I’ll write about just one way of doing this, which is also the same approach used by Supabase and Fly.io.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
+            </aside><p>There are probably many different ways to implement this, each with different trade-offs. In this post, I’ll write about just one way of doing this, which is also the same approach used by Supabase and Fly.io.<sup class="footnote-ref">
+        <a href="#fn1" id="fnref1">[1]</a>
+        <a href="#sn1" id="snref1">[1]</a>
+        </sup> It works for my particular use case and does not require refactoring my existing authentication logic.</p>
 <aside class="toc"><div>
       <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#how-it-works">How it Works</a></li><li><a href="#project-setup">Project Setup</a></li><li><a href="#a-basic-authentication-system">A Basic Authentication System</a></li><li><a href="#the-cli-login-endpoints">The CLI Login Endpoints</a></li><li><a href="#writing-the-cli-tool">Writing the CLI Tool</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></li><li><a href="#securing-the-endpoints">Securing the Endpoints</a></li><li><a href="#what%E2%80%99s-next%3F">What’s Next?</a></li></ol></div></aside>
 <h2 id="how-it-works" tabindex="-1"><a class="header-anchor" href="#how-it-works">How it Works</a></h2>
 <p>At first glance, it looks like there is a two-way communication between the CLI tool and the browser. When you log in to the browser, you’ll receive an access token. Then the browser sends it to the CLI in some way?. Maybe the CLI starts up an HTTP server with an endpoint to receive the access token from the web page, like the diagram below?</p>
 <p><img loading="lazy" decoding="async" src="/articles/cli-login/8zjhL3f3r0-2146.webp" alt="Two-way communication scheme" width="2146" height="683"></p>
 <p>This probably works, though I haven’t actually tested it yet. This isn’t the approach that I implemented, but it could be a good area for future experimentation.</p>
-<aside id="fn2" class="sidenote">
+<aside id="sn2" class="sidenote">
                <span class="sidenote-number">2.</span>
-               <div class="sidenote-content"><p>I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach, where both participants are sending requests to each other. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>I call it one-way communication here, but what I meant is that only one participant, this being the CLI, is making the requests. Contrast this to the other approach, where both participants are sending requests to each other. <a href="#snref2" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>How it works in Supabase CLI and <code>flyctl</code> is that it uses a “one-way” communication scheme instead of a two-way one.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> Instead of the remote server sending the access token after the user has logged in, the CLI will keep polling for the access token in the background. At a high level, the flow should look like this diagram:</p>
+            </aside><p>How it works in Supabase CLI and <code>flyctl</code> is that it uses a “one-way” communication scheme instead of a two-way one.<sup class="footnote-ref">
+        <a href="#fn2" id="fnref2">[2]</a>
+        <a href="#sn2" id="snref2">[2]</a>
+        </sup> Instead of the remote server sending the access token after the user has logged in, the CLI will keep polling for the access token in the background. At a high level, the flow should look like this diagram:</p>
 <p><img loading="lazy" decoding="async" src="/articles/cli-login/stdV4wS9zs-2146.webp" alt="One-way communication scheme" width="2146" height="683"></p>
 <p>The CLI will provide a session ID and ask the server to create a “CLI login session” when the user logs in successfully. An access token will be created for this specific session. Then, the CLI will request this access token from the server and store it for future requests.</p>
 <p>Since this approach uses <a href="https://javascript.info/long-polling#regular-polling">regular HTTP polling</a>, it’s a potential source of <a href="https://en.wikipedia.org/wiki/Denial-of-service_attack">DDOS attacks</a>. In a perfect world, a user needs to log in to the CLI only once after they install the tool. The server is unlikely to get too many login requests at a time. In the real world, attackers can keep sending login requests to the server to slow or take it down. We can mitigate this by rate-limiting the endpoints and blocking malicious IP addresses, but it’s not a perfect defence.</p>
-<aside id="fn3" class="sidenote">
+<aside id="sn3" class="sidenote">
                <span class="sidenote-number">3.</span>
-               <div class="sidenote-content"><p>450,000 is the number of registered developers on <a href="https://supabase.com/company">their website</a>. It's a vanity metric, but it's still an impressive number. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>450,000 is the number of registered developers on <a href="https://supabase.com/company">their website</a>. It's a vanity metric, but it's still an impressive number. <a href="#snref3" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSockets</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events">SSE</a>. This might not work for you depending on your <a href="https://en.wikipedia.org/wiki/Threat_model">threat model</a>. But hey, if it works for Supabase, which has around 450,000 users,<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> it’ll probably work for me too.</p>
+            </aside><p>This is a trade-off between security and code simplicity. HTTP polling is much simpler to implement than other solutions like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSockets</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events">SSE</a>. This might not work for you depending on your <a href="https://en.wikipedia.org/wiki/Threat_model">threat model</a>. But hey, if it works for Supabase, which has around 450,000 users,<sup class="footnote-ref">
+        <a href="#fn3" id="fnref3">[3]</a>
+        <a href="#sn3" id="snref3">[3]</a>
+        </sup> it’ll probably work for me too.</p>
 <p>Now that we know how it works, let’s get into the code implementation. I’ll build a web server and a CLI tool for a fictional developer tools company, ACME Corp. The CLI tool will be called <code>acme</code>.</p>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
 <p>I’ll use <a href="https://kit.svelte.dev">SvelteKit</a> for this project, but the concepts apply to any web framework. I’ll try to avoid using any Svelte-specific features or terminologies so that you can apply this to any language or web framework you like.</p>
@@ -162,11 +174,14 @@
 <p>Finally, start the development server by running <code>pnpm dev</code>. The server should now be running at <code>http://localhost:5173</code>.</p>
 <h2 id="a-basic-authentication-system" tabindex="-1"><a class="header-anchor" href="#a-basic-authentication-system">A Basic Authentication System</a></h2>
 <p>As the focus of this post is on automatic CLI login, we won’t be doing anything fancy with user authentication. It’ll use a database-backed session-based authentication. I’ll also skip hashing the password and just store it in plaintext. You should never store passwords like this in a production system. Either use a third-party authentication service or follow the <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP guide to password storage</a>.</p>
-<aside id="fn4" class="sidenote">
+<aside id="sn4" class="sidenote">
                <span class="sidenote-number">4.</span>
-               <div class="sidenote-content"><p>I made this choice just to keep the code as small as possible. You shouldn't do this in a real app unless you have a really specific reason. This UX is unfamiliar and can confuse users. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>I made this choice just to keep the code as small as possible. You shouldn't do this in a real app unless you have a really specific reason. This UX is unfamiliar and can confuse users. <a href="#snref4" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>First, let’s build a login page. For this app, the login page will serve as both the login and the signup page.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup></p>
+            </aside><p>First, let’s build a login page. For this app, the login page will serve as both the login and the signup page.<sup class="footnote-ref">
+        <a href="#fn4" id="fnref4">[4]</a>
+        <a href="#sn4" id="snref4">[4]</a>
+        </sup></p>
 <div class="codeblock">
       <div>
         <span>src/routes/login/+page.svelte</span>
@@ -440,16 +455,22 @@
 <p>Both of these attacks have one thing in common. If an attacker gets a hold of your access token, you’re hacked. We can increase the security of our app by encrypting the access tokens. This way, even if attackers obtain an encrypted access token, they won’t be able to decrypt it.</p>
 <p>Encrypting the tokens presents some challenges. How do we ensure that only the CLI can decrypt the token? What encryption scheme should be used? What if an attacker obtained the decryption key?</p>
 <h2 id="ecdh-key-exchange-%26-encryption" tabindex="-1"><a class="header-anchor" href="#ecdh-key-exchange-%26-encryption">ECDH Key Exchange &amp; Encryption</a></h2>
-<aside id="fn5" class="sidenote">
+<aside id="sn5" class="sidenote">
                <span class="sidenote-number">5.</span>
-               <div class="sidenote-content"><p>Check out <a href="https://cryptobook.nakov.com/asymmetric-key-ciphers/ecdh-key-exchange">the section on ECDH</a> from the <a href="https://cryptobook.nakov.com/">Practical Cryptography for Developers</a> book for more details on how the algorithm works. It's also a great resource for learning about cryptography in general without going too deep into the maths. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Check out <a href="https://cryptobook.nakov.com/asymmetric-key-ciphers/ecdh-key-exchange">the section on ECDH</a> from the <a href="https://cryptobook.nakov.com/">Practical Cryptography for Developers</a> book for more details on how the algorithm works. It's also a great resource for learning about cryptography in general without going too deep into the maths. <a href="#snref5" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>One possible solution is to use <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH key exchange</a>. ECDH (Elliptic Curve Diffie–Hellman Key Exchange) is a method that allows two parties to establish a shared secret over an insecure channel. ECDH is based on <a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a> (elliptic curve cryptography), a modern family of public-key cryptography and is considered the modern successor of RSA.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup></p>
-<aside id="fn6" class="sidenote">
+            </aside><p>One possible solution is to use <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman">ECDH key exchange</a>. ECDH (Elliptic Curve Diffie–Hellman Key Exchange) is a method that allows two parties to establish a shared secret over an insecure channel. ECDH is based on <a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">ECC</a> (elliptic curve cryptography), a modern family of public-key cryptography and is considered the modern successor of RSA.<sup class="footnote-ref">
+        <a href="#fn5" id="fnref5">[5]</a>
+        <a href="#sn5" id="snref5">[5]</a>
+        </sup></p>
+<aside id="sn6" class="sidenote">
                <span class="sidenote-number">6.</span>
-               <div class="sidenote-content"><p>This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good <a href="https://www.comparitech.com/blog/information-security/cryptography-guide/">introduction to cryptography article</a> that explains the basic concepts, as well as resources if you want to learn further. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>This post assumes you know about RSA and basic cryptography concepts. It's fine if you don't, but the concepts explained will make more sense if you do. Here's a good <a href="https://www.comparitech.com/blog/information-security/cryptography-guide/">introduction to cryptography article</a> that explains the basic concepts, as well as resources if you want to learn further. <a href="#snref6" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Here’s a high-level explanation of how ECDH works:<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
+            </aside><p>Here’s a high-level explanation of how ECDH works:<sup class="footnote-ref">
+        <a href="#fn6" id="fnref6">[6]</a>
+        <a href="#sn6" id="snref6">[6]</a>
+        </sup></p>
 <ol>
 <li>Alice generates a random ECC key pair: <strong>alicePriv</strong> &amp; <strong>alicePub</strong>.</li>
 <li>Bob generates a random ECC key pair: <strong>bobPriv</strong> &amp; <strong>bobPub</strong>.</li>
@@ -569,11 +590,14 @@
   <span class="token punctuation">}</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn7" class="sidenote">
+<aside id="sn7" class="sidenote">
                <span class="sidenote-number">7.</span>
-               <div class="sidenote-content"><p>If I'm using a third-party library like <a href="https://github.com/paulmillr/noble-curves">@noble/curves</a>, I'll use <a href="https://en.wikipedia.org/wiki/Curve25519">X25519</a> for ECDH. I'm not an expert in ECC, and most of my algorithm/curve choices are based on <a href="https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/">this blog post on choosing an elliptic curve signature algorithm</a>. Although it's about digital signatures (<a href="https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages">ECDSA</a>), I still find it helpful for ECDH. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>If I'm using a third-party library like <a href="https://github.com/paulmillr/noble-curves">@noble/curves</a>, I'll use <a href="https://en.wikipedia.org/wiki/Curve25519">X25519</a> for ECDH. I'm not an expert in ECC, and most of my algorithm/curve choices are based on <a href="https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/">this blog post on choosing an elliptic curve signature algorithm</a>. Although it's about digital signatures (<a href="https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages">ECDSA</a>), I still find it helpful for ECDH. <a href="#snref7" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Now, this function will generate a random ECC key pair to calculate the secret using the public key provided by the CLI. I’m using the <a href="https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf">NIST P-256</a> curve as the basis of the ECC key pair, as the <a href="https://developer.mozilla.org/en-US/docs/Web/API/EcKeyGenParams">WebCrypto API only supports NIST curves</a> at the moment.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup></p>
+            </aside><p>Now, this function will generate a random ECC key pair to calculate the secret using the public key provided by the CLI. I’m using the <a href="https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf">NIST P-256</a> curve as the basis of the ECC key pair, as the <a href="https://developer.mozilla.org/en-US/docs/Web/API/EcKeyGenParams">WebCrypto API only supports NIST curves</a> at the moment.<sup class="footnote-ref">
+        <a href="#fn7" id="fnref7">[7]</a>
+        <a href="#sn7" id="snref7">[7]</a>
+        </sup></p>
 <p>This secret is then used as the key for the symmetric encryption algorithm. I use AES-GCM here because it’s also directly supported in WebCrypto. The secret here is 32 bytes long, which means we’ll use a 256-bit key. AES-GCM encryption with a 256-bit key requires a nonce value (<code>iv</code>) of 12 bytes, which we also need to send to the user along with the server’s public key.</p>
 <p>The private and public keys are byte arrays here, so we also need some helper functions to decode byte arrays from/to hex strings:</p>
 <div class="codeblock">

@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.2">
+    <meta name="generator" content="Eleventy v3.1.5">
     <meta name="description" content="true">
-    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <script src="/js/analytics.js" defer=""></script>
     <title>Ryan Martin | Build and Deploy Web Apps With Clojure and FLy.io</title>
     <script src="/js/script.js" defer=""></script>
   </head>
@@ -17,6 +19,7 @@
     <a href="#main" id="skip-link">Skip to main content</a>
     <header>
       <a href="/">ryanmartin.me</a>
+      <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
             <a href="/articles/">Articles</a>
           
@@ -42,16 +45,22 @@
   </header>
   <section id="content">
     <p>This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects, but presented in a more structured format.</p>
-<aside id="fn1" class="sidenote">
+<aside id="sn1" class="sidenote">
                <span class="sidenote-number">1.</span>
-               <div class="sidenote-content"><p>The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and "loaded" into a VM. See <a href="https://www.youtube.com/watch?v=7iypMRKniPU">this video explanation</a> for more details. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and "loaded" into a VM. See <a href="https://www.youtube.com/watch?v=7iypMRKniPU">this video explanation</a> for more details. <a href="#snref1" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>As the title suggests, we’ll be deploying the app to <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My experience with it has been good; it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.</p>
-<aside id="fn2" class="sidenote">
+            </aside><p>As the title suggests, we’ll be deploying the app to <a href="https://fly.io">Fly.io</a>. It’s a service that allows you to deploy apps packaged as Docker images on lightweight virtual machines.<sup class="footnote-ref">
+        <a href="#fn1" id="fnref1">[1]</a>
+        <a href="#sn1" id="snref1">[1]</a>
+        </sup> My experience with it has been good; it’s easy to use and quick to set up. One downside of Fly is that it doesn’t have a free tier, but if you don’t plan on leaving the app deployed, it barely costs anything.</p>
+<aside id="sn2" class="sidenote">
                <span class="sidenote-number">2.</span>
-               <div class="sidenote-content"><p>If you're interested in learning Clojure, my recommendation is to follow <a href="https://clojure.org/guides/getting_started">the official getting started guide</a> and join the <a href="https://clojurians.slack.com/">Clojurians Slack</a>. Also, read through this <a href="https://gist.github.com/yogthos/be323be0361c589570a6da4ccc85f58f">list of introductory resources</a>. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>If you're interested in learning Clojure, my recommendation is to follow <a href="https://clojure.org/guides/getting_started">the official getting started guide</a> and join the <a href="https://clojurians.slack.com/">Clojurians Slack</a>. Also, read through this <a href="https://gist.github.com/yogthos/be323be0361c589570a6da4ccc85f58f">list of introductory resources</a>. <a href="#snref2" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This isn’t a tutorial on Clojure, so I’ll assume you already have some familiarity with the language as well as some of its libraries.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+            </aside><p>This isn’t a tutorial on Clojure, so I’ll assume you already have some familiarity with the language as well as some of its libraries.<sup class="footnote-ref">
+        <a href="#fn2" id="fnref2">[2]</a>
+        <a href="#sn2" id="snref2">[2]</a>
+        </sup></p>
 <aside class="toc"><div>
       <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#project-setup">Project Setup</a></li><li><a href="#systems-and-configuration">Systems and Configuration</a></li><li><a href="#routing%2C-middleware%2C-and-route-handlers">Routing, Middleware, and Route Handlers</a><ol><li><a href="#implementing-the-middlewares">Implementing the Middlewares</a></li><li><a href="#implementing-the-route-handlers">Implementing the Route Handlers</a></li></ol></li><li><a href="#packaging-the-app">Packaging the App</a></li><li><a href="#deploying-with-fly.io">Deploying with Fly.io</a></li><li><a href="#adding-a-production-repl">Adding a Production REPL</a></li><li><a href="#deploy-with-github-actions">Deploy with GitHub Actions</a></li><li><a href="#end">End</a></li></ol></div></aside>
 <h2 id="project-setup" tabindex="-1"><a class="header-anchor" href="#project-setup">Project Setup</a></h2>
@@ -66,11 +75,14 @@
 │   └── acme
 │       └── main.clj
 └── deps.edn</code></pre>
-<aside id="fn3" class="sidenote">
+<aside id="sn3" class="sidenote">
                <span class="sidenote-number">3.</span>
-               <div class="sidenote-content"><p>Kit was a big influence on me when I first started learning web development in Clojure. I never used it directly, but I did use their library choices and project structure as a base for my own projects. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Kit was a big influence on me when I first started learning web development in Clojure. I never used it directly, but I did use their library choices and project structure as a base for my own projects. <a href="#snref3" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>And the libraries we’re going to use. If you have some Clojure experience or have used <a href="https://kit-clj.github.io/">Kit</a>, you’re probably already familiar with all the libraries listed below.<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
+            </aside><p>And the libraries we’re going to use. If you have some Clojure experience or have used <a href="https://kit-clj.github.io/">Kit</a>, you’re probably already familiar with all the libraries listed below.<sup class="footnote-ref">
+        <a href="#fn3" id="fnref3">[3]</a>
+        <a href="#sn3" id="snref3">[3]</a>
+        </sup></p>
 <div class="codeblock">
       <div>
         <span>deps.edn</span>
@@ -91,11 +103,14 @@
                       integrant/repl <span class="token punctuation">{</span><span class="token symbol">:mvn/version</span> <span class="token string">"0.3.3"</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
         <span class="token symbol">:main-opts</span>   <span class="token punctuation">[</span><span class="token string">"-m"</span> <span class="token string">"nrepl.cmdline"</span> <span class="token string">"--interactive"</span> <span class="token string">"--color"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn4" class="sidenote">
+<aside id="sn4" class="sidenote">
                <span class="sidenote-number">4.</span>
-               <div class="sidenote-content"><p>There's no "Rails" for the Clojure ecosystem (yet?). The prevailing opinion is to build your own "framework" by composing different libraries together. Most of these libraries are stable and are already used in production by big companies, so don't let this discourage you from doing web development in Clojure! <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>There's no "Rails" for the Clojure ecosystem (yet?). The prevailing opinion is to build your own "framework" by composing different libraries together. Most of these libraries are stable and are already used in production by big companies, so don't let this discourage you from doing web development in Clojure! <a href="#snref4" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>I use <a href="https://github.com/juxt/aero">Aero</a> and <a href="https://github.com/weavejester/integrant">Integrant</a> for my system configuration (more on this in the next section), <a href="https://github.com/ring-clojure/ring">Ring</a> with the Jetty adaptor for the web server, <a href="https://github.com/metosin/reitit">Reitit</a> for routing, <a href="https://github.com/seancorfield/next-jdbc/">next.jdbc</a> for database interaction, and <a href="https://github.com/weavejester/hiccup/">Hiccup</a> for rendering HTML. From what I’ve seen, this is a popular “library combination” for building web apps in Clojure.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup></p>
+            </aside><p>I use <a href="https://github.com/juxt/aero">Aero</a> and <a href="https://github.com/weavejester/integrant">Integrant</a> for my system configuration (more on this in the next section), <a href="https://github.com/ring-clojure/ring">Ring</a> with the Jetty adaptor for the web server, <a href="https://github.com/metosin/reitit">Reitit</a> for routing, <a href="https://github.com/seancorfield/next-jdbc/">next.jdbc</a> for database interaction, and <a href="https://github.com/weavejester/hiccup/">Hiccup</a> for rendering HTML. From what I’ve seen, this is a popular “library combination” for building web apps in Clojure.<sup class="footnote-ref">
+        <a href="#fn4" id="fnref4">[4]</a>
+        <a href="#sn4" id="snref4">[4]</a>
+        </sup></p>
 <p>The <code>user</code> namespace in <code>dev/user.clj</code> contains helper functions from <a href="https://github.com/weavejester/integrant-repl">Integrant-repl</a> to start, stop, and restart the Integrant system.</p>
 <div class="codeblock">
       <div>
@@ -163,11 +178,14 @@
                     <span class="token symbol">:auth</span>     <span class="token punctuation">(</span><span class="token symbol">:auth</span> server<span class="token punctuation">)</span><span class="token punctuation">}</span>
      <span class="token symbol">:database/sql</span> database<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn5" class="sidenote">
+<aside id="sn5" class="sidenote">
                <span class="sidenote-number">5.</span>
-               <div class="sidenote-content"><p>There might be some keys that you add or remove, but the structure of the config file stays the same. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>There might be some keys that you add or remove, but the structure of the config file stays the same. <a href="#snref5" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>The system map is created in code instead of being in the configuration file. This makes refactoring your system simpler as you only need to change this method while leaving the config file (mostly) untouched.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup></p>
+            </aside><p>The system map is created in code instead of being in the configuration file. This makes refactoring your system simpler as you only need to change this method while leaving the config file (mostly) untouched.<sup class="footnote-ref">
+        <a href="#fn5" id="fnref5">[5]</a>
+        <a href="#sn5" id="snref5">[5]</a>
+        </sup></p>
 <p>My current approach to Integrant + Aero config files is mostly inspired by the blog post <a href="https://robjohnson.dev/posts/aero-and-integrant/">“Rethinking Config with Aero &amp; Integrant”</a> and Laravel’s configuration. The config file follows a similar structure to Laravel’s config files and contains the app configurations without describing the structure of the system. Previously, I had a key for each Integrant component, which led to the config file being littered with <code>#ig/ref</code> and more difficult to refactor.</p>
 <p>Also, if you haven’t already, start a REPL and connect to it from your editor. Run <code>clj -M:dev</code> if your editor doesn’t automatically start a REPL. Next, we’ll implement the <code>init-key</code> and <code>halt-key!</code> methods for each of the components:</p>
 <div class="codeblock">
@@ -305,16 +323,22 @@ Server started on port  8080
                         <span class="token symbol">:auth</span> auth<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn6" class="sidenote">
+<aside id="sn6" class="sidenote">
                <span class="sidenote-number">6.</span>
-               <div class="sidenote-content"><p>"assoc" (associate) is a Clojure slang that means to add or update a key-value pair in a map. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>"assoc" (associate) is a Clojure slang that means to add or update a key-value pair in a map. <a href="#snref6" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>The <code>components-middleware</code> function takes in a map of components and creates a middleware function that “assocs” each component into the request map.<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> If you have more components such as a Redis cache or a mail service, you can add them here.</p>
-<aside id="fn7" class="sidenote">
+            </aside><p>The <code>components-middleware</code> function takes in a map of components and creates a middleware function that “assocs” each component into the request map.<sup class="footnote-ref">
+        <a href="#fn6" id="fnref6">[6]</a>
+        <a href="#sn6" id="snref6">[6]</a>
+        </sup> If you have more components such as a Redis cache or a mail service, you can add them here.</p>
+<aside id="sn7" class="sidenote">
                <span class="sidenote-number">7.</span>
-               <div class="sidenote-content"><p>For more details on how basic authentication works, check out <a href="https://www.rfc-editor.org/rfc/rfc7617.html">the specification</a>. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>For more details on how basic authentication works, check out <a href="https://www.rfc-editor.org/rfc/rfc7617.html">the specification</a>. <a href="#snref7" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>We’ll also need a middleware to handle HTTP basic authentication.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup> This middleware will check if the username and password from the request map match the values in the <code>auth</code> map injected by <code>components-middleware</code>. If they match, then the request is authenticated and the user can view the site.</p>
+            </aside><p>We’ll also need a middleware to handle HTTP basic authentication.<sup class="footnote-ref">
+        <a href="#fn7" id="fnref7">[7]</a>
+        <a href="#sn7" id="snref7">[7]</a>
+        </sup> This middleware will check if the username and password from the request map match the values in the <code>auth</code> map injected by <code>components-middleware</code>. If they match, then the request is authenticated and the user can view the site.</p>
 <div class="codeblock">
       <div>
         <span>src/acme/handler.clj</span>
@@ -597,11 +621,14 @@ Server started on port  8080
 <span class="token instruction"><span class="token keyword">EXPOSE</span> 8080</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn8" class="sidenote">
+<aside id="sn8" class="sidenote">
                <span class="sidenote-number">8.</span>
-               <div class="sidenote-content"><p>Here's a cool resource I found when researching Java Dockerfiles: <a href="https://whichjdk.com">WhichJDK</a>. It provides a comprehensive comparison of the different JDKs available and recommendations on which one you should use. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Here's a cool resource I found when researching Java Dockerfiles: <a href="https://whichjdk.com">WhichJDK</a>. It provides a comprehensive comparison of the different JDKs available and recommendations on which one you should use. <a href="#snref8" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>It’s a <a href="https://www.docker.com/blog/multi-stage-builds/">multi-stage Dockerfile</a>. We use the official Clojure Docker image as the layer to build the uberjar. Once it’s built, we copy it to a smaller Docker image that only contains the Java runtime.<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.</p>
+            </aside><p>It’s a <a href="https://www.docker.com/blog/multi-stage-builds/">multi-stage Dockerfile</a>. We use the official Clojure Docker image as the layer to build the uberjar. Once it’s built, we copy it to a smaller Docker image that only contains the Java runtime.<sup class="footnote-ref">
+        <a href="#fn8" id="fnref8">[8]</a>
+        <a href="#sn8" id="snref8">[8]</a>
+        </sup> By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.</p>
 <p>That should be all for packaging the app. We can move on to the deployment now.</p>
 <h2 id="deploying-with-fly.io" tabindex="-1"><a class="header-anchor" href="#deploying-with-fly.io">Deploying with Fly.io</a></h2>
 <p>First things first, you’ll need to <a href="https://fly.io/docs/flyctl/install/">install <code>flyctl</code></a>, Fly’s CLI tool for interacting with their platform. Create <a href="https://fly.io/app/sign-up">a Fly.io account</a> if you haven’t already. Then run <code>fly auth login</code> to authenticate <code>flyctl</code> with your account.</p>
@@ -673,11 +700,14 @@ Server started on port  8080
 <p><img loading="lazy" decoding="async" src="/articles/clojure-fly/-0hDAZFbRj-800.webp" alt="The app in action" width="800" height="488"></p>
 <p>If you made additional changes to the app or <code>fly.toml</code>, you can redeploy the app using the same command, <code>fly deploy</code>. The app is configured to auto stop/start, which helps to cut costs when there’s not a lot of traffic to the site. If you want to take down the deployment, you’ll need to delete the app itself using <code>fly app destroy &lt;your app name&gt;</code>.</p>
 <h2 id="adding-a-production-repl" tabindex="-1"><a class="header-anchor" href="#adding-a-production-repl">Adding a Production REPL</a></h2>
-<aside id="fn9" class="sidenote">
+<aside id="sn9" class="sidenote">
                <span class="sidenote-number">9.</span>
-               <div class="sidenote-content"><p>Another (non-technically important) argument for live/production REPLs is just because it's cool. Ever since I read the story about <a href="https://news.ycombinator.com/item?id=31234338">NASA's programmers debugging a spacecraft through a live REPL</a>, I've always wanted to try it at least once. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Another (non-technically important) argument for live/production REPLs is just because it's cool. Ever since I read the story about <a href="https://news.ycombinator.com/item?id=31234338">NASA's programmers debugging a spacecraft through a live REPL</a>, I've always wanted to try it at least once. <a href="#snref9" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally, I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>
+            </aside><p>This is an interesting topic in the Clojure community, with varying opinions on whether or not it’s a good idea. Personally, I find having a REPL connected to the live app helpful, and I often use it for debugging and running queries on the live database.<sup class="footnote-ref">
+        <a href="#fn9" id="fnref9">[9]</a>
+        <a href="#sn9" id="snref9">[9]</a>
+        </sup> Since we’re using SQLite, we don’t have a database server we can directly connect to, unlike Postgres or MySQL.</p>
 <p>If you’re brave, you can even restart the app directly without redeploying from the REPL. You can easily go wrong with it, which is why some prefer not to use it.</p>
 <p>For this project, we’re gonna add a <a href="https://clojure.org/reference/repl_and_main#_launching_a_socket_server">socket REPL</a>. It’s very simple to add (you just need to add a JVM option) and it doesn’t require additional dependencies like <a href="https://nrepl.org/">nREPL</a>. Let’s update the Dockerfile:</p>
 <div class="codeblock">
@@ -701,11 +731,14 @@ Server started on port  8080
 <pre class="language-dockerfile"><code class="language-dockerfile"><span class="token comment"># ...</span>
 <span class="token instruction"><span class="token keyword">ENTRYPOINT</span> [<span class="token string">"java"</span>, <span class="token string">"-Dclojure.server.repl={:port 7888,:address \"fly-local-6pn\",:accept clojure.core.server/repl}"</span>, <span class="token string">"-jar"</span>, <span class="token string">"standalone.jar"</span>]</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn10" class="sidenote">
+<aside id="sn10" class="sidenote">
                <span class="sidenote-number">10.</span>
-               <div class="sidenote-content"><p>If you encounter errors related to WireGuard when running <code>fly proxy</code>, you can run <code>fly doctor</code>, which will hopefully detect issues with your local setup and also suggest fixes for them. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>If you encounter errors related to WireGuard when running <code>fly proxy</code>, you can run <code>fly doctor</code>, which will hopefully detect issues with your local setup and also suggest fixes for them. <a href="#snref10" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>After redeploying, we can use the <code>fly proxy</code> command to forward the port from the remote server to our local machine.<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></p>
+            </aside><p>After redeploying, we can use the <code>fly proxy</code> command to forward the port from the remote server to our local machine.<sup class="footnote-ref">
+        <a href="#fn10" id="fnref10">[10]</a>
+        <a href="#sn10" id="snref10">[10]</a>
+        </sup></p>
 <div class="codeblock">
       <div>
         <span></span>

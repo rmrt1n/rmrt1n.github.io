@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Eleventy v3.1.2">
+    <meta name="generator" content="Eleventy v3.1.5">
     <meta name="description" content="true">
-    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <script src="/js/analytics.js" defer=""></script>
     <title>Ryan Martin | Advent of Code 2024 in Zig</title>
     <script src="/js/script.js" defer=""></script>
   <style id="MJX-SVG-styles">
@@ -155,6 +157,7 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
     <a href="#main" id="skip-link">Skip to main content</a>
     <header>
       <a href="/">ryanmartin.me</a>
+      <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
             <a href="/articles/">Articles</a>
           
@@ -179,11 +182,14 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
     <ul class="tags"><li><a href="/tags/#advent-of-code">#advent-of-code</a></li><li><a href="/tags/#algorithms">#algorithms</a></li><li><a href="/tags/#optimization">#optimization</a></li><li><a href="/tags/#zig">#zig</a></li></ul>
   </header>
   <section id="content">
-    <aside id="fn1" class="sidenote">
+    <aside id="sn1" class="sidenote">
                <span class="sidenote-number">1.</span>
-               <div class="sidenote-content"><p>I failed my first attempt horribly with <a href="https://clojure.org/">Clojure</a> during Advent of Code 2023. Once I reached the later half of the event, I just couldn't solve the problems with a purely functional style. I could've pushed through using imperative code, but I stubbornly chose not to and gave up... <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>I failed my first attempt horribly with <a href="https://clojure.org/">Clojure</a> during Advent of Code 2023. Once I reached the later half of the event, I just couldn't solve the problems with a purely functional style. I could've pushed through using imperative code, but I stubbornly chose not to and gave up... <a href="#snref1" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This post is about <s>six</s> seven months late, but here are my takeaways from <a href="https://adventofcode.com/">Advent of Code 2024</a>. It was my second time participating, and this time I actually managed to complete it.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> My goal was to learn a new language, <a href="https://ziglang.org/">Zig</a>, and to improve my DSA and problem-solving skills.</p>
+            </aside><p>This post is about <s>six</s> seven months late, but here are my takeaways from <a href="https://adventofcode.com/">Advent of Code 2024</a>. It was my second time participating, and this time I actually managed to complete it.<sup class="footnote-ref">
+        <a href="#fn1" id="fnref1">[1]</a>
+        <a href="#sn1" id="snref1">[1]</a>
+        </sup> My goal was to learn a new language, <a href="https://ziglang.org/">Zig</a>, and to improve my DSA and problem-solving skills.</p>
 <p>If you’re not familiar, Advent of Code is an annual programming challenge that runs every December. A new puzzle is released each day from December 1st to the 25th. There’s also a global leaderboard where people (and AI) race to get the fastest solves, but I personally don’t compete in it, mostly because I want to do it at my own pace.</p>
 <p>I went with Zig because I have been curious about it for a while, mainly because of its promise of <a href="https://www.youtube.com/watch?v=Gv2I7qTux7g">being a better C</a> and because <a href="https://tigerbeetle.com/">TigerBeetle</a> (one of the coolest databases now) is written in it. Learning Zig felt like a good way to get back into systems programming, something I’ve been wanting to do after a couple of chaotic years of web development.</p>
 <p>This post is mostly about my setup, results, and the things I learned from solving the puzzles. If you’re more interested in my solutions, I’ve also uploaded my code and solution write-ups to my <a href="https://github.com/rmrt1n/advent-of-code">GitHub repository</a>.</p>
@@ -299,11 +305,14 @@ By “readable”, I mean the code should be straightforward and easy to follow.
 <li><strong>Solutions must be a single file</strong>.
 No external dependencies. No shared utilities module. Everything needed to solve the puzzle should be visible in that one solution file.</li>
 <li>
-<aside id="fn2" class="sidenote">
+<aside id="sn2" class="sidenote">
                <span class="sidenote-number">2.</span>
-               <div class="sidenote-content"><p>The original constraint was that each solution must run in under one second. As it turned out, the code was faster than I expected, so I increased the difficulty. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>The original constraint was that each solution must run in under one second. As it turned out, the code was faster than I expected, so I increased the difficulty. <a href="#snref2" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><strong>The total runtime must be under one second</strong>.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>
+            </aside><strong>The total runtime must be under one second</strong>.<sup class="footnote-ref">
+        <a href="#fn2" id="fnref2">[2]</a>
+        <a href="#sn2" id="snref2">[2]</a>
+        </sup>
 All solutions, when run sequentially, should finish in under one second. I want to improve my performance engineering skills.</li>
 <li><strong>Parts should be solved separately</strong>.
 This means: (1) no solving both parts simultaneously, and (2) no doing extra work in part one that makes part two faster. The aim of this is to get a clear idea of how long each part takes on its own.</li>
@@ -316,11 +325,14 @@ The solution doesn’t have to work for all possible scenarios, but it should wo
 <li><strong>Hardcoding is allowed</strong>.
 For example: size of the input, number of rows and columns, etc. Since the input is known at compile-time, we can skip runtime parsing and just embed it into the program using Zig’s <code>@embedFile</code>.</li>
 </ol>
-<aside id="fn3" class="sidenote">
+<aside id="sn3" class="sidenote">
                <span class="sidenote-number">3.</span>
-               <div class="sidenote-content"><p>TigerBeetle's code quality and <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md">engineering principles</a> are just wonderful. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>TigerBeetle's code quality and <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md">engineering principles</a> are just wonderful. <a href="#snref3" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle’s codebase (minus the assertions).<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> Lastly, I just thought it would make the experience more fun.</p>
+            </aside><p>Most of these constraints are designed to push me to write clearer, more performant code. I also wanted my code to look like it was taken straight from TigerBeetle’s codebase (minus the assertions).<sup class="footnote-ref">
+        <a href="#fn3" id="fnref3">[3]</a>
+        <a href="#sn3" id="snref3">[3]</a>
+        </sup> Lastly, I just thought it would make the experience more fun.</p>
 <h2 id="favourite-puzzles" tabindex="-1"><a class="header-anchor" href="#favourite-puzzles">Favourite Puzzles</a></h2>
 <p>From all of the puzzles, here are my top 3 favourites:</p>
 <ol>
@@ -385,11 +397,14 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <pre class="language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">matches</span><span class="token punctuation">(</span>pattern<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> target <span class="token operator">==</span> pattern <span class="token keyword">or</span> target <span class="token operator">==</span> pattern<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn4" class="sidenote">
+<aside id="sn4" class="sidenote">
                <span class="sidenote-number">4.</span>
-               <div class="sidenote-content"><p>You can implement this function without any allocation by mutating the string in place or by iterating over it twice, which is probably faster than my current implementation. I kept it as-is as a reminder of what <code>comptime</code> can do. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>You can implement this function without any allocation by mutating the string in place or by iterating over it twice, which is probably faster than my current implementation. I kept it as-is as a reminder of what <code>comptime</code> can do. <a href="#snref4" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Typically, a function like this requires some dynamic allocation to create the reversed string, since the length of the string is only known at runtime.<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup> For this puzzle, since the words to reverse are known at compile-time, we can do something like this:</p>
+            </aside><p>Typically, a function like this requires some dynamic allocation to create the reversed string, since the length of the string is only known at runtime.<sup class="footnote-ref">
+        <a href="#fn4" id="fnref4">[4]</a>
+        <a href="#sn4" id="snref4">[4]</a>
+        </sup> For this puzzle, since the words to reverse are known at compile-time, we can do something like this:</p>
 <div class="codeblock">
       <div>
         <span>src/days/day04.zig</span>
@@ -402,14 +417,17 @@ For example: size of the input, number of rows and columns, etc. Since the input
     <span class="token keyword">return</span> std<span class="token punctuation">.</span>mem<span class="token punctuation">.</span><span class="token function">eql</span><span class="token punctuation">(</span><span class="token builtin-type keyword">u8</span><span class="token punctuation">,</span> word<span class="token punctuation">,</span> slice<span class="token punctuation">)</span> <span class="token keyword">or</span> std<span class="token punctuation">.</span>mem<span class="token punctuation">.</span><span class="token function">eql</span><span class="token punctuation">(</span><span class="token builtin-type keyword">u8</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>reversed<span class="token punctuation">,</span> slice<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<aside id="fn5" class="sidenote">
+<aside id="sn5" class="sidenote">
                <span class="sidenote-number">5.</span>
                <div class="sidenote-content"><p>As a bonus, I was curious as to what this looks like compiled, so I listed all the functions in this binary in GDB and found:</p>
 <pre class="language-plaintext"><code class="language-plaintext">72: static bool day04.Day04(140).matches__anon_19741;
 72: static bool day04.Day04(140).matches__anon_19750;</code></pre>
-<p>It does generate separate functions! <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+<p>It does generate separate functions! <a href="#snref5" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This creates a separate function for each word I want to reverse.<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> Each function has an array with the same size as the word to reverse. This removes the need for dynamic allocation and makes the code run faster. As a bonus, Zig also warns you when this word isn’t compile-time known, so you get an immediate error if you pass in a runtime value.</p>
+            </aside><p>This creates a separate function for each word I want to reverse.<sup class="footnote-ref">
+        <a href="#fn5" id="fnref5">[5]</a>
+        <a href="#sn5" id="snref5">[5]</a>
+        </sup> Each function has an array with the same size as the word to reverse. This removes the need for dynamic allocation and makes the code run faster. As a bonus, Zig also warns you when this word isn’t compile-time known, so you get an immediate error if you pass in a runtime value.</p>
 <h3 id="optional-types" tabindex="-1"><a class="header-anchor" href="#optional-types">Optional Types</a></h3>
 <p>A common pattern in C is to return special sentinel values to denote missing values or errors, e.g. <code>-1</code>, <code>0</code>, or <code>NULL</code>. In fact, I did this on day 13 of the challenge:</p>
 <div class="codeblock">
@@ -505,11 +523,14 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <p>That said, this isn’t a one-size-fits-all solution. This only works for algorithms that traverse the grid one step at a time. If your logic jumps multiple tiles, it can still go out of bounds (except if you increase the width of the border to account for this). This approach also uses a bit more memory than the regular approach as you have to store more characters.</p>
 <h3 id="simd-vectors" tabindex="-1"><a class="header-anchor" href="#simd-vectors">SIMD Vectors</a></h3>
 <p>This could also go in the performance section, but I’m including it here because the biggest benefit I get from using SIMD in Zig is the improved code readability. Because Zig has first-class <a href="https://ziglang.org/documentation/master/#Vectors">support for vector types</a>, you can write elegant and readable code that also happens to be faster.</p>
-<aside id="fn6" class="sidenote">
+<aside id="sn6" class="sidenote">
                <span class="sidenote-number">6.</span>
-               <div class="sidenote-content"><p>Well, not always. The number of SIMD instructions depends on the machine's native SIMD size. If the length of the vector exceeds it, Zig will compile it into multiple SIMD instructions. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Well, not always. The number of SIMD instructions depends on the machine's native SIMD size. If the length of the vector exceeds it, Zig will compile it into multiple SIMD instructions. <a href="#snref6" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>If you’re not familiar with vectors, they are a special collection type used for <a href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_data">Single instruction, multiple data (SIMD)</a> operations. SIMD allows you to perform computation on multiple values in parallel using only a single CPU instruction, which often leads to some performance boosts.<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup></p>
+            </aside><p>If you’re not familiar with vectors, they are a special collection type used for <a href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_data">Single instruction, multiple data (SIMD)</a> operations. SIMD allows you to perform computation on multiple values in parallel using only a single CPU instruction, which often leads to some performance boosts.<sup class="footnote-ref">
+        <a href="#fn6" id="fnref6">[6]</a>
+        <a href="#sn6" id="snref6">[6]</a>
+        </sup></p>
 <p>I mostly use vectors to represent positions and directions, e.g. for traversing a grid. Instead of writing code like this:</p>
 <div class="codeblock">
       <div>
@@ -545,11 +566,14 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <p>Expressing the logic as vector operations makes the code cleaner since you don’t have to write loops and conditionals as you typically would in a traditional approach.</p>
 <h2 id="performance-tips" tabindex="-1"><a class="header-anchor" href="#performance-tips">Performance Tips</a></h2>
 <p>The tips below are general performance techniques that often help, but like most things in software engineering, “it depends”. These might work 80% of the time, but performance is often highly context-specific. You should benchmark your code instead of blindly following what other people say.</p>
-<aside id="fn7" class="sidenote">
+<aside id="sn7" class="sidenote">
                <span class="sidenote-number">7.</span>
-               <div class="sidenote-content"><p>Here's a nice <a href="https://cprimozic.net/blog/optimizing-advent-of-code-2024/">post on optimising day 9's solution with Rust</a>. It's a good read if you're into performance engineering or Rust techniques. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Here's a nice <a href="https://cprimozic.net/blog/optimizing-advent-of-code-2024/">post on optimising day 9's solution with Rust</a>. It's a good read if you're into performance engineering or Rust techniques. <a href="#snref7" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>This section would’ve been more fun with concrete examples, step-by-step optimisations, and benchmarks, but that would’ve made the post way too long. Hopefully, I’ll get to write something like that in the future.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup></p>
+            </aside><p>This section would’ve been more fun with concrete examples, step-by-step optimisations, and benchmarks, but that would’ve made the post way too long. Hopefully, I’ll get to write something like that in the future.<sup class="footnote-ref">
+        <a href="#fn7" id="fnref7">[7]</a>
+        <a href="#sn7" id="snref7">[7]</a>
+        </sup></p>
 <h3 id="minimise-allocations" tabindex="-1"><a class="header-anchor" href="#minimise-allocations">Minimise Allocations</a></h3>
 <p>Whenever possible, prefer static allocation. Static allocation is cheaper since it just involves moving the stack pointer vs dynamic allocation which has more overhead from the allocator machinery. That said, it’s not always the right choice since it has some limitations, e.g. stack size is limited, memory size must be compile-time known, its lifetime is tied to the current stack frame, etc.</p>
 <p>If you need to do dynamic allocations, try to reduce the number of times you call the allocator. The number of allocations you do matters more than the amount of memory you allocate. More allocations mean more bookkeeping, synchronisation, and sometimes syscalls.</p>
@@ -624,11 +648,14 @@ For example: size of the input, number of rows and columns, etc. Since the input
 └────────┴─┬─┴─┬─┴─┬─┴─┬─┴───┴───┴───┴───┘
    up bit ─┘   │   │   └─ left bit
     right bit ─┘ down bit</code></pre>
-<aside id="fn8" class="sidenote">
+<aside id="sn8" class="sidenote">
                <span class="sidenote-number">8.</span>
-               <div class="sidenote-content"><p>One thing about packed structs is that their layout is dependent on the system endianness. Most modern systems are little-endian, so the memory layout I showed is actually reversed. Thankfully, Zig has some useful functions to convert between endianness like <code>std.mem.nativeToBig</code>, which makes working with packed structs easier. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>One thing about packed structs is that their layout is dependent on the system endianness. Most modern systems are little-endian, so the memory layout I showed is actually reversed. Thankfully, Zig has some useful functions to convert between endianness like <code>std.mem.nativeToBig</code>, which makes working with packed structs easier. <a href="#snref8" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>If your language supports struct packing, you can express this layout directly:<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup></p>
+            </aside><p>If your language supports struct packing, you can express this layout directly:<sup class="footnote-ref">
+        <a href="#fn8" id="fnref8">[8]</a>
+        <a href="#sn8" id="snref8">[8]</a>
+        </sup></p>
 <div class="codeblock">
       <div>
         <span>src/days/day06.zig</span>
@@ -647,11 +674,14 @@ For example: size of the input, number of rows and columns, etc. Since the input
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>Doing this avoids extra allocations and improves cache locality. Since the directions metadata is colocated with the tile type, all of them can fit together in cache. Accessing the directions just requires some bitwise operations instead of having to fetch them from another region of memory.</p>
-<aside id="fn9" class="sidenote">
+<aside id="sn9" class="sidenote">
                <span class="sidenote-number">9.</span>
-               <div class="sidenote-content"><p>Technically, you can store 2-digit base 26 numbers in a <code>u10</code>, as there are only <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="3.25ex" height="2.005ex" role="img" focusable="false" viewBox="0 -864 1436.6 886" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mn" transform="translate(1033,393.1) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>26</mn><mn>2</mn></msup></math></mjx-assistive-mml></mjx-container> possible numbers. Most systems usually pad values by byte size, so <code>u10</code> will still be stored as <code>u16</code>, which is why I just went straight for it. <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Technically, you can store 2-digit base 26 numbers in a <code>u10</code>, as there are only <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="3.25ex" height="2.005ex" role="img" focusable="false" viewBox="0 -864 1436.6 886" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mn" transform="translate(1033,393.1) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>26</mn><mn>2</mn></msup></math></mjx-assistive-mml></mjx-container> possible numbers. Most systems usually pad values by byte size, so <code>u10</code> will still be stored as <code>u16</code>, which is why I just went straight for it. <a href="#snref9" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Another way to do this is to represent your data using <a href="https://en.wikipedia.org/wiki/Numeral_system#Positional_systems_in_detail">alternate number bases</a>. Here’s an example from day 23. Computers are represented as two-character strings made up of only lowercase letters, e.g. <code>"bc"</code>, <code>"xy"</code>, etc. Instead of storing this as a <code>[2]u8</code> array, you can convert it into a base-26 number and store it as a <code>u16</code>.<sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></p>
+            </aside><p>Another way to do this is to represent your data using <a href="https://en.wikipedia.org/wiki/Numeral_system#Positional_systems_in_detail">alternate number bases</a>. Here’s an example from day 23. Computers are represented as two-character strings made up of only lowercase letters, e.g. <code>"bc"</code>, <code>"xy"</code>, etc. Instead of storing this as a <code>[2]u8</code> array, you can convert it into a base-26 number and store it as a <code>u16</code>.<sup class="footnote-ref">
+        <a href="#fn9" id="fnref9">[9]</a>
+        <a href="#sn9" id="snref9">[9]</a>
+        </sup></p>
 <p>Here’s the idea: map <code>'a'</code> to 0, <code>'b'</code> to 1, up to <code>'z'</code> as 25. Each character in the string becomes a digit in the base-26 number. For example,  <code>"bc"</code> ( <code>[2]u8{ 'b', 'c' }</code>) becomes the base-10 number 28 (<mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="14.33ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 6334 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g><g data-mml-node="mi" transform="translate(500,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="mn" transform="translate(1278,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(500,0)"></use></g><g data-mml-node="mo" transform="translate(2500.2,0)"><use data-c="2B" xlink:href="#MJX-TEX-N-2B"></use></g><g data-mml-node="mn" transform="translate(3500.4,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="mo" transform="translate(4278.2,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(5334,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="38" xlink:href="#MJX-TEX-N-38" transform="translate(500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mi>×</mi><mn>26</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>28</mn></math></mjx-assistive-mml></mjx-container>). If we represent this using the base-64 character set, it becomes 12 (<code>'b'</code> = 1, <code>'c'</code> = 2).</p>
 <p>While they take the same amount of space (2 bytes), a <code>u16</code> has some benefits over a <code>[2]u8</code>:</p>
 <ol>

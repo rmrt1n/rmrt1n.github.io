@@ -39,7 +39,7 @@
 }
 
 
-:target, p:has(:target) {
+:target, p:has(:target), li:has(:target) {
   animation: highlight-fade 2s ease-out forwards;
 
   @media (prefers-color-scheme: dark) {
@@ -88,6 +88,17 @@ body > header {
     &:focus {
       background-color: var(--color-bg);
       color: var(--color-links);
+    }
+  }
+
+  > a:nth-child(2) {
+    font-size: 1.125rem;
+    text-decoration: none;
+    background-color: var(--color-bg);
+    padding-left: .5rem;
+    opacity: 0;
+    &:hover {
+      opacity: 1;
     }
   }
 }
@@ -204,10 +215,20 @@ main > article {
       line-height: 1.25;
     }
 
+    .footnote-ref {
+      a:first-child { display: inline; }
+      a:last-child { display: none; }
+    }
+
     /* content-width + 2 * rail-width + 2 * rail-gap */
     @container main-layout (min-width: 85rem) {
       .footnotes, .footnotes-sep {
         display: none;
+      }
+
+      .footnote-ref {
+        a:first-child { display: none; }
+        a:last-child { display: inline; }
       }
 
       .sidenote {
@@ -431,6 +452,29 @@ table {
   rotate: 15deg;
   user-select: none;
 }
+
+/* only used in .codeblock and #ctf atm */
+button {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  padding: 0 .5rem;
+
+  &:hover {
+    background-color: white;
+    @media (prefers-color-scheme: dark) {
+      background-color: #404040;
+    }
+  }
+
+  &:active {
+    background-color: #d4d4d4;
+    @media (prefers-color-scheme: dark) {
+      background-color: black;
+    }
+  }
+}
+
 .codeblock {
   > div {
     display: flex;
@@ -448,26 +492,6 @@ table {
       line-height: 1.25;
     }
 
-    > button {
-      border: 1px solid var(--color-border);
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-      padding: 0 .5rem;
-
-      &:hover {
-        background-color: white;
-        @media (prefers-color-scheme: dark) {
-          background-color: #404040;
-        }
-      }
-
-      &:active {
-        background-color: #d4d4d4;
-        @media (prefers-color-scheme: dark) {
-          background-color: black;
-        }
-      }
-    }
   }
 
   > pre {
@@ -480,3 +504,68 @@ table {
   aspect-ratio: 16 / 9;
   background-color: var(--color-links);
 }
+
+#ctf {
+  > * + * { margin-top: .75rem; }
+
+  > div:first-child {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+    gap: .75rem;
+
+    label {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      padding: 1px 2px;
+      width: 100%;
+    }
+  }
+  > div:last-child {
+    display: flex;
+    justify-content: end;
+    gap: .75rem;
+  }
+}
+
+#banner {
+  padding: .25rem;
+  color: var(--color-fg);
+
+  &.true {
+    border: 1px solid var(--color-fg);
+    background-color: #86efac;
+  }
+  &.false {
+    border: 1px solid var(--color-fg);
+    background-color: #fca5a5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &.true {
+      background-color: #166534;
+    }
+    &.false {
+      background-color: #991b1b;
+    }
+  }
+}
+
+#pokemon {
+  img {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+/* ZXoxOjJzOXBuODFwMTEyMHIycjZwNHIyNTI4NTVzbnI2MzRv */

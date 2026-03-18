@@ -1,0 +1,123 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Eleventy v3.1.5">
+    <meta name="description" content="true">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <script src="/js/analytics.js" defer=""></script>
+    <title>Ryan Martin | Capture The Flag 🚩</title>
+    <script src="/js/script.js" defer=""></script>
+  </head>
+  <body>
+    <a href="#main" id="skip-link">Skip to main content</a>
+    <header>
+      <a href="/">ryanmartin.me</a>
+      <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
+      <nav>
+            <a href="/articles/">Articles</a>
+          
+            <a href="/tags/">Tags</a>
+          
+            <a href="/projects/">Projects</a>
+          
+            <a href="/">About</a>
+          </nav>
+    </header>
+    <div id="top"></div>
+    <main id="main">
+      
+        <h1>Capture The Flag 🚩</h1>
+      
+      <p>There are 10 flags hidden in this website. Can you find them all?</p>
+<p>A flag is any string that follows this format:</p>
+<pre class="language-plaintext"><code class="language-plaintext">rm[number]:[32-character hex string]</code></pre>
+<p>As you find flags, store them in the <a href="#flag-checker">flag checker</a>, which will
+save your progress in your browser’s local storage. Note, the checker will only
+validate your flags once you’ve found all 10. There’s a secret prize in store
+for you if you managed to find them all!</p>
+<p>This challenge is about learning new things and having fun. There are some <a href="#hints">hints</a> below,
+but if you’re stuck and need more hints, feel free to <a href="https://x.com/gud_mornign">message me on X</a>.</p>
+<p><strong>Spoiler alert!</strong> This site is open source. Please don’t spoil the fun for yourself by digging
+through the repo!</p>
+<p>To get you started, here’s the first flag: <!-- rm0:777fda6c519cd062e6d8414e96a4605e --></p>
+<h2 id="flag-checker" tabindex="-1"><a class="header-anchor" href="#flag-checker">Flag Checker</a></h2>
+<p>Enter your flags without the <code>rm.:</code> prefix:</p>
+<form id="ctf">
+  <div><label for="rm0">rm0:
+      <input required="" id="rm0" name="rm0">
+      </label><label for="rm1">rm1:
+      <input required="" id="rm1" name="rm1">
+      </label><label for="rm2">rm2:
+      <input required="" id="rm2" name="rm2">
+      </label><label for="rm3">rm3:
+      <input required="" id="rm3" name="rm3">
+      </label><label for="rm4">rm4:
+      <input required="" id="rm4" name="rm4">
+      </label><label for="rm5">rm5:
+      <input required="" id="rm5" name="rm5">
+      </label><label for="rm6">rm6:
+      <input required="" id="rm6" name="rm6">
+      </label><label for="rm7">rm7:
+      <input required="" id="rm7" name="rm7">
+      </label><label for="rm8">rm8:
+      <input required="" id="rm8" name="rm8">
+      </label><label for="rm9">rm9:
+      <input required="" id="rm9" name="rm9">
+      </label></div>
+  <div>
+    <button id="clear" type="button">Clear</button>
+    <button>Submit</button>
+  </div>
+</form>
+<div id="banner"></div>
+<h2 id="hints" tabindex="-1"><a class="header-anchor" href="#hints">Hints</a></h2>
+<p>So they’re not too obvious, I’ll give only one hint per flag… as Pokemons!</p>
+<details>
+  <summary>Click to reveal!</summary>
+  <div id="pokemon">
+    <img loading="eager" decoding="async" src="/ctf/O3TP-mdE-m-80.webp" alt="kecleon" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/mxj5ZY6JeL-80.webp" alt="smeargle" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/qIyjYjY9Vc-80.webp" alt="palkia" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/3ne2ymnvsD-80.webp" alt="porygon-z" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/LfTaUo5nmN-80.webp" alt="meowth" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/Vvuq_fPG2w-80.webp" alt="mimikyu" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/DK44SG5t9U-80.webp" alt="pikachu" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/3UwI8yxcxr-80.webp" alt="diglett" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/32Djc3s0yV-80.webp" alt="tangela" width="80" height="80">
+    <img loading="eager" decoding="async" src="/ctf/PteA4abftw-80.webp" alt="ditto" width="80" height="80">
+  </div>
+</details>
+<h2 id="about-this-ctf" tabindex="-1"><a class="header-anchor" href="#about-this-ctf">About This CTF</a></h2>
+<p>This <a href="https://en.wikipedia.org/wiki/Capture_the_flag_(cybersecurity)">capture the flag (CTF)</a> is
+made just for fun and for educational purposes. It’s designed for both CTF newcomers and veterans
+that looking for a short, cozy challenge. It’s inspired by
+<a href="https://garrit.xyz/ctf">Garrit’s Challenge</a>.</p>
+<script type="module" src="/ctf/ctf.js" defer=""></script>
+
+    </main>
+    <footer>
+      <div>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small><a href="#top">Back to top ⤴</a></small>
+      </div>
+      <small>
+        <a href="/feed.xml">
+          Subscribe via RSS
+          <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" style="height: 1.2em; width: 1.2em; vertical-align: text-bottom" viewBox="0 0 256 256">
+            <circle cx="68" cy="189" r="24" fill="currentColor"></circle>
+            <path d="M160 213h-34a82 82 0 0 0 -82 -82v-34a116 116 0 0 1 116 116z" fill="currentColor"></path>
+            <path d="M184 213A140 140 0 0 0 44 73 V 38a175 175 0 0 1 175 175z" fill="currentColor"></path>
+          </svg>
+          </a>
+      </small>
+      <small><a href="/colophon/">Colophon</a></small>
+    </footer>
+  </body>
+</html>
