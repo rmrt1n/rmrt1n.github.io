@@ -28,7 +28,19 @@ export default function (eleventyConfig) {
   }))
   eleventyConfig.amendLibrary('md', (md) => {
     md.use(footnote)
+    // See: https://github.com/markdown-it/markdown-it-footnote/blob/master/index.mjs
+    md.renderer.rules.footnote_ref = (tokens, idx, options, env, slf) => {
+      const id = slf.rules.footnote_anchor_name(tokens, idx, options, env, slf)
+      const caption = slf.rules.footnote_caption(tokens, idx, options, env, slf)
+      let refid = id
 
+      if (tokens[idx].meta.subId > 0) refid += `:${tokens[idx].meta.subId}`
+
+      return `<sup class="footnote-ref">
+        <a href="#fn${id}" id="fnref${refid}">${caption}</a>
+        <a href="#sn${id}" id="snref${refid}">${caption}</a>
+        </sup>`
+    }
     md.core.ruler.after('footnote_tail', 'sidenote_content', (state) => {
       const sidenotes = Object.fromEntries(state.tokens
         .map((token, i) => ({ token, i }))
@@ -41,13 +53,12 @@ export default function (eleventyConfig) {
           console.assert(end !== -1)
 
           const footnoteTokens = state.tokens.slice(i + 1, end)
-          const html = state.md.renderer.render(footnoteTokens, state.md.options, state.env)
+          const html = state.md.renderer.render(footnoteTokens, state.md.options, state.env).replaceAll('fnref', 'snref')
 
           return [id, html]
         }))
       state.env.sidenotes = sidenotes
     })
-
     md.core.ruler.after('sidenote_content', 'sidenote_paragraph_inject', (state) => {
       state.tokens = state.tokens.flatMap((token, i, tokens) => {
         if (
@@ -67,7 +78,7 @@ export default function (eleventyConfig) {
         const sidenote = new state.Token('html_block', '', 0)
         sidenote.content = footnotes
           .map(({ id, label }) =>
-            `<aside id="fn${label}" class="sidenote">
+            `<aside id="sn${label}" class="sidenote">
                <span class="sidenote-number">${label}.</span>
                <div class="sidenote-content">${state.env.sidenotes[id]}</div>
             </aside>`)
@@ -113,6 +124,8 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({
     './public/': '/',
+    './src/ctf/js/ctf.js': '/ctf/',
+    './src/ctf/js/sw.js': '/flag/'
   })
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])

@@ -11,3 +11,13 @@ function copy(button) {
     setTimeout(() => (button.textContent = original), 1000);
   })
 }
+
+function psst() {
+  const message = `Hi there!
+If you're reading this, you might like:
+https://ryanmartin.me/ctf/
+`
+  meow(message)
+}
+
+psst()
