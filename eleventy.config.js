@@ -124,8 +124,8 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({
     './public/': '/',
-    './src/ctf/js/ctf.js': '/ctf/',
-    './src/ctf/js/sw.js': '/flag/'
+    './src/ctf/js/ctf.js': '/ctf/ctf.js',
+    './src/ctf/js/sw.js': '/flag/sw.js'
   })
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
