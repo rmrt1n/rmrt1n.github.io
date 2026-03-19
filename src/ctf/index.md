@@ -17,7 +17,7 @@ validate your flags once you've found all 10. There's a secret prize in store
 for you if you managed to find them all!
 
 This challenge is about learning new things and having fun. There are some [hints](#hints) below,
-but if you're stuck and need more hints, feel free to [message me on X](https://x.com/gud_mornign).
+but if you're stuck and need more hints, feel free to [reach out]({{ metadata.author.x }}).
 
 **Spoiler alert!** This site is open source. Please don't spoil the fun for yourself by digging
 through the repo!
@@ -61,6 +61,8 @@ So they're not too obvious, I'll give only one hint per flag... as Pokemons!
     <img loading="eager" src="./pokemons/tangela.png" alt="tangela">
     <img loading="eager" src="./pokemons/ditto.png" alt="ditto">
   </div>
+
+  Note, the order is the same as the numbers in the flags.
 </details>
 
 ## About This CTF

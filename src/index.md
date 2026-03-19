@@ -10,13 +10,12 @@ the craft of software engineering — from compilers to command lines to user-fa
 work, I enjoy reading, playing billiards, and finding good food and drinks.
 
 Currently I'm working on the core systems behind the
-[World Engine](https://github.com/argus-labs/world-engine), an SDK for building onchain games, at
+[World Engine](https://github.com/argus-labs/world-engine), a real-time game server framework, at
 [Argus Labs](https://argus.gg).
 
 <!-- placeholder for any previous exp -->
 
-Occasionally, I write articles about the things I've learned or encountered at work. Here are a few
-recent ones:
+Occasionally, I write articles about the things I find interesting. Here are a few recent ones:
 
 <ul style="margin-left: 1rem">
   {% assign articles = collections.articles | sort: 'data.published' | reverse %}

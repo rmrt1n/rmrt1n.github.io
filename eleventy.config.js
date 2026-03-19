@@ -171,7 +171,6 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addGlobalData('eleventyComputed', {
-    eleventyExcludeFromCollections: (data) => data.draft ?? data.eleventyExcludeFromCollections,
     permalink: (data) => {
       if (data.draft) {
         const hash = crypto.createHash('md5').update(data.title).digest('hex')
