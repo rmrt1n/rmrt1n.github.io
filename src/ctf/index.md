@@ -69,7 +69,7 @@ So they're not too obvious, I'll give only one hint per flag... as Pokemons!
 
 This [capture the flag (CTF)](https://en.wikipedia.org/wiki/Capture_the_flag_(cybersecurity)) is
 made just for fun and for educational purposes. It's designed for both CTF newcomers and veterans
-that looking for a short, cozy challenge. It's inspired by
+looking for a short, cozy challenge. It's inspired by
 [Garrit's Challenge](https://garrit.xyz/ctf).
 
 <script type="module" src="/ctf/ctf.js" defer></script>
