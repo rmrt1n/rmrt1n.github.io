@@ -558,6 +558,8 @@ button {
 }
 
 #pokemon {
+  margin-bottom: .5rem;
+
   img {
     background: none;
     border: none;

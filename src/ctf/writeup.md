@@ -2,6 +2,7 @@
 layout: base.liquid
 title: The End
 permalink: /ctf/a537dbfd7610ae3ea801362d6467536b/
+eleventyExcludeFromCollections: true
 ---
 
 You've reached the end.
