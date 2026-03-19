@@ -535,14 +535,15 @@ button {
 }
 
 #banner {
-  padding: .25rem;
   color: var(--color-fg);
 
   &.true {
+    padding: .25rem;
     border: 1px solid var(--color-fg);
     background-color: #86efac;
   }
   &.false {
+    padding: .25rem;
     border: 1px solid var(--color-fg);
     background-color: #fca5a5;
   }
