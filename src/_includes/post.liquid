@@ -39,9 +39,7 @@ layout: base.liquid
       <p>Continue reading:</p>
 
       {% if page.url contains "/articles/" %}
-        {% assign posts = collections.articles | sort: 'data.published' %}
-      {% elsif page.url contains "/snippets/" %}
-        {% assign posts = collections.snippets | sort: 'data.published' %}
+        {% assign posts = collections.articles | where: 'data.draft', null | sort: 'data.published' %}
       {% endif %}
 
       {% if posts %}

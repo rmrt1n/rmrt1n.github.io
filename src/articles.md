@@ -10,13 +10,11 @@ updates via [this RSS feed](/feed.xml). If you have any feedback or corrections 
 [email](mailto:{{ metadata.author.email }}) or [message me on X]({{ metadata.author.x }})!
 
 <ul class="archive">
-  {% assign articles = collections.articles | sort: 'data.published' | reverse %} 
+  {% assign articles = collections.articles | where: 'data.draft', null | sort: 'data.published' | reverse %}
   {%- for article in articles -%}
-    {%- if not article.data.draft -%}
-      <li>
-        <time>{{ article.data.published | toISODateString }}</time>
-        <a href="{{ article.page.url }}">{{ article.data.title}}</a>
-      </li>
-    {%- endif -%}
+    <li>
+      <time>{{ article.data.published | toISODateString }}</time>
+      <a href="{{ article.page.url }}">{{ article.data.title}}</a>
+    </li>
   {%- endfor -%}
 </ul>

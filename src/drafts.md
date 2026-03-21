@@ -12,12 +12,10 @@ These are works in progress, so please don't share them yet. If you happen to sp
 any feedback, I'd love to hear them!
 
 <ol style="margin-left: 1rem">
-  {% assign articles = collections.articles | sort: 'data.updated' | reverse %}
-  {%- for article in articles -%}
-    {%- if article.data.draft -%}
-      <li>
-        <a href="{{ article.page.url }}">{{ article.data.title}}</a>
-      </li>
-    {%- endif -%}
+  {% assign drafts = collections.articles | where: 'data.draft', true | sort: 'data.updated' | reverse %}
+  {%- for draft in drafts -%}
+    <li>
+      <a href="{{ draft.page.url }}">{{ draft.data.title}}</a>
+    </li>
   {%- endfor -%}
 </ol>
