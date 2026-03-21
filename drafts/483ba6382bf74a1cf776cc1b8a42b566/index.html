@@ -1,0 +1,917 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Eleventy v3.1.5">
+    <meta name="description" content="true">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <script src="/js/analytics.js" defer=""></script>
+    <title>Ryan Martin | Lessons From Adopting Generative Testing</title>
+    <script src="/js/script.js" defer=""></script>
+  <style id="MJX-SVG-styles">
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+</style></head>
+  <body>
+    <a href="#main" id="skip-link">Skip to main content</a>
+    <header>
+      <a href="/">ryanmartin.me</a>
+      <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
+      <nav>
+            <a href="/articles/">Articles</a>
+          
+            <a href="/tags/">Tags</a>
+          
+            <a href="/projects/">Projects</a>
+          
+            <a href="/">About</a>
+          </nav>
+    </header>
+    <div id="top"></div>
+    <main id="main">
+      
+      
+<article>
+  <header>
+    
+      <p id="draft">DRAFT</p>
+    
+    <h1>Lessons From Adopting Generative Testing</h1>
+    <p> <!-- wrap with p just to make the line height consistent -->
+      <time></time>
+    </p>
+    <ul class="tags"><li><a href="/tags/#fuzzing">#fuzzing</a></li><li><a href="/tags/#go">#go</a></li><li><a href="/tags/#testing">#testing</a></li></ul>
+  </header>
+  <section id="content">
+    <p>Over the past few months, I rewrote most of my test suite. It was a cleanup effort as well as a chance to rethink how I approach testing, something I’ve been neglecting for most of my programming career.</p>
+<aside id="sn1" class="sidenote">
+               <span class="sidenote-number">1.</span>
+               <div class="sidenote-content"><p>Only the tests were slop, I actually put a lot of thought into the code itself! <a href="#snref1" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>There were two main reasons for rewriting my tests. The first reason was that the codebase I’ve been working on has grown, and more people are now working on it, however the existing tests weren’t adequate. At the time, they were the largest source of tech debt in the project, and I’m mostly to blame for that… Most of the tests were half-broken, vibe-coded slop just there to satisfy <a href="https://about.codecov.io/">Codecov</a>.<sup class="footnote-ref">
+        <a href="#fn1" id="fnref1">[1]</a>
+        <a href="#sn1" id="snref1">[1]</a>
+        </sup></p>
+<p>The other reason was that I wanted to try generative testing. I’m a big fan of <a href="https://tigerbeetle.com/">TigerBeetle</a> and <a href="https://antithesis.com/">Antithesis</a>, both well known for their focus on software correctness and rigorous testing. I’ve read many of their blog posts and learned a lot of techniques and ideas, which I’ve always wanted to apply to my own projects.</p>
+<p>The combination of tech debt pressure and unsatisfied curiosity eventually pushed me to delete my existing tests and rewrite them the way I imagined they should be. This post goes through that process and what I learned from it.</p>
+<aside class="toc"><div>
+      <h2 id="toc"><a href="#toc" class="header-anchor">Table of Contents</a></h2><ol><li><a href="#notes-on-terminology">Notes on Terminology</a></li><li><a href="#rethinking-my-testing-approach">Rethinking My Testing Approach</a><ol><li><a href="#properties-over-examples">Properties Over Examples</a></li><li><a href="#system-wide-fuzzing">System-Wide Fuzzing</a></li><li><a href="#testing-with-intent">Testing with Intent</a></li></ol></li><li><a href="#the-system-under-test">The System Under Test</a></li><li><a href="#property-based-testing-techniques">Property-Based Testing Techniques</a><ol><li><a href="#testing-data-structures">Testing Data Structures</a></li><li><a href="#swarm-testing">Swarm Testing</a></li><li><a href="#concerns-with-model-based-testing">Concerns with Model-Based Testing</a></li><li><a href="#reducing-the-state-space">Reducing the State Space</a></li><li><a href="#on-tooling">On Tooling</a></li></ol></li><li><a href="#(almost)-deterministic-simulation-testing">(Almost) Deterministic Simulation Testing</a><ol><li><a href="#how-it-works">How it Works</a></li><li><a href="#expectations-vs-reality">Expectations VS Reality</a></li></ol></li><li><a href="#end-to-end-fuzzing">End-to-End Fuzzing</a></li><li><a href="#what%E2%80%99s-next%3F">What’s Next?</a></li></ol></div></aside>
+<h2 id="notes-on-terminology" tabindex="-1"><a class="header-anchor" href="#notes-on-terminology">Notes on Terminology</a></h2>
+<p>Before going into more details, I just want to clarify some terms I’ll use. There are a lot of overloaded terms in testing (and software in general), and people often use the same words to mean different things. You may disagree with these, that’s fine. This is just what I mean when I use them.</p>
+<p>I use only two scopes for tests:</p>
+<ol>
+<li><strong>Unit tests</strong>: Tests scoped to any component or subsystem of the full system. The size doesn’t matter. It can be a single function, a module, or a group of modules. Some people will call tests that span multiple units “integration tests”, but I disagree. That definition is too ambiguous. I use the term “integration” to describe a different concept.</li>
+<li><strong>System tests</strong>: Tests scoped to the entire system. I also consider tests that replace production components with test versions to still be system tests, as long as the overall system is exercised as a whole.</li>
+</ol>
+<p>I use the term <strong>integration tests</strong> for tests (any scope) that interact with “black boxes”, e.g. third-party services, filesystems, networks, databases, etc. Or, in functional programming terms, impure tests. Tests without “integration” in their name implicitly mean pure tests. Also, I use the term <strong>end-to-end (E2E) tests</strong> specifically for system-scoped integration tests.</p>
+<h2 id="rethinking-my-testing-approach" tabindex="-1"><a class="header-anchor" href="#rethinking-my-testing-approach">Rethinking My Testing Approach</a></h2>
+<p>Before starting the rewrite, I spent some time thinking about how to approach it and what my tests should look like. As you can already tell from the title of this post, most of the rewrite involves writing generative tests.</p>
+<p>Generative testing is basically a catch-all term for tests where you write code that generates test cases, instead of you specifying the test cases themselves. This includes randomised approaches like property-based testing or <a href="https://en.wikipedia.org/wiki/Fuzzing">fuzzing</a>, and non-random ones where you try every possible input.</p>
+<aside id="sn2" class="sidenote">
+               <span class="sidenote-number">2.</span>
+               <div class="sidenote-content"><p>I like comparing PBT and fuzzing to <a href="https://en.wikipedia.org/wiki/Convergent_evolution">convergent evolution</a>, which is when species of different lineages evolve similar features. PBT came from functional programming, fuzzing came much earlier from systems/security. The approach is similar, but their focus is different (program correctness vs security issues). Yes, I got this from <a href="https://antithesis.com/product/how_is_antithesis_different/#property-based-testing-vs.-antithesis">Antithesis</a>. <a href="#snref2" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>Note, I’ll use the terms “PBT” and “fuzzing” interchangeably going forward. Both involve using randomised input to test some property of the system. There are subtle differences, but in practice they’re minor enough that I just consider them the same. <sup class="footnote-ref">
+        <a href="#fn2" id="fnref2">[2]</a>
+        <a href="#sn2" id="snref2">[2]</a>
+        </sup></p>
+<p>Here are some of the main ideas that guided the rewrite:</p>
+<h3 id="properties-over-examples" tabindex="-1"><a class="header-anchor" href="#properties-over-examples">Properties Over Examples</a></h3>
+<aside id="sn3" class="sidenote">
+               <span class="sidenote-number">3.</span>
+               <div class="sidenote-content"><p>I recommend reading <a href="https://antithesis.com/resources/property_based_testing/">Antithesis's PBT primer</a> first, and then <a href="https://fsharpforfunandprofit.com/series/property-based-testing/">F# for Fun and Profit's PBT series</a> for some more practical tips. <a href="#snref3" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p><a href="https://en.wikipedia.org/wiki/Software_testing#Property_testing">Property-based testing (PBT)</a> is a testing approach where you specify properties of your code and throw randomised input at it to break those properties. I’m not going to explain it in detail here as there are already plenty of good resources online, and I don’t have anything new to add.<sup class="footnote-ref">
+        <a href="#fn3" id="fnref3">[3]</a>
+        <a href="#sn3" id="snref3">[3]</a>
+        </sup> Here, I’ll just talk about my case for PBT.</p>
+<p>While the system is still small, I wanted to catch most bugs early so they don’t compound as the system grows. The existing example-based tests are limited in this regard, as they only cover cases I already know. PBT is much more effective as they uncover cases and scenarios that we forgot or may never have thought of.</p>
+<p>In other words, <strong>property-based tests find bugs; example-based tests catch regressions</strong>.</p>
+<p>My plan was to replace most of the existing tests with property-based tests, keeping a few select example-based tests, which are still useful for:</p>
+<ul>
+<li><strong>Smoke tests</strong>: Sanity checks of the happy path, sometimes including common error cases . I mainly use them for code that doesn’t need extensive testing, e.g. thin wrappers or simple glue code.</li>
+<li><strong>Documentation</strong>: Example-based tests are more readable, so I leave some to illustrate API usage or internal behaviour.</li>
+<li><strong>Regression tests</strong>: Dedicated tests to ensure new changes don’t reintroduce known bugs.</li>
+</ul>
+<h3 id="system-wide-fuzzing" tabindex="-1"><a class="header-anchor" href="#system-wide-fuzzing">System-Wide Fuzzing</a></h3>
+<p>System tests are usually the most valuable as they validate your system as a whole. The hardest bugs usually emerge only when components are used together. PBT/fuzzing is scope-agnostic, so it makes a whole lot of sense to also apply it in system tests.</p>
+<aside id="sn4" class="sidenote">
+               <span class="sidenote-number">4.</span>
+               <div class="sidenote-content"><p>My real reason for adopting DST is just because I think it's cool. It's what got me interested in TigerBeetle in the first place. <a href="#snref4" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>There are two approaches I went with for this: the infamous deterministic simulation testing (DST) and traditional full-system fuzzing.<sup class="footnote-ref">
+        <a href="#fn4" id="fnref4">[4]</a>
+        <a href="#sn4" id="snref4">[4]</a>
+        </sup></p>
+<p>DST is basically just a system-scoped property-based test. Sure, it involves extra steps like replacing non-deterministic components (e.g. network, disk, clock, etc.) with deterministic counterparts, but the overall flow is the same as regular fuzzing or stateful PBT. If you like to learn more about DST, I recommend reading <a href="https://antithesis.com/resources/deterministic_simulation_testing/">Antithesis’s DST primer</a> or <a href="https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html">Phil Eaton’s blog post</a>.</p>
+<p>The main pitch of DST is that it finds the most outlandish bugs for you while keeping them perfectly reproducible, but as I eventually learned, it’s not the silver bullet I initially thought it was. More on this later!</p>
+<p>The other approach is an E2E test where we fuzz the system in its production configuration, i.e. replacing the non-deterministic components. This means that the test runs in wall clock time and that they may be flaky, but it provides more coverage as the bugs it catches may not show up in DST. This follows the same principles as <a href="https://tigerbeetle.com/blog/2025-02-13-a-descent-into-the-vortex/">TigerBeetle’s Vortex</a>.</p>
+<h3 id="testing-with-intent" tabindex="-1"><a class="header-anchor" href="#testing-with-intent">Testing with Intent</a></h3>
+<p>This isn’t related to generative testing, but I still think it’s worth including. One thing I started to pay more attention to now in my tests is the intent or thought behind it.</p>
+<p>It’s a similar concept to design. If you read design case studies or write-ups, you might be surprised at the amount of thought put into seemingly trivial details. Every decision is made on purpose. It’s the same for code. I think through the program’s architecture and how to structure the code, but I’ve always neglected doing it for tests.</p>
+<p>You may argue that tests already have a purpose by default, e.g. to verify correctness, catch regressions, etc. I’m talking about stuff beyond that. Stuff like:</p>
+<ul>
+<li>Is this test testing intended behaviour, or is it just copying your implementation? The latter gives you false confidence, e.g. you can cover every branch and still be wrong.</li>
+<li>How should I test this? Not everything needs the same level of testing. Sometimes a simple smoke test is enough vs a full-blown exhaustive test.</li>
+<li>Do I need a test for this? Do I care enough about this to add a test? Every code you add is code you have to maintain.</li>
+</ul>
+<p>Thinking about a test’s intent also forces you to reason about the SUT. I treat it as a design exercise; others describe it like an <a href="https://spawn-queue.acm.org/doi/10.1145/3291276.3294770">experiment’s hypothesis</a>. I’ve also started adding comments on my tests to make them easier for other developers to understand, e.g. why it exists, what behaviour/properties it checks, how it actually verifies them, etc.</p>
+<h2 id="the-system-under-test" tabindex="-1"><a class="header-anchor" href="#the-system-under-test">The System Under Test</a></h2>
+<p>Here’s a brief overview of the SUT to give you context for the examples later. All examples in this post are drawn from <strong>Cardinal</strong>, the game server component of the <a href="https://github.com/Argus-Labs/world-engine">World Engine</a> stack. It’s written in <a href="https://go.dev/">Go</a>.</p>
+<p>To be more specific, Cardinal is a <a href="https://gamedev.stackexchange.com/questions/81608/what-is-a-tick-in-the-context-of-game-development">tick-based</a> game server framework built around an <a href="https://docs.unity3d.com/Packages/com.unity.entities@6.5/manual/concepts-ecs.html">archetypal</a> <a href="https://en.wikipedia.org/wiki/Entity_component_system">entity-component-system (ECS)</a> core. Users implement game logic as systems, which are executed each tick to advance the world state. Cardinal communicates with other services through <a href="https://nats.io/">NATS</a> and persists state using periodic snapshots.</p>
+<p>Every tick, Cardinal injects commands received from external services (e.g. game clients) into the ECS core and runs the registered systems. These systems process commands, update the world state, and emit events. After the tick ends, event handlers publish the emitted events to NATS for other services to consume.</p>
+<p>Here’s a diagram showing Cardinal’s high-level architecture:</p>
+<p><img loading="lazy" decoding="async" src="/drafts/483ba6382bf74a1cf776cc1b8a42b566/krFIKhquxE-1420.webp" alt="Cardinal's architecture diagram" width="1420" height="1444"></p>
+<p>Ok, hope that made sense. Now, on to the testing techniques.</p>
+<h2 id="property-based-testing-techniques" tabindex="-1"><a class="header-anchor" href="#property-based-testing-techniques">Property-Based Testing Techniques</a></h2>
+<p>The hardest part of PBT is figuring out what properties to test, so I think one of the best ways to learn is to just see a lot of examples and start recognising patterns. Most of the techniques mentioned here came from <a href="https://tigerbeetle.com/blog/">TigerBeetle’s blog</a> and <a href="https://github.com/tigerbeetle/tigerbeetle">source code</a>, as that’s where I learned them. If you’re also interested in PBT/fuzzing, definitely give them a read!</p>
+<h3 id="testing-data-structures" tabindex="-1"><a class="header-anchor" href="#testing-data-structures">Testing Data Structures</a></h3>
+<p>Cardinal is mostly made up of data structures. Testing them is a bit different from pure functions often used in PBT examples. With pure functions, you simply assert on the output. With data structures, there are two ways to do it:</p>
+<ol>
+<li><strong>Assert internal properties (invariants).</strong>
+An invariant is a condition that must always be true. You can test these if your tests have access to internal fields, or by placing <a href="https://tigerstyle.dev/#assertions">assertions</a> directly in the implementation.</li>
+<li><strong>Assert against a model.</strong>
+This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, state machine testing, differential testing, etc. In MBT, you compare the behaviour of your implementation against a model with the same <strong>semantics</strong>. The model can be a simplified implementation or a trusted reference, e.g. a data structure from your language’s standard library.</li>
+</ol>
+<p>The idea is simple: run the same operations on both your implementation and the model, and assert that their states match.</p>
+<p>I’ll use Cardinal’s <code>componentManager</code> to illustrate. Here’s what it looks like:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/component.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> componentManager <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	nextID    componentID            <span class="token comment">// The next available component ID</span>
+	catalog   <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>componentID <span class="token comment">// Component name -&gt; component ID</span>
+	factories <span class="token punctuation">[</span><span class="token punctuation">]</span>columnFactory        <span class="token comment">// Component ID -&gt; column factory</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// register registers a new component type and returns its ID.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token function">register</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> factory columnFactory<span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token comment">// getID returns a component's ID given its name.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token function">getID</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>While the manager does more internally, the bulk of its work is for component registrations, which basically involves mapping component IDs to their names. Since this behaviour is essentially like a map, I used Go’s built-in <code>map</code> as the model because it has the same semantics. Here’s a simplified version of the test:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/component_internal_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+	impl <span class="token operator">:=</span> <span class="token function">newComponentManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	model <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>componentID<span class="token punctuation">)</span>
+
+	operations <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>opRegister<span class="token punctuation">,</span> opGetID<span class="token punctuation">}</span> <span class="token comment">// Just string constants</span>
+	<span class="token keyword">for</span> <span class="token keyword">range</span> <span class="token number">10_000</span> <span class="token punctuation">{</span>
+		<span class="token keyword">switch</span> testutils<span class="token punctuation">.</span><span class="token function">RandOp</span><span class="token punctuation">(</span>prng<span class="token punctuation">,</span> weights<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// Pick a random operation</span>
+		<span class="token keyword">case</span> opRegister<span class="token punctuation">:</span>
+			name <span class="token operator">:=</span> <span class="token function">randValidComponentName</span><span class="token punctuation">(</span>prng<span class="token punctuation">)</span>
+			implID<span class="token punctuation">,</span> implErr <span class="token operator">:=</span> impl<span class="token punctuation">.</span><span class="token function">register</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+			modelID<span class="token punctuation">,</span> modelExists <span class="token operator">:=</span> model<span class="token punctuation">[</span>name<span class="token punctuation">]</span>
+
+			require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> implErr<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> modelExists <span class="token punctuation">{</span>
+        <span class="token comment">// Property: duplicate registrations return same ID.</span>
+				assert<span class="token punctuation">.</span><span class="token function">Equal</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> modelID<span class="token punctuation">,</span> implID<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+				model<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> implID
+			<span class="token punctuation">}</span>
+		<span class="token keyword">case</span> opGetID<span class="token punctuation">:</span>
+			name <span class="token operator">:=</span> <span class="token function">randProbablyRegisteredComponentName</span><span class="token punctuation">(</span>prng<span class="token punctuation">)</span> <span class="token comment">// Can return non-existent keys</span>
+			implID<span class="token punctuation">,</span> implErr <span class="token operator">:=</span> impl<span class="token punctuation">.</span><span class="token function">getID</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span>
+			modelID<span class="token punctuation">,</span> modelExists <span class="token operator">:=</span> model<span class="token punctuation">[</span>name<span class="token punctuation">]</span>
+
+			<span class="token comment">// Property: getID returns same existence and value as model.</span>
+			assert<span class="token punctuation">.</span><span class="token function">Equal</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> modelExists<span class="token punctuation">,</span> implErr <span class="token operator">==</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+			<span class="token keyword">if</span> modelExists <span class="token punctuation">{</span>
+				assert<span class="token punctuation">.</span><span class="token function">Equal</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> modelID<span class="token punctuation">,</span> implID<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// Property: implementation matches model.</span>
+	assert<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> impl<span class="token punctuation">.</span>catalog<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>model<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> name<span class="token punctuation">,</span> modelID <span class="token operator">:=</span> <span class="token keyword">range</span> model <span class="token punctuation">{</span>
+		implID<span class="token punctuation">,</span> err <span class="token operator">:=</span> impl<span class="token punctuation">.</span><span class="token function">getID</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span>
+		require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		assert<span class="token punctuation">.</span><span class="token function">Equal</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> modelID<span class="token punctuation">,</span> implID<span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>Now you might be thinking: wait, doesn’t the implementation also use a <code>map</code>? The model is the same as the implementation. Your test essentially just compares two different maps here. Is this test even doing anything?</p>
+<p>I had similar doubts too when I first wrote this. The benefits of this test aren’t obvious at first (to me at least), but it becomes clear once you change the implementation. For example, I could replace the map with an exotic data structure to get a 100x performance boost. This test will still work (as long as the semantics are the same, of course) because it tests the behaviour, not the implementation.</p>
+<p>Note, MBT and internal assertions aren’t mutually exclusive. Ideally, you should use both. It’s not shown in the example above, but I also have assertions in the implementation to guard against invalid states. They check for different things: <strong>internal assertions ensure invariants hold, MBT ensures it behaves correctly</strong>.</p>
+<h3 id="swarm-testing" tabindex="-1"><a class="header-anchor" href="#swarm-testing">Swarm Testing</a></h3>
+<p>I complement all my model-based tests with <a href="https://tigerbeetle.com/blog/2025-04-23-swarm-testing-data-structures/">swarm testing</a>. In the previous example, the test picks a random operation, where every operation has the same chance of being selected (a uniform distribution). In practice, this usually doesn’t lead to interesting scenarios.</p>
+<p>The idea behind swarm testing is to randomise the test configuration. In our case, that means randomising which operations are performed. We can do this by picking a subset of all possible operations and assigning each a random weight (probability of being picked).</p>
+<p>TigerBeetle uses <a href="https://www.openmymind.net/Basic-MetaProgramming-in-Zig/">Zig’s metaprogramming magic</a> to automatically derive operations from a struct’s fields. You could probably do this in Go using <a href="https://go.dev/blog/laws-of-reflection">runtime reflection</a>, which I only realised while writing this… What I ended up doing was writing helper functions that take a hardcoded list of operations and randomises them:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/testutils/random.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> OpWeights <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">uint64</span> <span class="token comment">// Operation names -&gt; weights</span>
+
+<span class="token comment">// RandOpWeights selects a random subset of operations and assigns random weights to them.</span>
+<span class="token comment">// At minimum 1 operation is enabled, at most all operations are enabled.</span>
+<span class="token keyword">func</span> <span class="token function">RandOpWeights</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span> OpWeights <span class="token punctuation">{</span>
+	assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>ops<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"you need multiple operations to randomize"</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Randomly select how many operations to enable (1 to len(ops)).</span>
+	numEnabled <span class="token operator">:=</span> <span class="token number">1</span> <span class="token operator">+</span> r<span class="token punctuation">.</span><span class="token function">IntN</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>ops<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Shuffle and take the first numEnabled operations.</span>
+	shuffled <span class="token operator">:=</span> slices<span class="token punctuation">.</span><span class="token function">Clone</span><span class="token punctuation">(</span>ops<span class="token punctuation">)</span>
+	r<span class="token punctuation">.</span><span class="token function">Shuffle</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>shuffled<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		shuffled<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> shuffled<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> shuffled<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> shuffled<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+	<span class="token punctuation">}</span><span class="token punctuation">)</span>
+	weights <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">uint64</span><span class="token punctuation">,</span> numEnabled<span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token keyword">range</span> numEnabled <span class="token punctuation">{</span>
+		weights<span class="token punctuation">[</span>shuffled<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">uint64</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> r<span class="token punctuation">.</span><span class="token function">IntN</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> weights
+<span class="token punctuation">}</span>
+
+<span class="token comment">// RandWeightedOp returns a random weighted operation from a OpWeights.</span>
+<span class="token keyword">func</span> <span class="token function">RandWeightedOp</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops OpWeights<span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span>
+	<span class="token keyword">var</span> total <span class="token builtin">uint64</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> weight <span class="token operator">:=</span> <span class="token keyword">range</span> ops <span class="token punctuation">{</span>
+		total <span class="token operator">+=</span> weight
+	<span class="token punctuation">}</span>
+	pick <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token function">Uint64N</span><span class="token punctuation">(</span>total<span class="token punctuation">)</span>
+	<span class="token keyword">for</span> op<span class="token punctuation">,</span> weight <span class="token operator">:=</span> <span class="token keyword">range</span> ops <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> pick <span class="token operator">&lt;</span> weight <span class="token punctuation">{</span>
+			<span class="token keyword">return</span> op
+		<span class="token punctuation">}</span>
+		pick <span class="token operator">-=</span> weight
+	<span class="token punctuation">}</span>
+	<span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">"unreachable"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>Here’s what the previous test looks like with swarm testing:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/component_internal_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+
+	<span class="token comment">// Get a random weighted subset of your operations.</span>
+	operations <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>opRegister<span class="token punctuation">,</span> opGetID<span class="token punctuation">}</span>
+	weights <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">RandOpWeights</span><span class="token punctuation">(</span>prng<span class="token punctuation">,</span> operations<span class="token punctuation">)</span>
+
+	<span class="token keyword">for</span> <span class="token keyword">range</span> <span class="token number">10_000</span> <span class="token punctuation">{</span>
+		op <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">RandWeightedOp</span><span class="token punctuation">(</span>prng<span class="token punctuation">,</span> weights<span class="token punctuation">)</span>
+		<span class="token keyword">switch</span> op <span class="token punctuation">{</span>
+		<span class="token keyword">case</span> opRegister<span class="token punctuation">:</span>
+			<span class="token comment">// ...</span>
+		<span class="token keyword">case</span> opGetID<span class="token punctuation">:</span>
+			<span class="token comment">// ...</span>
+	<span class="token punctuation">}</span>
+	<span class="token comment">// ...</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>Initially, I thought regular MBT was enough, until I found a bug in one of my code. It’s the type of bug that can be found faster through swarm testing. Here’s a snippet of the buggy code from Cardinal’s event manager type. Can you spot the issue?</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/event/event.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">NewManager</span><span class="token punctuation">(</span>channelCapacity <span class="token builtin">int</span><span class="token punctuation">)</span> Manager <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> Manager<span class="token punctuation">{</span>
+		channel<span class="token punctuation">:</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> Event<span class="token punctuation">,</span> channelCapacity<span class="token punctuation">)</span><span class="token punctuation">,</span>
+		<span class="token comment">// ...</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Enqueue enqueues an event into the Manager.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Manager<span class="token punctuation">)</span> <span class="token function">Enqueue</span><span class="token punctuation">(</span>event Event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	e<span class="token punctuation">.</span>channel <span class="token operator">&lt;-</span> event
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>The bug here is that <code>Enqueue</code> <strong>blocks when the channel capacity is reached</strong>.</p>
+<p>The existing tests never found it, and it never happened during local development, so this bug went unnoticed for a long time. While I was writing the model tests, I experimented with increasing the number of operations. The tests eventually got stuck, revealing the bug.</p>
+<p>This is exactly the kind of bug swarm testing helps catch. The original test runs both enqueue and dequeue operations, so the channel never fills up. If the dequeue operation is disabled, or is less likely to be picked, the channel quickly reaches capacity, and the bug becomes obvious!</p>
+<p>After fixing the bug, I added a regression test to ensure it doesn’t happen again:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/event/event_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestEvent_EnqueueChannelFull</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	synctest<span class="token punctuation">.</span><span class="token function">Test</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">const</span> channelCapacity <span class="token operator">=</span> <span class="token number">16</span>
+		<span class="token keyword">const</span> totalEvents <span class="token operator">=</span> channelCapacity <span class="token operator">*</span> <span class="token number">3</span> <span class="token comment">// Well beyond channel capacity</span>
+
+		impl <span class="token operator">:=</span> event<span class="token punctuation">.</span><span class="token function">NewManager</span><span class="token punctuation">(</span>channelCapacity<span class="token punctuation">)</span>
+
+		<span class="token comment">// Enqueue more events than channel capacity.</span>
+		<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token keyword">range</span> totalEvents <span class="token punctuation">{</span>
+				impl<span class="token punctuation">.</span><span class="token function">Enqueue</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>Event<span class="token punctuation">{</span>Kind<span class="token punctuation">:</span> event<span class="token punctuation">.</span>KindDefault<span class="token punctuation">,</span> Payload<span class="token punctuation">:</span> i<span class="token punctuation">}</span><span class="token punctuation">)</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		<span class="token comment">// Wait for all goroutines to complete or durably block.</span>
+		<span class="token comment">// If enqueue blocks, synctest.Test will detect deadlock and fail.</span>
+		synctest<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		<span class="token comment">// Extra property checks...</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>This test uses Go’s new <a href="https://pkg.go.dev/testing/synctest"><code>testing/synctest</code></a> to detect deadlocks. Unlike traditional timeout-based tests, goroutines spawned inside the <code>synctest.Test</code> bubble are tracked, which allows the runtime to detect deadlocks/leaks quicker and deterministically.</p>
+<h3 id="concerns-with-model-based-testing" tabindex="-1"><a class="header-anchor" href="#concerns-with-model-based-testing">Concerns with Model-Based Testing</a></h3>
+<p>A big concern I had when writing these tests was how do I know whether my model is correct. I’m usually confident when the models are from Go’s standard library, since they’ve probably been tested to death by maintainers and by users in production.</p>
+<p>But sometimes the standard library doesn’t have anything with the same behaviour as the data structure I’m testing. In these cases, I’m forced to write my own simplified model implementation. The hard part was verifying the model. How do I know if it’s correct? Do I test my model? What do I test it against? Should I test my tests? It’s turtles all the way down.</p>
+<aside id="sn5" class="sidenote">
+               <span class="sidenote-number">5.</span>
+               <div class="sidenote-content"><p>There are some approaches that address this problem (somewhat), e.g. <a href="https://en.wikipedia.org/wiki/metamorphic_testing">metamorphic testing</a>. It solves this by using oracles derived from the tests themselves (through special properties called metamorphic relations), but it's not a universal solution. <a href="#snref5" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>Turns out this is a well-known problem called the <a href="https://en.wikipedia.org/wiki/Test_oracle">test oracle problem</a>. A test oracle is basically what determines the correct output of a test. In example-based tests, you are the oracle because you specify the expected output. In MBT, the model is the oracle. As far as I know, there’s no complete solution this problem.<sup class="footnote-ref">
+        <a href="#fn5" id="fnref5">[5]</a>
+        <a href="#sn5" id="snref5">[5]</a>
+        </sup></p>
+<p>My only practical suggestion is to make your models (and tests in general) “obviously correct”. Prioritise simplicity and clarity above everything else. Keep the code short and easy to audit. It doesn’t matter if it’s slow or inelegant. Ideally, you should be able to convince yourself (and others) that the code is correct just by reading it.</p>
+<h3 id="reducing-the-state-space" tabindex="-1"><a class="header-anchor" href="#reducing-the-state-space">Reducing the State Space</a></h3>
+<p>Some behaviours are surprisingly difficult to test, especially when they depend on many interacting variables. The number of possible variable combinations grows quickly, leading to a state space explosion. When this happens, uniform random sampling becomes less effective as most samples fall into “empty space” rather than edges and boundaries where bugs often hide.</p>
+<p>Here’s an example. Cardinal’s ECS has the concept of <strong>archetypes</strong>. An archetype represents a unique combination of component types. It stores a list of entities belonging to that archetype as well as their component data. Here’s what it looks like:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/archetype.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> archetype <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	id         archetypeID      <span class="token comment">// Corresponds to the index in the archetypes array</span>
+	components bitmap<span class="token punctuation">.</span>Bitmap    <span class="token comment">// Bitmap of components contained in this archetype</span>
+	rows       sparseSet        <span class="token comment">// Maps entity ID -&gt; row index in entities and columns</span>
+	entities   <span class="token punctuation">[</span><span class="token punctuation">]</span>EntityID       <span class="token comment">// List of entities of this archetype</span>
+	columns    <span class="token punctuation">[</span><span class="token punctuation">]</span>abstractColumn <span class="token comment">// List of columns containing component data</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>When components are added to and/or removed from an entity, it is moved to a different archetype with the required component set. This operation involves creating the entity in the destination archetype, copying its components, and removing it from the source archetype:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/archetype.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token comment">// moveEntity moves an entity from one archetype to another.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>a <span class="token operator">*</span>archetype<span class="token punctuation">)</span> <span class="token function">moveEntity</span><span class="token punctuation">(</span>destination <span class="token operator">*</span>archetype<span class="token punctuation">,</span> eid EntityID<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">if</span> a <span class="token operator">==</span> destination <span class="token punctuation">{</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">}</span>
+	row<span class="token punctuation">,</span> exists <span class="token operator">:=</span> a<span class="token punctuation">.</span>rows<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>eid<span class="token punctuation">)</span>
+	assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>exists<span class="token punctuation">,</span> <span class="token string">"entity is not in archetype"</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Create a new entity in the destination archetype with the id.</span>
+	destination<span class="token punctuation">.</span><span class="token function">newEntity</span><span class="token punctuation">(</span>eid<span class="token punctuation">)</span>
+	newRow<span class="token punctuation">,</span> exists <span class="token operator">:=</span> destination<span class="token punctuation">.</span>rows<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>eid<span class="token punctuation">)</span>
+	assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>exists<span class="token punctuation">,</span> <span class="token string">"new entity isn't created in the destination archetype"</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Move entity's components to the new archetype.</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> dst <span class="token operator">:=</span> <span class="token keyword">range</span> destination<span class="token punctuation">.</span>columns <span class="token punctuation">{</span>
+		<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> src <span class="token operator">:=</span> <span class="token keyword">range</span> a<span class="token punctuation">.</span>columns <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> dst<span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> src<span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				value <span class="token operator">:=</span> src<span class="token punctuation">.</span><span class="token function">getAbstract</span><span class="token punctuation">(</span>row<span class="token punctuation">)</span>
+				dst<span class="token punctuation">.</span><span class="token function">setAbstract</span><span class="token punctuation">(</span>newRow<span class="token punctuation">,</span> value<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+	<span class="token comment">// Remove the entity from the current archetype, which also updates the row mapping.</span>
+	a<span class="token punctuation">.</span><span class="token function">removeEntity</span><span class="token punctuation">(</span>eid<span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>There are a lot of variables involved in a move operation:</p>
+<ul>
+<li>The source and destination archetypes.</li>
+<li>The number of components added, removed, or copied.</li>
+<li>The number of entities in both archetypes.</li>
+<li>Which entity is being moved.</li>
+</ul>
+<p>If we only consider the source and destination archetypes, the input space is already huge. If there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.009ex" height="1.545ex" role="img" focusable="false" viewBox="0 -683 888 683" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D441" xlink:href="#MJX-TEX-I-1D441"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>N</mi></math></mjx-assistive-mml></mjx-container> component types, there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.74ex" height="1.914ex" role="img" focusable="false" viewBox="0 -846 1210.9 846" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="mi" transform="translate(533,363) scale(0.707)"><use data-c="1D441" xlink:href="#MJX-TEX-I-1D441"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mi>N</mi></msup></math></mjx-assistive-mml></mjx-container> possible archetypes (<a href="https://www.geeksforgeeks.org/dsa/number-distinct-subsets-set/">distinct subsets</a>). Cardinal supports up to <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.919ex" height="1.887ex" role="img" focusable="false" viewBox="0 -833.9 1290.1 833.9" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup></math></mjx-assistive-mml></mjx-container> component types, so the theoretical number of archetypes is <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="4.628ex" height="2.155ex" role="img" focusable="false" viewBox="0 -952.7 2045.4 952.7" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g><g data-mml-node="mo" transform="translate(1679.1,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mo stretchy="false">(</mo><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup><mo stretchy="false">)</mo></mrow></msup></math></mjx-assistive-mml></mjx-container>. This means there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="11.015ex" height="2.155ex" role="img" focusable="false" viewBox="0 -952.7 4868.7 952.7" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g><g data-mml-node="mo" transform="translate(1679.1,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g><g data-mml-node="mi" transform="translate(2045.4,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="msup" transform="translate(2823.4,0)"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g><g data-mml-node="mo" transform="translate(1679.1,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mo stretchy="false">(</mo><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup><mo stretchy="false">)</mo></mrow></msup><mi>×</mi><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mo stretchy="false">(</mo><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup><mo stretchy="false">)</mo></mrow></msup></math></mjx-assistive-mml></mjx-container> source-destination pairs. That’s a number with <strong>258,583 digits</strong>!</p>
+<aside id="sn6" class="sidenote">
+               <span class="sidenote-number">6.</span>
+               <div class="sidenote-content"><p>this is probably why shrinking in pbt works. while the original intent is too create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#snref6" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>To make testing this more effective, I intentionally limited the size of the state space. The rationale is based on the <a href="https://dspace.mit.edu/bitstream/handle/1721.1/149864/MIT-LCS-TR-735.pdf">small scope hypothesis</a>, which argues that most bugs can be found within small input sizes.<sup class="footnote-ref">
+        <a href="#fn6" id="fnref6">[6]</a>
+        <a href="#sn6" id="snref6">[6]</a>
+        </sup> Larger inputs don’t necessarily lead to new execution paths. Borrowing the words of <a href="https://matklad.github.io/">Matklad</a>:</p>
+<blockquote>
+<p>Most of the bugs involve small, tricky examples. If a sorting routine breaks on some array with ten thousand elements it’s highly likely that there’s a much smaller array (a handful of elements), which exposes the same bug.</p>
+</blockquote>
+<p>With a smaller scope, we can now feasibly test all possible variable combinations exhaustively. Some of you might already know where I’m heading here. Yes, I’m talking about <a href="https://matklad.github.io/2021/11/07/generate-all-the-things.html">Exhaustigen</a>. It’s a helper library for generating combinations of multiple variables exhaustively. I ported TigerBeetle’s Zig version to Go, which you can find <a href="#">here</a>.</p>
+<p>For my archetype move test, I reduced my variables to:</p>
+<ul>
+<li>Maximum 6 component types, which results in 64 possible archetypes. This produces <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="10.792ex" height="2.165ex" role="img" focusable="false" viewBox="0 -875 4770.1 957" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="36" xlink:href="#MJX-TEX-N-36"></use><use data-c="34" xlink:href="#MJX-TEX-N-34" transform="translate(500,0)"></use></g><g data-mml-node="mn" transform="translate(1033,404.1) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g><g data-mml-node="mo" transform="translate(1714.3,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(2770.1,0)"><use data-c="34" xlink:href="#MJX-TEX-N-34"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use><use data-c="39" xlink:href="#MJX-TEX-N-39" transform="translate(1000,0)"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(1500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>64</mn><mn>2</mn></msup><mo>=</mo><mn>4096</mn></math></mjx-assistive-mml></mjx-container> source-destination pairs. I arrived at this number after some experimentation. Higher counts lead to exponentially longer test runs.</li>
+<li>1-3 entities in the source and 0-2 entities in the destination. The source must have at least one entity to move.</li>
+<li>The entity to be moved is randomly chosen from the source. Entities and components are stored in slices under the hood. This verifies moves work correctly regardless of whether the entity is at the beginning, middle, or end of the slice.</li>
+</ul>
+<p>With that, my number of test cases becomes: <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="24.01ex" height="1.971ex" role="img" focusable="false" viewBox="0 -677 10612.2 871" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="34" xlink:href="#MJX-TEX-N-34"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use><use data-c="39" xlink:href="#MJX-TEX-N-39" transform="translate(1000,0)"></use><use data-c="36" xlink:href="#MJX-TEX-N-36" transform="translate(1500,0)"></use></g><g data-mml-node="mi" transform="translate(2000,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="mn" transform="translate(2778,0)"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use></g><g data-mml-node="mi" transform="translate(3278,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="mn" transform="translate(4056,0)"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use></g><g data-mml-node="mi" transform="translate(4556,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="mn" transform="translate(5334,0)"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use></g><g data-mml-node="mo" transform="translate(6111.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(7167.6,0)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use><use data-c="31" xlink:href="#MJX-TEX-N-31" transform="translate(500,0)"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(1000,0)"></use></g><g data-mml-node="mo" transform="translate(8667.6,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mn" transform="translate(9112.2,0)"><use data-c="35" xlink:href="#MJX-TEX-N-35"></use><use data-c="39" xlink:href="#MJX-TEX-N-39" transform="translate(500,0)"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(1000,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4096</mn><mi>×</mi><mn>3</mn><mi>×</mi><mn>3</mn><mi>×</mi><mn>3</mn><mo>=</mo><mn>110</mn><mo>,</mo><mn>592</mn></math></mjx-assistive-mml></mjx-container>. This is small enough to run in under a second, but large enough to go beyond the simplest cases.</p>
+<p>Here’s a simplified version of the test:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/internal/ecs/archetype_internal_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestArchetype_MoveExhaustive</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+
+	<span class="token comment">// Generate all possible subsets (archetype) with N component types.</span>
+	<span class="token keyword">const</span> maxComponents <span class="token operator">=</span> <span class="token number">6</span>
+	pool <span class="token operator">:=</span> <span class="token function">newArchetypePool</span><span class="token punctuation">(</span>maxComponents<span class="token punctuation">)</span>
+
+	<span class="token comment">// Exhaustively test combinations of source * destination * entity count * moved entity row.</span>
+	gen <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewGen</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> <span class="token operator">!</span>gen<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		src <span class="token operator">:=</span> pool<span class="token punctuation">[</span>gen<span class="token punctuation">.</span><span class="token function">Index</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>pool<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token comment">// Randomize source</span>
+		dst <span class="token operator">:=</span> pool<span class="token punctuation">[</span>gen<span class="token punctuation">.</span><span class="token function">Index</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>pool<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token comment">// Randomize destination</span>
+
+		<span class="token comment">// Populate source with 1-3 entities, destination with 0-2 entities.</span>
+		countSrc <span class="token operator">:=</span> gen<span class="token punctuation">.</span><span class="token function">Range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token comment">// Randomize source entity count</span>
+		<span class="token keyword">for</span> eid <span class="token operator">:=</span> <span class="token keyword">range</span> countSrc <span class="token punctuation">{</span>
+			src<span class="token punctuation">.</span><span class="token function">newEntity</span><span class="token punctuation">(</span><span class="token function">EntityID</span><span class="token punctuation">(</span>eid<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">}</span>
+		countDst <span class="token operator">:=</span> gen<span class="token punctuation">.</span><span class="token function">Range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token comment">// Randomize destination entity count</span>
+		<span class="token keyword">for</span> eid <span class="token operator">:=</span> <span class="token keyword">range</span> countDst <span class="token punctuation">{</span>
+			dst<span class="token punctuation">.</span><span class="token function">newEntity</span><span class="token punctuation">(</span><span class="token function">EntityID</span><span class="token punctuation">(</span>countSrc <span class="token operator">+</span> eid<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">// Entity IDs are globally unique</span>
+		<span class="token punctuation">}</span>
+
+		<span class="token comment">// Pick which entity to move.</span>
+		row <span class="token operator">:=</span> gen<span class="token punctuation">.</span><span class="token function">Index</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>src<span class="token punctuation">.</span>entities<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">// Randomize moved entity row</span>
+		eid <span class="token operator">:=</span> src<span class="token punctuation">.</span>entities<span class="token punctuation">[</span>row<span class="token punctuation">]</span>
+
+		<span class="token keyword">if</span> src <span class="token operator">==</span> dst <span class="token punctuation">{</span>
+			assert<span class="token punctuation">.</span><span class="token function">NotPanics</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				src<span class="token punctuation">.</span><span class="token function">moveEntity</span><span class="token punctuation">(</span>dst<span class="token punctuation">,</span> eid<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"self move should be a no-op and must not panic"</span><span class="token punctuation">)</span>
+			<span class="token keyword">continue</span>
+		<span class="token punctuation">}</span>
+
+		src<span class="token punctuation">.</span><span class="token function">moveEntity</span><span class="token punctuation">(</span>dst<span class="token punctuation">,</span> eid<span class="token punctuation">)</span> <span class="token comment">// Do the actual move.</span>
+
+		<span class="token comment">// Assert properties here...</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>Exhaustigen’s API is so nicely designed. It still amazes me that this small amount of code is enough to cover all variable combinations. It does some intricate machinery under the hood, so if you’re curious about how it works, check out the <a href="https://matklad.github.io/2021/11/07/generate-all-the-things.html">original blog post</a>!</p>
+<h3 id="on-tooling" tabindex="-1"><a class="header-anchor" href="#on-tooling">On Tooling</a></h3>
+<p>I didn’t use any third-party PBT libraries, e.g. <a href="https://github.com/flyingmutant/rapid">Rapid</a>, or Go’s <code>testing/quick</code> and <code>testing.F</code>. For my use cases, Go’s <code>rand.Rand</code> <a href="https://en.wikipedia.org/wiki/Pseudorandom_number_generator">PRNG</a> already provided most of the functionality I needed.</p>
+<p>As I wrote the tests, I gradually extracted utilities once the patterns became clear. These helpers live in a small <code>testutils</code> package. The first thing I added was support for a global seed for the test PRNGs.</p>
+<p>Since PBT relies on randomness, rerunning the same test can produce different results. To make failures reproducible, I seed all test PRNGs with the same value. If a test fails, I can reproduce it by rerunning it using the same seed:</p>
+<pre class="language-bash"><code class="language-bash"><span class="token assign-left variable">TEST_SEED</span><span class="token operator">=</span>0x0123456789abcdef go <span class="token builtin class-name">test</span> ./<span class="token punctuation">..</span>.</code></pre>
+<p>The seed is printed if you run the tests with the <code>-v</code> (verbose) flag. Here’s the code for it:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/testutils/random.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">var</span> Seed <span class="token builtin">uint64</span> <span class="token comment">// Global test seed</span>
+
+<span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	Seed <span class="token operator">=</span> <span class="token function">uint64</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">UnixNano</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> envSeed <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Getenv</span><span class="token punctuation">(</span><span class="token string">"TEST_SEED"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> envSeed <span class="token operator">!=</span> <span class="token string">""</span> <span class="token punctuation">{</span>
+		parsed<span class="token punctuation">,</span> err <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">ParseUint</span><span class="token punctuation">(</span>envSeed<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">64</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span> <span class="token comment">// Only set using the env if it's valid</span>
+			Seed <span class="token operator">=</span> parsed
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"to reproduce: TEST_SEED=0x%x\n"</span><span class="token punctuation">,</span> Seed<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">NewRand</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand <span class="token punctuation">{</span>
+	t<span class="token punctuation">.</span><span class="token function">Helper</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">// We derive a unique seed for each test by XOR-ing the global seed with a hash of the test name.</span>
+	h <span class="token operator">:=</span> fnv<span class="token punctuation">.</span><span class="token function">New64a</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>t<span class="token punctuation">.</span><span class="token function">Name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+	perTest <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Sum64</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> rand<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>rand<span class="token punctuation">.</span><span class="token function">NewPCG</span><span class="token punctuation">(</span>Seed<span class="token operator">^</span>perTest<span class="token punctuation">,</span> Seed<span class="token operator">^</span><span class="token punctuation">(</span>perTest<span class="token operator">&lt;&lt;</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<aside id="sn7" class="sidenote">
+               <span class="sidenote-number">7.</span>
+               <div class="sidenote-content"><p>I tried to keep the explanation short earlier, so here's a concrete example. Some of my integration tests share a single, in-memory NATS server. When tests used the same seed, I noticed they would sometimes fail. The reason for this is that multiple tests were accessing the same NATS subjects, even though the tests were meant to be isolated. Using a different seed for each test solves this.</p>
+<p>Also, before the rewrite, each test would create its own NATS server. This is simpler, but it fails when there are a lot of parallel tests. The tests would use up all memory in CI (and sometimes in my local machine) and <a href="https://en.wikipedia.org/wiki/Out_of_memory">OOM</a>. <a href="#snref7" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>Tests use <code>NewRand</code> as their source of randomness. Each test also uses a different seed, which is derived from the same original seed. This prevents parallel tests from generating the same random values. While this isn’t a problem for isolated tests, some tests share a common resource, e.g. a server or database. Using the same seed could cause them to pick the same resources, leading to collisions and tests corrupting other tests.<sup class="footnote-ref">
+        <a href="#fn7" id="fnref7">[7]</a>
+        <a href="#sn7" id="snref7">[7]</a>
+        </sup></p>
+<h2 id="(almost)-deterministic-simulation-testing" tabindex="-1"><a class="header-anchor" href="#(almost)-deterministic-simulation-testing">(Almost) Deterministic Simulation Testing</a></h2>
+<p>After I finished with the unit tests, I moved on to implement DST. Cardinal wasn’t initially designed with DST in mind, so it took quite a few refactors to get it mostly there. Almost all of the non-deterministic parts are stubbed out, except for the concurrent systems scheduler.</p>
+<aside id="sn8" class="sidenote">
+               <span class="sidenote-number">8.</span>
+               <div class="sidenote-content"><p>It's technically easy to replace, and I'm also considering replacing it with a simpler, sequential version, but first, I need to do some benchmarks with a lot of different system schedules to understand the implications. It'll take a while, so I decided to just leave it there so I could get the DST set up first. <a href="#snref8" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>It’s a bit difficult to replace, so I just left it there.<sup class="footnote-ref">
+        <a href="#fn8" id="fnref8">[8]</a>
+        <a href="#sn8" id="snref8">[8]</a>
+        </sup> To guard against scheduler bugs that may not be 100% reproducible, I wrote extra tests to verify the scheduler’s internal concurrency works correctly. This way, I can still have confidence in its behaviour without needing to fully eliminate its non-determinism.</p>
+<aside id="sn9" class="sidenote">
+               <span class="sidenote-number">9.</span>
+               <div class="sidenote-content"><p>Which is also, my coding agent of choice :) <a href="#snref9" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>I’ve always thought it would be hard to implement DST, considering my first reference is <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/internals/vopr.md">TigerBeetle’s VOPR</a>, which has a huge number of components and configurations. Then, I stumbled upon this <a href="https://wickstrom.tech/2025-08-28-findings-bugs-coding-agent-lightweight-dst.html">blog post</a> by Oskar Wickstrom about implementing a lightweight DST for <a href="https://ampcode.com">Amp</a>.<sup class="footnote-ref">
+        <a href="#fn9" id="fnref9">[9]</a>
+        <a href="#sn9" id="snref9">[9]</a>
+        </sup> It showed me that at its core, DST isn’t really a complicated concept, which made DST more attemptable.</p>
+<aside id="sn10" class="sidenote">
+               <span class="sidenote-number">10.</span>
+               <div class="sidenote-content"><p>There's another way to do DST in Go. This <a href="https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go">blog post</a> by <a href="https://www.polarsignals.com/">Polar Signals</a> explains how they implemented DST in Go by compiling their program to <a href="https://go.dev/wiki/WebAssembly">WASM</a> and (slightly) modifying the Go runtime. <a href="#snref10" class="footnote-backref">↩︎</a></p>
+</div>
+            </aside><p>I had the same realisation while writing the model-based tests. They looked a whole lot like the lightweight DST from the blog post. And they are! DST is basically just a bigger model-based test, with non-deterministic components stubbed out. Since I already wrote a lot of them, implementing the DST didn’t turn out to be too hard.<sup class="footnote-ref">
+        <a href="#fn10" id="fnref10">[10]</a>
+        <a href="#sn10" id="snref10">[10]</a>
+        </sup></p>
+<h3 id="how-it-works" tabindex="-1"><a class="header-anchor" href="#how-it-works">How it Works</a></h3>
+<p>I don’t remember where I first learned this, but TigerBeetle is structured so that it moves in fixed ticks, where each tick time is injected. In production use, this uses a regular wall clock, but in simulation, it uses a simulated clock. Well, Cardinal is a tick-based game server! It was already well-prepared for DST in this regard.</p>
+<p>Cardinal only updates its state on every call to <code>Tick</code>:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/cardinal.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token comment">// NOTE: The World type is Cardinal.</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>World<span class="token punctuation">)</span> <span class="token function">Tick</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> timestamp time<span class="token punctuation">.</span>Time<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	w<span class="token punctuation">.</span>currentTick<span class="token punctuation">.</span>timestamp <span class="token operator">=</span> timestamp
+
+	<span class="token comment">// Collect the commands for this tick.</span>
+	<span class="token boolean">_</span> <span class="token operator">=</span> w<span class="token punctuation">.</span>commands<span class="token punctuation">.</span><span class="token function">Drain</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Tick ECS world.</span>
+	w<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Emit events.</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> w<span class="token punctuation">.</span>events<span class="token punctuation">.</span><span class="token function">Dispatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+		w<span class="token punctuation">.</span>tel<span class="token punctuation">.</span>Logger<span class="token punctuation">.</span><span class="token function">Warn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Msg</span><span class="token punctuation">(</span><span class="token string">"errors encountered dispatching events"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// Publish snapshot every N ticks.</span>
+	<span class="token keyword">if</span> w<span class="token punctuation">.</span>currentTick<span class="token punctuation">.</span>height<span class="token operator">%</span><span class="token function">uint64</span><span class="token punctuation">(</span>w<span class="token punctuation">.</span>options<span class="token punctuation">.</span>SnapshotRate<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+		snapshotCtx<span class="token punctuation">,</span> cancel <span class="token operator">:=</span> context<span class="token punctuation">.</span><span class="token function">WithTimeout</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token number">2</span><span class="token operator">*</span>time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+		w<span class="token punctuation">.</span><span class="token function">snapshot</span><span class="token punctuation">(</span>snapshotCtx<span class="token punctuation">,</span> timestamp<span class="token punctuation">)</span>
+		<span class="token function">cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// Increment tick height.</span>
+	w<span class="token punctuation">.</span>currentTick<span class="token punctuation">.</span>height<span class="token operator">++</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>In production use, Cardinal’s <code>StartGame</code> method handles its lifecycle. This basically runs an infinite loop, calling <code>Tick</code> every N seconds. For the simulation test, all we have to do is just replace <code>StartGame</code> and have the test harness control Cardinal using <code>Tick</code>.</p>
+<p>Here’s a simplified version of the DST harness:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/dst.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">RunDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token operator">*</span>World<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+	cfg <span class="token operator">:=</span> <span class="token function">newDSTConfig</span><span class="token punctuation">(</span>prng<span class="token punctuation">)</span>
+	fix <span class="token operator">:=</span> <span class="token function">newDSTFixture</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> cfg<span class="token punctuation">,</span> setup<span class="token punctuation">)</span>
+
+	<span class="token comment">// Add the world's commmands as operations in the dst config.</span>
+	cfg<span class="token punctuation">.</span><span class="token function">addCommandsAsOperations</span><span class="token punctuation">(</span>fix<span class="token punctuation">.</span>world<span class="token punctuation">)</span>
+	cfg<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token comment">// Log the test config</span>
+
+	<span class="token comment">// The main test loop:</span>
+	tick <span class="token operator">:=</span> <span class="token number">0</span>
+	<span class="token keyword">for</span> tick <span class="token operator">&lt;</span> cfg<span class="token punctuation">.</span>Ticks <span class="token punctuation">{</span>
+		op <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">RandWeightedOp</span><span class="token punctuation">(</span>prng<span class="token punctuation">,</span> cfg<span class="token punctuation">.</span>OpWeights<span class="token punctuation">)</span>
+		<span class="token keyword">switch</span> <span class="token punctuation">{</span>
+		<span class="token keyword">case</span> op <span class="token operator">==</span> opTick<span class="token punctuation">:</span>
+			timestamp <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token function">int64</span><span class="token punctuation">(</span>tick<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+			fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">Background</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> timestamp<span class="token punctuation">)</span>
+			<span class="token comment">// Assert structural ECS invariants after every tick.</span>
+			ecs<span class="token punctuation">.</span><span class="token function">CheckWorld</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span>world<span class="token punctuation">)</span>
+			tick<span class="token operator">++</span>
+
+		<span class="token keyword">case</span> strings<span class="token punctuation">.</span><span class="token function">HasPrefix</span><span class="token punctuation">(</span>op<span class="token punctuation">,</span> opCommandPrefix<span class="token punctuation">)</span><span class="token punctuation">:</span>
+			cmdName <span class="token operator">:=</span> strings<span class="token punctuation">.</span><span class="token function">TrimPrefix</span><span class="token punctuation">(</span>op<span class="token punctuation">,</span> opCommandPrefix<span class="token punctuation">)</span>
+			cmd <span class="token operator">:=</span> fix<span class="token punctuation">.</span><span class="token function">randCommand</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> prng<span class="token punctuation">,</span> cmdName<span class="token punctuation">)</span>
+			require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span>commands<span class="token punctuation">.</span><span class="token function">Enqueue</span><span class="token punctuation">(</span>cmd<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+		<span class="token keyword">case</span> op <span class="token operator">==</span> opRestart<span class="token punctuation">:</span>
+			fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		<span class="token keyword">case</span> op <span class="token operator">==</span> opSnapshotRestore<span class="token punctuation">:</span>
+			fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">restore</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">Background</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// Final validation after all randomized operations complete.</span>
+	ecs<span class="token punctuation">.</span><span class="token function">CheckWorld</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span>world<span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>This test does a few things:</p>
+<ol>
+<li>Create a test configuration with random values. There are only a few ATM, and no fancy fault injections, but it’s a start.</li>
+<li>Initialises Cardinal with that configuration and replaces non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic versions that contains assertions. The non-deterministic parts are tested separately in integration tests.</li>
+<li>Register systems using the user-provided <code>setup</code> function. I’ll talk more about this soon.</li>
+<li>Extract type information from the command types used in the systems using reflection. We’ll use this to generate random commands to send to the Cardinal.</li>
+<li>Run for N ticks (configurable) and perform a random operation each time.</li>
+<li>We switch between several operations: tick the world, send a random command, reset the world, and restore from a snapshot. The tick operation is always enabled, but the rest are random (as in swarm testing).</li>
+<li>We validate the internal state every tick and at the end of the test.</li>
+</ol>
+<p>While implementing this, there was a major design choice I had to make. Cardinal is a framework, and its input is user-provided game logic in the form of systems. I’ll refer to this set of systems as just “game”. The test harness above can only verify Cardinal’s internal invariants. It cannot verify whether the game is logically correct. I had to make a choice between:</p>
+<ul>
+<li>Keeping the harness specific to a single, hand-coded game designed to test Cardinal. This allows us to add more instrumentation to verify some extra invariants and also to validate the game logic, but also means it must be a private type to access the required internal fields.</li>
+<li>Make the harness game-agnostic and public. This gives a few benefits, namely, users can use it with their games, and we also get free inputs to test Cardinal on. We can only verify a subset of all our properties, but we’re more likely to get something we didn’t expect.</li>
+</ul>
+<p>In the end, I went with the second design, mainly because we can explore more of the state space with it. If we had stuck with a single input, the harness might be biased.</p>
+<p>So now, we have an importable DST harness that users can use, but not to test their game logic, rather to test that Cardinal works correctly with it. Here’s what its usage looks like:</p>
+<div class="codeblock">
+      <div>
+        <span>example_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">import</span> <span class="token string">"github.com/argus-labs/world-engine/pkg/cardinal"</span>
+
+<span class="token keyword">func</span> <span class="token function">YourTestDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	cardinal<span class="token punctuation">.</span><span class="token function">RunDST</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>w <span class="token operator">*</span>cardinal<span class="token punctuation">.</span>World<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token comment">// Register your systems here...</span>
+		cardinal<span class="token punctuation">.</span><span class="token function">RegisterSystem</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> system<span class="token punctuation">.</span>PlayerSpawnerSystem<span class="token punctuation">,</span> cardinal<span class="token punctuation">.</span><span class="token function">WithHook</span><span class="token punctuation">(</span>cardinal<span class="token punctuation">.</span>Init<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		cardinal<span class="token punctuation">.</span><span class="token function">RegisterSystem</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> system<span class="token punctuation">.</span>CreatePlayerSystem<span class="token punctuation">)</span>
+		cardinal<span class="token punctuation">.</span><span class="token function">RegisterSystem</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> system<span class="token punctuation">.</span>RegenSystem<span class="token punctuation">)</span>
+		cardinal<span class="token punctuation">.</span><span class="token function">RegisterSystem</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> system<span class="token punctuation">.</span>AttackPlayerSystem<span class="token punctuation">)</span>
+	<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<h3 id="expectations-vs-reality" tabindex="-1"><a class="header-anchor" href="#expectations-vs-reality">Expectations VS Reality</a></h3>
+<p>So initially, I tested with a simple game that I asked AI to write. I was really excited because of all the hype around DST, like how it seemingly found all the bugs in <a href="https://www.foundationdb.org/">FoundationDB</a>. The first time I ran it, the test froze. When I reran it, it froze again! My DST has found my first bug!</p>
+<p>After some investigation, I found out that it was a bug in Cardinal’s scheduler. It’s a deadlock that happens only when the world is reset after an odd number of ticks. A ridiculous bug! I probably would’ve caught this myself in local development, but the fact that the simulator caught it this fast was amazing.</p>
+<p>Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but it turned out to be a bug in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn’t sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free? Was it finding bugs but I didn’t have the correct assertions to catch them?</p>
+<p>I don’t know the answer. And it seems I wasn’t the only one with this issue. I was watching the <a href="https://youtu.be/UHdPnubbzBI?si=8Ulo3BXc3x8a5Fr-">BugBash Podcast episode</a> with the co-authors of <a href="https://dataintensive.net/">DDIA (2nd edition)</a>, and <a href="https://cnr.sh/">Chris Riccomini</a> talked about his experience adding DST to <a href="https://slatedb.io/">SlateDB</a>. He mentioned things like DST being high-investment but low-return, didn’t explore that much state, and that it only found three known bugs. This matched perfectly with my (short) experience!</p>
+<p>Chris also mentioned that a better approach might be to apply DST on subcomponents much earlier in the process instead of going all in with full-system DST, which would’ve given more value much earlier. Coincidentally, this is what I did (if you count the model-based tests as DST), and it also aligns with my experience. I had caught several bugs from those tests. It’s probably why my DST didn’t catch many bugs, but that’s just my wishful thinking.</p>
+<p>I’ll also add this quote from <a href="https://antithesis.com/author/will-wilson/">Will Wilson</a>, the CEO of Antithesis:</p>
+<blockquote>
+<p>The biggest challenge of DST in my experience is that tuning all the random distributions, the parameters of your system, the workload, the fault injection, etc. so that it produces interesting behaviour is very challenging and very labor intensive. As with fuzzing or PBT, it’s terrifyingly easy to build a DST system that appears to be doing a ton of testing, but actually never explores very much of the state space of your system. At FoundationDB, the vast majority of the work we put into the simulator was an iterative process of hunting for what wasn’t being covered by our tests and then figuring out how to make the tests better. This process often resembles science more than it does engineering.</p>
+</blockquote>
+<p>I’m still not giving up, though. My DST harness is still small, which means it can only grow from here. I already have several improvements in mind, so I’ll stick with it for a bit longer.</p>
+<h2 id="end-to-end-fuzzing" tabindex="-1"><a class="header-anchor" href="#end-to-end-fuzzing">End-to-End Fuzzing</a></h2>
+<p>The final test I added was the E2E tests. This actually followed a similar structure to the DST, where we set up Cardinal with user-provided game logic and bombard it with randomised commands. The biggest difference is that it runs with the same, non-deterministic configuration as it would in production.</p>
+<p>The actual harness code is pretty gnarly, so here’s an extremely simplified version of it:</p>
+<div class="codeblock">
+      <div>
+        <span>pkg/cardinal/e2e.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">RunE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup E2ESetupFunc<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+	cfg <span class="token operator">:=</span> <span class="token function">newE2EConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	fix <span class="token operator">:=</span> <span class="token function">newE2EFixture</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> setup<span class="token punctuation">)</span>
+
+	<span class="token comment">// Add the world's commmands as operations in the dst config.</span>
+	cfg<span class="token punctuation">.</span><span class="token function">addCommandsAsOperations</span><span class="token punctuation">(</span>fix<span class="token punctuation">.</span>world<span class="token punctuation">)</span>
+	cfg<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span> <span class="token comment">// Log the test config</span>
+
+	<span class="token comment">// Start the world's run loop in a background goroutine.</span>
+	ctx<span class="token punctuation">,</span> cancel <span class="token operator">:=</span> context<span class="token punctuation">.</span><span class="token function">WithCancel</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">Background</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	runErr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">error</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		runErr <span class="token operator">&lt;-</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+	<span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	deadline <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">After</span><span class="token punctuation">(</span>cfg<span class="token punctuation">.</span>Duration<span class="token punctuation">)</span>
+sendLoop<span class="token punctuation">:</span>
+	<span class="token keyword">for</span> <span class="token punctuation">{</span>
+		<span class="token keyword">select</span> <span class="token punctuation">{</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>deadline<span class="token punctuation">:</span>
+			err <span class="token operator">:=</span> <span class="token function">stopWorld</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>errors<span class="token punctuation">.</span><span class="token function">Is</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> context<span class="token punctuation">.</span>Canceled<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				t<span class="token punctuation">.</span><span class="token function">Fatalf</span><span class="token punctuation">(</span><span class="token string">"world.run returned unexpected error: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span>
+			<span class="token keyword">break</span> sendLoop
+		<span class="token keyword">default</span><span class="token punctuation">:</span>
+			name <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">RandWeightedOp</span><span class="token punctuation">(</span>prng<span class="token punctuation">,</span> cfg<span class="token punctuation">.</span>CommandWeights<span class="token punctuation">)</span>
+			cmd <span class="token operator">:=</span> fix<span class="token punctuation">.</span><span class="token function">randCommand</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> prng<span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+			fix<span class="token punctuation">.</span><span class="token function">sendCommand</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> cmd<span class="token punctuation">)</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// Final validation after the world has fully stopped.</span>
+	ecs<span class="token punctuation">.</span><span class="token function">CheckWorld</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> fix<span class="token punctuation">.</span>world<span class="token punctuation">.</span>world<span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<p>All this does is run Cardinal in a separate goroutine and send it randomised requests. Unlike in DST, where you control the number of ticks to run, here you control the test duration. Since it uses wall clock time, it’ll run much slower than other tests. This is why I made the E2E tests disabled by default. To run them, pass the <code>-e2e.run</code> flag to <code>go test</code>.</p>
+<p>The usage API is also similar to DST, but instead of passing a function to register systems, you’d return the actual <code>cardinal.World</code> instead. In DST, we randomise Cardinal’s config, but in the E2E test we want it to have the same config as production to test more realistically:</p>
+<div class="codeblock">
+      <div>
+        <span>example_test.go</span>
+        <button onclick="copy(this)">Copy</button>
+      </div>
+<pre class="language-go"><code class="language-go"><span class="token keyword">import</span> <span class="token string">"github.com/argus-labs/world-engine/pkg/cardinal"</span>
+
+<span class="token keyword">func</span> <span class="token function">TestE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	cardinal<span class="token punctuation">.</span><span class="token function">RunE2E</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>cardinal<span class="token punctuation">.</span>World <span class="token punctuation">{</span>
+		world<span class="token punctuation">,</span> err <span class="token operator">:=</span> cardinal<span class="token punctuation">.</span><span class="token function">NewWorld</span><span class="token punctuation">(</span>cardinal<span class="token punctuation">.</span>WorldOptions<span class="token punctuation">{</span>
+			<span class="token comment">// Your world configuration...</span>
+		<span class="token punctuation">}</span><span class="token punctuation">)</span>
+		require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+
+		<span class="token comment">// Register systems here...</span>
+
+		<span class="token keyword">return</span> world
+	<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p></p></div><p></p>
+<h2 id="what%E2%80%99s-next%3F" tabindex="-1"><a class="header-anchor" href="#what%E2%80%99s-next%3F">What’s Next?</a></h2>
+<p>Phew… That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with almost 7000 words. If you read the entire thing, big props to you.</p>
+<p>Here’s the <a href="github.com/Argus-Labs/world-engine/">source code</a> if you want to take a closer look. After all this, I’m even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a <a href="https://antithesis.com/blog/deterministic_hypervisor/">deterministic hypervisor</a> :), formal methods, etc.</p>
+<p><img loading="lazy" decoding="async" src="/drafts/483ba6382bf74a1cf776cc1b8a42b566/q6JJPjYOAk-1080.webp" alt="Big plans for this code beaver meme" width="1080" height="1075"></p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Only the tests were slop, I actually put a lot of thought into the code itself! <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>I like comparing PBT and fuzzing to <a href="https://en.wikipedia.org/wiki/Convergent_evolution">convergent evolution</a>, which is when species of different lineages evolve similar features. PBT came from functional programming, fuzzing came much earlier from systems/security. The approach is similar, but their focus is different (program correctness vs security issues). Yes, I got this from <a href="https://antithesis.com/product/how_is_antithesis_different/#property-based-testing-vs.-antithesis">Antithesis</a>. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>I recommend reading <a href="https://antithesis.com/resources/property_based_testing/">Antithesis’s PBT primer</a> first, and then <a href="https://fsharpforfunandprofit.com/series/property-based-testing/">F# for Fun and Profit’s PBT series</a> for some more practical tips. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>My real reason for adopting DST is just because I think it’s cool. It’s what got me interested in TigerBeetle in the first place. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn5" class="footnote-item"><p>There are some approaches that address this problem (somewhat), e.g. <a href="https://en.wikipedia.org/wiki/metamorphic_testing">metamorphic testing</a>. It solves this by using oracles derived from the tests themselves (through special properties called metamorphic relations), but it’s not a universal solution. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn6" class="footnote-item"><p>this is probably why shrinking in pbt works. while the original intent is too create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn7" class="footnote-item"><p>I tried to keep the explanation short earlier, so here’s a concrete example. Some of my integration tests share a single, in-memory NATS server. When tests used the same seed, I noticed they would sometimes fail. The reason for this is that multiple tests were accessing the same NATS subjects, even though the tests were meant to be isolated. Using a different seed for each test solves this.</p>
+<p>Also, before the rewrite, each test would create its own NATS server. This is simpler, but it fails when there are a lot of parallel tests. The tests would use up all memory in CI (and sometimes in my local machine) and <a href="https://en.wikipedia.org/wiki/Out_of_memory">OOM</a>. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn8" class="footnote-item"><p>It’s technically easy to replace, and I’m also considering replacing it with a simpler, sequential version, but first, I need to do some benchmarks with a lot of different system schedules to understand the implications. It’ll take a while, so I decided to just leave it there so I could get the DST set up first. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn9" class="footnote-item"><p>Which is also, my coding agent of choice :) <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn10" class="footnote-item"><p>There’s another way to do DST in Go. This <a href="https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go">blog post</a> by <a href="https://www.polarsignals.com/">Polar Signals</a> explains how they implemented DST in Go by compiling their program to <a href="https://go.dev/wiki/WebAssembly">WASM</a> and (slightly) modifying the Go runtime. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+  </section>
+  
+</article>
+
+    </main>
+    <footer>
+      <div>
+        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small><a href="#top">Back to top ⤴</a></small>
+      </div>
+      <small>
+        <a href="/feed.xml">
+          Subscribe
+          <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" style="height: 1.2em; width: 1.2em; vertical-align: text-bottom" viewBox="0 0 256 256">
+            <circle cx="68" cy="189" r="24" fill="currentColor"></circle>
+            <path d="M160 213h-34a82 82 0 0 0 -82 -82v-34a116 116 0 0 1 116 116z" fill="currentColor"></path>
+            <path d="M184 213A140 140 0 0 0 44 73 V 38a175 175 0 0 1 175 175z" fill="currentColor"></path>
+          </svg>
+          </a>
+          <a href="https://aboutfeeds.com/">(What's this?)</a>
+      </small>
+      <small><a href="/colophon/">Colophon</a></small>
+    </footer>
+  <svg style="display: none;" id="MJX-SVG-global-cache"><defs><path id="MJX-TEX-I-1D441" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path><path id="MJX-TEX-N-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path><path id="MJX-TEX-N-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path><path id="MJX-TEX-N-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path id="MJX-TEX-N-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path><path id="MJX-TEX-I-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path><path id="MJX-TEX-N-36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path><path id="MJX-TEX-N-34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path><path id="MJX-TEX-N-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path><path id="MJX-TEX-N-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path id="MJX-TEX-N-39" d="M352 287Q304 211 232 211Q154 211 104 270T44 396Q42 412 42 436V444Q42 537 111 606Q171 666 243 666Q245 666 249 666T257 665H261Q273 665 286 663T323 651T370 619T413 560Q456 472 456 334Q456 194 396 97Q361 41 312 10T208 -22Q147 -22 108 7T68 93T121 149Q143 149 158 135T173 96Q173 78 164 65T148 49T135 44L131 43Q131 41 138 37T164 27T206 22H212Q272 22 313 86Q352 142 352 280V287ZM244 248Q292 248 321 297T351 430Q351 508 343 542Q341 552 337 562T323 588T293 615T246 625Q208 625 181 598Q160 576 154 546T147 441Q147 358 152 329T172 282Q197 248 244 248Z"></path><path id="MJX-TEX-N-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path id="MJX-TEX-N-2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path><path id="MJX-TEX-N-35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z"></path></defs></svg></body>
+</html>
