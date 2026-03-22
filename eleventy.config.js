@@ -129,6 +129,9 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
+  eleventyConfig.addFilter('cleanMarkdown', (s) =>
+    s.replaceAll('[[toc]]', '').replaceAll(/\{.*\}/g, '')
+  )
 
   eleventyConfig.addShortcode("commitHash", () => execSync('git show -s --format="%h"'))
   eleventyConfig.addShortcode("commitMessage", () => execSync('git show -s --format="%s"'))

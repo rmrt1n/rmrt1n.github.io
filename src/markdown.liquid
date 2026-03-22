@@ -8,4 +8,4 @@ permalink: '{{ article.page.url | slice: 0, -1 }}.md'
 
 # {{ article.data.title }}
 
-{{ article.rawInput }}
+{{ article.rawInput | cleanMarkdown }}
