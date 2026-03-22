@@ -8,7 +8,7 @@ As the title suggests, we'll be deploying the app to [Fly.io](https://fly.io). I
 
 This isn't a tutorial on Clojure, so I'll assume you already have some familiarity with the language as well as some of its libraries.[^2]
 
-[[toc]]
+
 ## Project Setup
 
 In this post, we'll be building a barebones bookmarks manager for the demo app. Users can log in using [basic authentication](https://roadmap.sh/guides/http-basic-authentication), view all bookmarks, and create a new bookmark. It'll be a traditional multi-page web app and the data will be stored in a [SQLite](https://sqlite.org) database.
@@ -29,30 +29,30 @@ Here's an overview of the project's starting directory structure:
 
 And the libraries we're going to use. If you have some Clojure experience or have used [Kit](https://kit-clj.github.io/), you're probably already familiar with all the libraries listed below.[^3]
 
-{% code "deps.edn" %}
+
 ```clojure
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure               {:mvn/version "1.12.0"}
-        aero/aero                         {:mvn/version "1.1.6"}
-        integrant/integrant               {:mvn/version "0.11.0"}
-        ring/ring-jetty-adapter           {:mvn/version "1.12.2"}
-        metosin/reitit-ring               {:mvn/version "0.7.2"}
-        com.github.seancorfield/next.jdbc {:mvn/version "1.3.939"}
-        org.xerial/sqlite-jdbc            {:mvn/version "3.46.1.0"}
-        hiccup/hiccup                     {:mvn/version "2.0.0-RC3"}}
+ :deps 
+        aero/aero                         
+        integrant/integrant               
+        ring/ring-jetty-adapter           
+        metosin/reitit-ring               
+        com.github.seancorfield/next.jdbc 
+        org.xerial/sqlite-jdbc            
+        hiccup/hiccup                     
  :aliases
  {:dev {:extra-paths ["dev"]
-        :extra-deps  {nrepl/nrepl    {:mvn/version "1.3.0"}
-                      integrant/repl {:mvn/version "0.3.3"}}
+        :extra-deps  
+                      integrant/repl 
         :main-opts   ["-m" "nrepl.cmdline" "--interactive" "--color"]}}}
 ```
-{% endcode %}
+
 
 I use [Aero](https://github.com/juxt/aero) and [Integrant](https://github.com/weavejester/integrant) for my system configuration (more on this in the next section), [Ring](https://github.com/ring-clojure/ring) with the Jetty adaptor for the web server, [Reitit](https://github.com/metosin/reitit) for routing, [next.jdbc](https://github.com/seancorfield/next-jdbc/) for database interaction, and [Hiccup](https://github.com/weavejester/hiccup/) for rendering HTML. From what I've seen, this is a popular "library combination" for building web apps in Clojure.[^4]
 
 The `user` namespace in `dev/user.clj` contains helper functions from [Integrant-repl](https://github.com/weavejester/integrant-repl) to start, stop, and restart the Integrant system.
 
-{% code "dev/user.clj" %}
+
 ```clojure
 (ns user
   (:require
@@ -73,13 +73,13 @@ The `user` namespace in `dev/user.clj` contains helper functions from [Integrant
   (reset)
   (reset-all))
 ```
-{% endcode %}
+
 
 ## Systems and Configuration
 
 If you're new to Integrant or other dependency injection libraries like [Component](https://github.com/stuartsierra/component), I'd suggest reading ["How to Structure a Clojure Web"](https://mccue.dev/pages/12-7-22-clojure-web-primer). It's a great explanation of the reasoning behind these libraries. Like most Clojure apps that use Aero and Integrant, my system configuration lives in a `.edn` file. I usually name mine as `resources/config.edn`. Here's what it looks like:
 
-{% code "resources/config.edn" %}
+
 ```clojure
 {:server
  {:port #long #or [#env PORT 8080]
@@ -91,13 +91,13 @@ If you're new to Integrant or other dependency injection libraries like [Compone
  {:dbtype "sqlite"
   :dbname #or [#env DB_DATABASE "database.db"]}}
 ```
-{% endcode %}
+
 
 In production, most of these values will be set using environment variables. During local development, the app will use the hard-coded default values. We don't have any sensitive values in our config (e.g., API keys), so it's fine to commit this file to version control. If there are such values, I usually put them in another file that's not tracked by version control and include them in the config file using Aero's `#include` reader tag.
 
 This config file is then "expanded" into the Integrant system map using the `expand-key` method:
 
-{% code "src/acme/main.clj" %}
+
 ```clojure
 (ns acme.main
   (:require
@@ -107,17 +107,17 @@ This config file is then "expanded" into the Integrant system map using the `exp
 
 (defn read-config
   []
-  {:system/config (aero/read-config (io/resource "config.edn"))})
+  )
 
 (defmethod ig/expand-key :system/config
   [_ opts]
-  (let [{:keys [server database]} opts]
+  (let [ opts]
     {:server/jetty (assoc server :handler (ig/ref :handler/ring))
      :handler/ring {:database (ig/ref :database/sql)
                     :auth     (:auth server)}
      :database/sql database}))
 ```
-{% endcode %}
+
 
 The system map is created in code instead of being in the configuration file. This makes refactoring your system simpler as you only need to change this method while leaving the config file (mostly) untouched.[^5]
 
@@ -125,7 +125,7 @@ My current approach to Integrant + Aero config files is mostly inspired by the b
 
 Also, if you haven't already, start a REPL and connect to it from your editor. Run `clj -M:dev` if your editor doesn't automatically start a REPL. Next, we'll implement the `init-key` and `halt-key!` methods for each of the components:
 
-{% code "src/acme/main.clj" %}
+
 ```clojure
 ;; src/acme/main.clj
 (ns acme.main
@@ -139,7 +139,7 @@ Also, if you haven't already, start a REPL and connect to it from your editor. R
 
 (defmethod ig/init-key :server/jetty
   [_ opts]
-  (let [{:keys [handler port]} opts
+  (let [ opts
         jetty-opts (-> opts (dissoc :handler :auth) (assoc :join? false))
         server     (jetty/run-jetty handler jetty-opts)]
     (println "Server started on port " port)
@@ -159,11 +159,11 @@ Also, if you haven't already, start a REPL and connect to it from your editor. R
     (util/setup-db datasource)
     datasource))
 ```
-{% endcode %}
+
 
 The `setup-db` function creates the required tables in the database if they don't exist yet. This works fine for database migrations in small projects like this demo app, but for larger projects, consider using libraries such as [Migratus](https://github.com/yogthos/migratus) (my preferred library) or [Ragtime](https://github.com/weavejester/ragtime).
 
-{% code "src/acme/util.clj" %}
+
 ```clojure
 (ns acme.util 
   (:require
@@ -179,11 +179,11 @@ The `setup-db` function creates the required tables in the database if they don'
        created_at datetime default (unixepoch()) not null
      )"]))
 ```
-{% endcode %}
+
 
 For the server handler, let's start with a simple function that returns a "hi world" string.
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 (ns acme.handler
   (:require
@@ -194,7 +194,7 @@ For the server handler, let's start with a simple function that returns a "hi wo
   (fn [req]
     (res/response "hi world")))
 ```
-{% endcode %}
+
 
 Now all the components are implemented. We can check if the system is working properly by evaluating `(reset)` in the `user` namespace. This will reload your files and restart the system. You should see this message printed in your REPL:
 
@@ -206,12 +206,12 @@ Server started on port  8080
 
 If we send a request to `http://localhost:8080/`, we should get "hi world" as the response:
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>curl localhost:8080/
 # hi world
 ```
-{% endcode %}
+
 
 Nice! The system is working correctly. In the next section, we'll implement routing and our business logic handlers.
 
@@ -219,7 +219,7 @@ Nice! The system is working correctly. In the next section, we'll implement rout
 
 First, let's set up a ring handler and router using Reitit. We only have one route, the index `/` route that'll handle both GET and POST requests.
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 (ns acme.handler
   (:require
@@ -235,10 +235,10 @@ First, let's set up a ring handler and router using Reitit. We only have one rou
    (ring/router routes)
    (ring/routes
     (ring/redirect-trailing-slash-handler)
-    (ring/create-resource-handler {:path "/"})
+    (ring/create-resource-handler )
     (ring/create-default-handler))))
 ```
-{% endcode %}
+
 
 We're including some useful middleware:
 
@@ -250,13 +250,13 @@ We're including some useful middleware:
 
 If you remember the `:handler/ring` from earlier, you'll notice that it has two dependencies, `database` and `auth`. Currently, they're inaccessible to our route handlers. To fix this, we can inject these components into the Ring request map using a middleware function.
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 ;; ...
 
 (defn components-middleware
   [components]
-  (let [{:keys [database auth]} components]
+  (let [ components]
     (fn [handler]
       (fn [req]
         (handler (assoc req
@@ -264,13 +264,13 @@ If you remember the `:handler/ring` from earlier, you'll notice that it has two 
                         :auth auth))))))
 ;; ...
 ```
-{% endcode %}
+
 
 The `components-middleware` function takes in a map of components and creates a middleware function that "assocs" each component into the request map.[^6] If you have more components such as a Redis cache or a mail service, you can add them here.
 
 We'll also need a middleware to handle HTTP basic authentication.[^7] This middleware will check if the username and password from the request map match the values in the `auth` map injected by `components-middleware`. If they match, then the request is authenticated and the user can view the site.
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 (ns acme.handler
   (:require
@@ -282,8 +282,8 @@ We'll also need a middleware to handle HTTP basic authentication.[^7] This middl
 (defn wrap-basic-auth
   [handler]
   (fn [req]
-    (let [{:keys [headers auth]} req
-          {:keys [username password]} auth
+    (let [ req
+           auth
           authorization (get headers "authorization")
           correct-creds (str "Basic " (util/base64-encode
                                        (format "%s:%s" username password)))]
@@ -294,11 +294,11 @@ We'll also need a middleware to handle HTTP basic authentication.[^7] This middl
             (res/header "WWW-Authenticate" "Basic realm=protected"))))))
 ;; ...
 ```
-{% endcode %}
+
 
 A nice feature of Clojure is that interop with the host language is easy. The `base64-encode` function is just a thin wrapper over Java's `Base64.Encoder`:
 
-{% code "src/acme/util.clj" %}
+
 ```clojure
 (ns acme.util
    ;; ...
@@ -308,11 +308,11 @@ A nice feature of Clojure is that interop with the host language is easy. The `b
   [s]
   (.encodeToString (Base64/getEncoder) (.getBytes s)))
 ```
-{% endcode %}
+
 
 Finally, we need to add them to the router. Since we'll be handling form requests later, we'll also bring in Ring's `wrap-params` middleware.
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 (ns acme.handler
   (:require
@@ -328,7 +328,7 @@ Finally, we need to add them to the router. Since we'll be handling form request
                  wrap-basic-auth
                  wrap-params]}))
 ```
-{% endcode %}
+
 
 ### Implementing the Route Handlers
 
@@ -337,7 +337,7 @@ We now have everything we need to implement the route handlers or the business l
 1. Shows all of the user's bookmarks in the database, and
 2. Shows a form that allows the user to insert new bookmarks into the database
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 (ns acme.handler
   (:require
@@ -355,9 +355,9 @@ We now have everything we need to implement the route handlers or the business l
             :content "width=device-width, initial-scale=1.0"}]]
    [:body
     [:h1 "bookmarks"]
-    [:form {:method "POST"}
+    [:form 
      [:div
-      [:label {:for "url"} "url "]
+      [:label  "url "]
       [:input#url {:name "url"
                    :type "url"
                    :required true
@@ -368,9 +368,9 @@ We now have everything we need to implement the route handlers or the business l
      (if (empty? bookmarks)
        [:li "you don't have any bookmarks"]
        (map
-        (fn [{:keys [url]}]
+        (fn []
           [:li
-           [:a {:href url} url]])
+           [:a  url]])
         bookmarks))]]])
 
 (defn index-page
@@ -384,11 +384,11 @@ We now have everything we need to implement the route handlers or the business l
       (util/server-error e))))
 ;; ...
 ```
-{% endcode %}
+
 
 Database queries can sometimes throw exceptions, so it's good to wrap them in a try-catch block. I'll also introduce some helper functions:
 
-{% code "src/acme/util.clj" %}
+
 ```clojure
 (ns acme.util
   (:require
@@ -412,28 +412,28 @@ Database queries can sometimes throw exceptions, so it's good to wrap them in a 
   (-> (res/response "Internal server error")
       (res/status 500)))
 ```
-{% endcode %}
+
 
 `render` takes a hiccup form and turns it into a ring response, while `server-error` takes an exception, logs it, and returns a 500 response.
 
 Next, we'll implement the `index-action` function:
 
-{% code "src/acme/handler.clj" %}
+
 ```clojure
 ;; ...
 
 (defn index-action
   [req]
   (try
-    (let [{:keys [db form-params]} req
+    (let [ req
           value (get form-params "url")]
-      (sql/insert! db :bookmarks {:bookmark_id (random-uuid) :url value})
+      (sql/insert! db :bookmarks )
       (res/redirect "/" 303))
     (catch Exception e
       (util/server-error e))))
 ;; ...
 ```
-{% endcode %}
+
 
 This is an implementation of a typical [post/redirect/get](https://en.wikipedia.org/wiki/Post/Redirect/Get) pattern. We get the value from the URL form field, insert a new row in the database with that value, and redirect back to the index page. Again, we're using a try-catch block to handle possible exceptions from the database query.
 
@@ -443,14 +443,14 @@ That should be all of the code for the controllers. If you reload your REPL and 
 
 The last thing we need to do is to update the main function to start the system:
 
-{% code "src/acme/main.clj" %}
+
 ```clojure
 ;; ...
 
 (defn -main [& _]
   (-> (read-config) ig/expand ig/init))
 ```
-{% endcode %}
+
 
 Now, you should be able to run the app using `clj -M -m acme.main`. That's all the code needed for the app. In the next section, we'll package the app into a Docker image to deploy to Fly.
 
@@ -463,33 +463,33 @@ While there are [many ways to package a Clojure app](https://www.metosin.fi/blog
 
 Both are valid approaches. I prefer the first since its only dependency is the JVM. We'll use the [tools.build]( https://github.com/clojure/tools.build) library to build the uberjar. Check out the [official guide](https://clojure.org/guides/tools_build) for more information on building Clojure programs. Since it's a library, to use it, we can add it to our `deps.edn` file with an alias:
 
-{% code "deps.edn" %}
+
 ```clojure
 {;; ...
  :aliases
  {;; ...
   :build {:extra-deps {io.github.clojure/tools.build 
-                       {:git/tag "v0.10.5" :git/sha "2a21b7a"}}
+                       
           :ns-default build}}}
 ```
-{% endcode %}
+
 
 Tools.build expects a `build.clj` file in the root of the project directory, so we'll need to create that file. This file contains the instructions to build artefacts, which in our case is a single uberjar. There are many great examples of `build.clj` files on the web, including from the official documentation. For now, you can copy+paste this file into your project.
 
-{% code "build.clj" %}
+
 ```clojure
 (ns build
   (:require
    [clojure.tools.build.api :as b]))
 
-(def basis (delay (b/create-basis {:project "deps.edn"})))
+(def basis (delay (b/create-basis )))
 (def src-dirs ["src" "resources"])
 (def class-dir "target/classes")
 
 (defn uber
   [_]
   (println "Cleaning build directory...")
-  (b/delete {:path "target"})
+  (b/delete )
 
   (println "Copying files...")
   (b/copy-dir {:src-dirs   src-dirs
@@ -506,11 +506,11 @@ Tools.build expects a `build.clj` file in the root of the project directory, so 
            :uber-file "target/standalone.jar"
            :main      'acme.main}))
 ```
-{% endcode %}
+
 
 To build the project, run `clj -T:build uber`. This will create the uberjar `standalone.jar` in the `target` directory. The `uber` in `clj -T:build uber` refers to the `uber` function from `build.clj`. Since the build system is a Clojure program, you can customise it however you like. If we try to run the uberjar now, we'll get an error:
 
-{% code %}
+
 ```bash
 # build the uberjar
 <code style="user-select:none;color:var(--color-links)">$ </code>clj -T:build uber
@@ -524,22 +524,22 @@ To build the project, run `clj -T:build uber`. This will create the uberjar `sta
 # Error: Could not find or load main class acme.main
 # Caused by: java.lang.ClassNotFoundException: acme.main
 ```
-{% endcode %}
+
 
 This error occurred because the Main class that is required by Java isn't built. To fix this, we need to add the `:gen-class` directive in our main namespace. This will instruct Clojure to create the Main class from the `-main` function.
 
-{% code "src/acme/main.clj" %}
+
 ```clojure
 (ns acme.main
   ;; ...
   (:gen-class))
 ;; ...
 ```
-{% endcode %}
+
 
 If you rebuild the project and run `java -jar target/standalone.jar` again, it should work perfectly. Now that we have a working build script, we can write the Dockerfile:
 
-{% code "Dockerfile" %}
+
 ```dockerfile
 # install additional dependencies here in the base layer
 # separate base from build layer so any additional deps installed are cached
@@ -555,7 +555,7 @@ COPY --from=build /opt/target/standalone.jar /
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "standalone.jar"]
 ```
-{% endcode %}
+
 
 It's a [multi-stage Dockerfile](https://www.docker.com/blog/multi-stage-builds/). We use the official Clojure Docker image as the layer to build the uberjar. Once it's built, we copy it to a smaller Docker image that only contains the Java runtime.[^8] By doing this, we get a smaller container image as well as a faster Docker build time because the layers are better cached.
 
@@ -567,18 +567,18 @@ First things first, you'll need to [install `flyctl`](https://fly.io/docs/flyctl
 
 Next, we'll need to create a new [Fly App](https://fly.io/docs/apps/overview/):
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>fly app create
 # ? Choose an app name (leave blank to generate one): 
 # automatically selected personal organization: Ryan Martin
 # New app created: blue-water-6489
 ```
-{% endcode %}
+
 
 Another way to do this is with the `fly launch` command, which automates a lot of the app configuration for you. We have some steps to do that are not done by `fly launch`, so we'll be configuring the app manually. I also already have a `fly.toml` file ready that you can straight away copy to your project.
 
-{% code "fly.toml" %}
+
 ```toml
 # replace these with your app and region name
 # run `fly platform regions` to get a list of regions
@@ -606,29 +606,29 @@ primary_region = 'sin'
   cpus = 1
   cpu_kind = "shared"
 ```
-{% endcode %}
+
 
 These are mostly the default configuration values with some additions. Under the `[env]` section, we're setting the SQLite database location to `/data/database.db`. The `database.db` file itself will be stored in a persistent [Fly Volume](https://fly.io/docs/volumes/overview/) mounted on the `/data` directory. This is specified under the `[mounts]` section. Fly Volumes are similar to regular Docker volumes but are designed for Fly's micro VMs.
 
 We'll need to set the `AUTH_USER` and `AUTH_PASSWORD` environment variables too, but not through the `fly.toml` file as these are sensitive values. To securely set these credentials with Fly, we can set them as [app secrets](https://fly.io/docs/apps/secrets/). They're stored encrypted and will be automatically injected into the app at boot time.
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>fly secrets set AUTH_USER=hi@ryanmartin.me AUTH_PASSWORD=not-so-secure-password
 # Secrets are staged for the first deployment
 ```
-{% endcode %}
+
 
 With this, the configuration is done and we can deploy the app using `fly deploy`:
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>fly deploy
 # ...
 # Checking DNS configuration for blue-water-6489.fly.dev
 # Visit your newly deployed app at https://blue-water-6489.fly.dev/
 ```
-{% endcode %}
+
 
 The first deployment will take longer since it's building the Docker image for the first time. Subsequent deployments should be faster due to the cached image layers. You can click on the link to view the deployed app, or you can also run `fly open`, which will do the same thing. Here's the app in action:
 
@@ -644,13 +644,13 @@ If you're brave, you can even restart the app directly without redeploying from 
 
 For this project, we're gonna add a [socket REPL](https://clojure.org/reference/repl_and_main#_launching_a_socket_server). It's very simple to add (you just need to add a JVM option) and it doesn't require additional dependencies like [nREPL](https://nrepl.org/). Let's update the Dockerfile:
 
-{% code "Dockerfile" %}
+
 ```dockerfile
 # ...
 EXPOSE 7888
-ENTRYPOINT ["java", "-Dclojure.server.repl={:port 7888 :accept clojure.core.server/repl}", "-jar", "standalone.jar"]
+ENTRYPOINT ["java", "-Dclojure.server.repl=", "-jar", "standalone.jar"]
 ```
-{% endcode %}
+
 
 The socket REPL will be listening on port 7888. If we redeploy the app now, the REPL will be started, but we won't be able to connect to it. That's because we haven't exposed the service through [Fly proxy](https://fly.io/docs/reference/fly-proxy/). We can do this by adding the socket REPL as a service in the `[services]` section in `fly.toml`.
 
@@ -660,30 +660,30 @@ By default, all Fly apps in your organisation live in the same [private network]
 
 Fly VMs are also configured with the hostname `fly-local-6pn`, which maps to its 6PN address. This is analogous to `localhost`, which points to your loopback address `127.0.0.1`. To expose a service to 6PN, all we have to do is bind or serve it to `fly-local-6pn` instead of the usual `0.0.0.0`. We have to update the socket REPL options to:
 
-{% code "Dockerfile" %}
+
 ```dockerfile
 # ...
-ENTRYPOINT ["java", "-Dclojure.server.repl={:port 7888,:address \"fly-local-6pn\",:accept clojure.core.server/repl}", "-jar", "standalone.jar"]
+ENTRYPOINT ["java", "-Dclojure.server.repl=", "-jar", "standalone.jar"]
 ```
-{% endcode %}
+
 
 After redeploying, we can use the `fly proxy` command to forward the port from the remote server to our local machine.[^10]
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>fly proxy 7888:7888
 # Proxying local port 7888 to remote [blue-water-6489.internal]:7888
 ```
-{% endcode %}
+
 
 In another shell, run:
 
-{% code %}
+
 ```bash
 <code style="user-select:none;color:var(--color-links)">$ </code>rlwrap nc localhost 7888
 # user=>
 ```
-{% endcode %}
+
 
 Now we have a REPL connected to the production app! `rlwrap` is used for [readline](https://en.wikipedia.org/wiki/GNU_Readline) functionality, e.g. up/down arrow keys, vi bindings. Of course, you can also connect to it from your editor.
 
@@ -691,7 +691,7 @@ Now we have a REPL connected to the production app! `rlwrap` is used for [readli
 
 If you're using [GitHub](https://github.com), we can also set up automatic deployments on pushes/PRs with [GitHub Actions](https://github.com/features/actions). All you need is to create the workflow file:
 
-{% code ".github/workflows/fly.yaml" %}
+
 ```yaml
 name: Fly Deploy
 on:
@@ -710,10 +710,10 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
-          FLY_API_TOKEN: {{ '${{ secrets.FLY_API_TOKEN }}' }}
+          FLY_API_TOKEN: 
 
 ```
-{% endcode %}
+
 
 To get this to work, you'll need to create a [deploy token](https://fly.io/docs/security/tokens/) from your app's dashboard. Then, in your GitHub repo, create a new repository secret called `FLY_API_TOKEN` with the value of your deploy token. Now, whenever you push to the `main` branch, this workflow will automatically run and deploy your app. You can also manually run the workflow from GitHub because of the `workflow_dispatch` option.
 
