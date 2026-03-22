@@ -2,7 +2,7 @@
 layout: base.liquid
 title: Drafts
 eleventyImport:
-  collections: ['articles']
+  collections: ['drafts']
 ---
 
 You have stumbled upon my drafts. This is where I put my article drafts for review. I usually only
@@ -12,7 +12,7 @@ These are works in progress, so please don't share them yet. If you happen to sp
 any feedback, I'd love to hear them!
 
 <ol style="margin-left: 1rem">
-  {% assign drafts = collections.articles | where: 'data.draft', true | sort: 'data.updated' | reverse %}
+  {% assign drafts = collections.drafts | sort: 'data.updated' | reverse %}
   {%- for draft in drafts -%}
     <li>
       <a href="{{ draft.page.url }}">{{ draft.data.title}}</a>

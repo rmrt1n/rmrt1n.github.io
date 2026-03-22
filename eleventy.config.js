@@ -149,12 +149,16 @@ export default function (eleventyConfig) {
   eleventyConfig.addCollection('tags', (collection) => {
     const frequencies = collection
       .getAll()
+      .filter((item) => !item.data.draft)
       .flatMap((item) => item.data.tags ?? [])
-      .filter((tag) => !['articles', 'snippets'].includes(tag))
+      .filter((tag) => !['articles'].includes(tag))
       .reduce((acc, tag) => ({ ...acc, [tag]: (acc[tag] ?? 0) + 1 }), {})
     return Object.entries(frequencies)
       .map(([tag, count]) => ({ tag, count }))
       .sort((a, b) => b.count - a.count)
+  })
+  eleventyConfig.addCollection('drafts', (collection) => {
+    return collection.getAll().filter((item) => item.data.draft === true)
   })
 
   eleventyConfig.addPreprocessor('toc', 'md', (data, content) => (
@@ -171,13 +175,12 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addGlobalData('eleventyComputed', {
-    permalink: (data) => {
-      if (data.draft) {
-        const hash = crypto.createHash('md5').update(data.title).digest('hex')
-        return `drafts/${hash}/`
-      }
-      return data.permalink
-    },
+    permalink: (data) => data.draft
+      ? `drafts/${crypto.createHash('md5').update(data.title).digest('hex')}/`
+      : data.permalink,
+    eleventyExcludeFromCollections: (data) => data.draft
+      ? ['articles']
+      : data.eleventyExcludeFromCollections,
   })
 
   return {

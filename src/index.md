@@ -18,7 +18,7 @@ Currently I'm working on the core systems behind the
 Occasionally, I write articles about the things I find interesting. Here are a few recent ones:
 
 <ul style="margin-left: 1rem">
-  {% assign articles = collections.articles | where: 'data.draft', null | sort: 'data.published' | reverse %}
+  {% assign articles = collections.articles | sort: 'data.published' | reverse %}
   {%- for article in articles limit:3 -%}
     <li style="margin-top: .25rem;">
       <a href="{{ article.page.url }}">{{ article.data.title}}</a>
