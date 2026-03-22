@@ -9,7 +9,7 @@ layout: base.liquid
     {% endif %}
     <h1>{{ title }}</h1>
     <p> <!-- wrap with p just to make the line height consistent -->
-      <time>{{ published | date: "%d %B %Y" }}</time>
+      <time>Published on {{ published | date: "%d %B %Y" }}</time>
     </p>
     <ul class="tags">
       {%- for tag in tags offset:1 -%}
@@ -20,6 +20,9 @@ layout: base.liquid
   <section id="content">
     {{ content }}
   </section>
+  <p style="text-align: right; margin-top: 2rem;">
+    <a href="{{ page.url | slice: 0, -1 }}.md">View markdown</a>
+  </p>
   {% if not draft %}
     <section id="hey">
       <p>

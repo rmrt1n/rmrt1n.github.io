@@ -160,6 +160,9 @@ export default function (eleventyConfig) {
   eleventyConfig.addCollection('drafts', (collection) => {
     return collection.getAll().filter((item) => item.data.draft === true)
   })
+  eleventyConfig.addCollection('markdown', (collection) => {
+    return collection.getAll().filter((item) => item.data.tags?.includes('articles'))
+  })
 
   eleventyConfig.addPreprocessor('toc', 'md', (data, content) => (
     data.tags?.includes('articles')

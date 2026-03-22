@@ -1,0 +1,11 @@
+---
+pagination:
+  data: collections.markdown
+  size: 1
+  alias: article
+permalink: '{{ article.page.url | slice: 0, -1 }}.md'
+---
+
+# {{ article.data.title }}
+
+{{ article.rawInput }}
