@@ -55,7 +55,7 @@ function loop(i) {
 loop(0)
 
 function draw(map) {
-  const fill = getComputedStyle(document.documentElement).getPropertyValue('--color-bg')
+  const fill = getComputedStyle(document.documentElement).getPropertyValue('--color-links')
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   context.fillStyle = fill;
