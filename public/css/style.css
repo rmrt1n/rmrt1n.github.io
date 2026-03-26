@@ -242,6 +242,8 @@ main > article {
 
         > .sidenote-content {
           min-width: 0; /* don't stretch parent */
+
+          > * + * { margin-top: .5rem; }
         }
 
         pre code {
