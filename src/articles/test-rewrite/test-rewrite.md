@@ -11,9 +11,9 @@ Over the past few months, I rewrote most of my test suite. It was a cleanup effo
 
 There were two main reasons for rewriting my tests. The first reason was that the codebase I've been working on has grown, and more people are now working on it, however the existing tests weren't adequate. At the time, they were the largest source of tech debt in the project, and I'm mostly to blame for that... Most of the tests were half-broken, vibe-coded slop just there to satisfy [Codecov](https://about.codecov.io/).[^1]
 
-The other reason was that I wanted to try generative testing. I'm a big fan of [TigerBeetle](https://tigerbeetle.com/) and [Antithesis](https://antithesis.com/), both well known for their focus on software correctness and rigorous testing. I've read many of their blog posts and learned a lot of techniques and ideas, which I've always wanted to apply to my own projects.
+The other reason was that I wanted to try generative testing. I read and consume a lot of content about generative testing, e.g. from [TigerBeetle](https://tigerbeetle.com/) and [Antithesis](https://antithesis.com/), and I've always wanted to apply it to my own projects.
 
-The combination of tech debt pressure and unsatisfied curiosity eventually pushed me to delete my existing tests and rewrite them the way I imagined they should be. This post goes through that process and what I learned from it.
+These eventually pushed me to delete my existing tests and rewrite them the way I imagined they should be. This post goes through that process and what I learned from it.
 
 ## Notes on Terminology
 
@@ -30,7 +30,7 @@ I use the term **integration tests** for tests (any scope) that interact with "b
 
 Before starting the rewrite, I spent some time thinking about how to approach it and what my tests should look like. As you can already tell from the title of this post, most of the rewrite involves writing generative tests.
 
-Generative testing is basically a catch-all term for tests where you write code that generates test cases, instead of you specifying the test cases themselves. This includes randomised approaches like property-based testing or [fuzzing](https://en.wikipedia.org/wiki/Fuzzing), and non-random ones where you try every possible input.
+Generative testing is basically a catch-all term for tests where you write code that generates test cases, instead of you specifying the test cases themselves. This includes randomised approaches like [property-based testing (PBT)](https://antithesis.com/resources/property_based_testing/) or [fuzzing](https://en.wikipedia.org/wiki/Fuzzing), and non-random ones where you try every possible input.
 
 Note, I'll use the terms "PBT" and "fuzzing" interchangeably going forward. Both involve using randomised input to test some property of the system. There are subtle differences, but in practice they're minor enough that I just consider them the same. [^2]
 
@@ -38,7 +38,7 @@ Here are some of the main ideas that guided the rewrite:
 
 ### Properties Over Examples
 
-[Property-based testing (PBT)](https://en.wikipedia.org/wiki/Software_testing#Property_testing) is a testing approach where you specify properties of your code and throw randomised input at it to break those properties. I'm not going to explain it in detail here as there are already plenty of good resources online, and I don't have anything new to add.[^3] Here, I'll just talk about my case for PBT.
+Property-based testing is a testing approach where you specify properties of your code and throw randomised input at it to break those properties. I'm not going to explain it in detail here as there are already plenty of good resources online, and I don't have anything new to add.[^3] Here, I'll just talk about my case for PBT.
 
 While the system is still small, I wanted to catch most bugs early so they don't compound as the system grows. The existing example-based tests are limited in this regard, as they only cover cases I already know. PBT is much more effective as they uncover cases and scenarios that we forgot or may never have thought of.
 
@@ -54,13 +54,13 @@ My plan was to replace most of the existing tests with property-based tests, kee
 
 System tests are usually the most valuable as they validate your system as a whole. The hardest bugs usually emerge only when components are used together. PBT/fuzzing is scope-agnostic, so it makes a whole lot of sense to also apply it in system tests.
 
-There are two approaches I went with for this: the infamous deterministic simulation testing (DST) and traditional full-system fuzzing.[^4]
+There are two approaches I went with for this: the infamous [deterministic simulation testing (DST)](https://www.youtube.com/watch?v=4fFDFbi3toc) and traditional full-system fuzzing.[^4]
 
-DST is basically just a system-scoped property-based test. Sure, it involves extra steps like replacing non-deterministic components (e.g. network, disk, clock, etc.) with deterministic counterparts, but the overall flow is the same as regular fuzzing or stateful PBT. If you like to learn more about DST, I recommend reading [Antithesis's DST primer](https://antithesis.com/resources/deterministic_simulation_testing/) or [Phil Eaton's blog post](https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html).
+DST is basically just a system-scoped property-based test. Sure, it involves extra steps like replacing non-deterministic components (e.g. network, disk, clock, etc.) with deterministic counterparts, but the overall flow is the same as regular fuzzing or stateful PBT. If you want to learn more about DST, I recommend reading [Antithesis's DST primer](https://antithesis.com/resources/deterministic_simulation_testing/) or [Phil Eaton's blog post](https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html).
 
 The main pitch of DST is that it finds the most outlandish bugs for you while keeping them perfectly reproducible, but as I eventually learned, it's not the silver bullet I initially thought it was. More on this later!
 
-The other approach is an E2E test where we fuzz the system in its production configuration, i.e. replacing the non-deterministic components. This means that the test runs in wall clock time and that they may be flaky, but it provides more coverage as the bugs it catches may not show up in DST. This follows the same principles as [TigerBeetle's Vortex](https://tigerbeetle.com/blog/2025-02-13-a-descent-into-the-vortex/).
+The other approach is an E2E test where we fuzz the system in its production configuration, i.e. without replacing non-deterministic components. This means that the test runs in wall clock time and that they may be flaky, but it provides more coverage as the bugs it catches may not show up in DST. This follows the same principles as [TigerBeetle's Vortex](https://tigerbeetle.com/blog/2025-02-13-a-descent-into-the-vortex/).
 
 ### Testing with Intent
 
@@ -70,15 +70,15 @@ It's a similar concept to design. If you read design case studies or write-ups, 
 
 You may argue that tests already have a purpose by default, e.g. to verify correctness, catch regressions, etc. I'm talking about stuff beyond that. Stuff like:
 
-- Is this test testing intended behaviour, or is it just copying your implementation? The latter gives you false confidence, e.g. you can cover every branch and still be wrong.
+- Is this test testing intended behaviour, or is it just copying your implementation? The latter gives you false confidence, e.g. it can cover every branch and still be wrong.
 - How should I test this? Not everything needs the same level of testing. Sometimes a simple smoke test is enough vs a full-blown exhaustive test.
 - Do I need a test for this? Do I care enough about this to add a test? Every code you add is code you have to maintain.
 
-Thinking about a test's intent also forces you to reason about the SUT. I treat it as a design exercise; others describe it like an [experiment's hypothesis](https://spawn-queue.acm.org/doi/10.1145/3291276.3294770). I've also started adding comments on my tests to make them easier for other developers to understand, e.g. why it exists, what behaviour/properties it checks, how it actually verifies them, etc.
+Thinking about a test's intent also forces you to reason about the [system under test (SUT)](https://en.wikipedia.org/wiki/System_under_test). I treat it as a design exercise; some people describe it like an [experiment's hypothesis](https://spawn-queue.acm.org/doi/10.1145/3291276.3294770). I've also started adding comments on my tests to make them easier for other developers to understand, e.g. why it exists, what behaviour/properties it checks, how it actually verifies them, etc.
 
 ## The System Under Test
 
-Here's a brief overview of the SUT to give you context for the examples later. All examples in this post are drawn from **Cardinal**, the game server component of the [World Engine](https://github.com/Argus-Labs/world-engine) stack. It's written in [Go](https://go.dev/).
+Here's a brief overview of the SUT for context in the examples later. All examples in this post are drawn from **Cardinal**, the game server component of the [World Engine](https://github.com/Argus-Labs/world-engine) stack. It's written in [Go](https://go.dev/).
 
 To be more specific, Cardinal is a [tick-based](https://gamedev.stackexchange.com/questions/81608/what-is-a-tick-in-the-context-of-game-development) game server framework built around an [archetypal](https://docs.unity3d.com/Packages/com.unity.entities@6.5/manual/concepts-ecs.html) [entity-component-system (ECS)](https://en.wikipedia.org/wiki/Entity_component_system) core. Users implement game logic as systems, which are executed each tick to advance the world state. Cardinal communicates with other services through [NATS](https://nats.io/) and persists state using periodic snapshots.
 
@@ -88,20 +88,22 @@ Here's a diagram showing Cardinal's high-level architecture:
 
 ![Cardinal's architecture diagram](test-rewrite-1.png)
 
-Ok, hope that made sense. Now, on to the testing techniques.
+Ok, hope that made sense. Now, on to how I wrote the tests.
 
 ## Property-Based Testing Techniques
 
-The hardest part of PBT is figuring out what properties to test, so I think one of the best ways to learn is to just see a lot of examples and start recognising patterns. Most of the techniques mentioned here came from [TigerBeetle's blog](https://tigerbeetle.com/blog/) and [source code](https://github.com/tigerbeetle/tigerbeetle), as that's where I learned them. If you're also interested in PBT/fuzzing, definitely give them a read!
+I started by writing unit tests first, on small units, just to familiarise myself with PBT before moving on to larger units and the full system. This section lists down most of the techniques I learned while doing it.
+
+The hardest part of PBT is figuring out what properties to test, so I think one of the best ways to learn is to just see a lot of examples to start recognising patterns. Most of the things mentioned here came from [TigerBeetle's blog](https://tigerbeetle.com/blog/) and [source code](https://github.com/tigerbeetle/tigerbeetle), as that's where I learned them. If you're also interested in PBT/fuzzing, definitely give them a read!
 
 ### Testing Data Structures
 
-Cardinal is mostly made up of data structures. Testing them is a bit different from pure functions often used in PBT examples. With pure functions, you simply assert on the output. With data structures, there are two ways to do it:
+Cardinal is mostly made up of data structures. Testing them is a bit different from testing pure functions often used in PBT examples. With pure functions, you simply assert on the output. With data structures, there are two ways to do it:
 
 1. **Assert internal properties (invariants).**
     An invariant is a condition that must always be true. You can test these if your tests have access to internal fields, or by placing [assertions](https://tigerstyle.dev/#assertions) directly in the implementation.
 2. **Assert against a model.**
-    This is called **model-based testing (MBT)**, or stateful PBT, state machine testing, differential testing, etc. In MBT, you compare the behaviour of your implementation against a model with the same **semantics**. The model can be a simplified implementation or a trusted reference, e.g. a data structure from your language's standard library.
+    This is called **model-based testing (MBT)**, or stateful PBT, state machine testing, differential testing, etc. In MBT, you compare the behaviour of your implementation against a model with the **same semantics**. The model can be a simplified implementation or a trusted reference, e.g. a data structure from your language's standard library.
 
 The idea is simple: run the same operations on both your implementation and the model, and assert that their states match.
 
@@ -123,7 +125,7 @@ func (cm *componentManager) getID(name string) (componentID, error) {}
 ```
 {% endcode %}
 
-While the manager does more internally, the bulk of its work is for component registrations, which basically involves mapping component IDs to their names. Since this behaviour is essentially like a map, I used Go's built-in `map` as the model because it has the same semantics. Here's a simplified version of the test:
+While the manager does more internally, the bulk of its work is component registrations, which basically involves mapping component IDs to their names. Since this behaviour is essentially like a map, I used Go's built-in `map` as the model. Here's a simplified version of the test:
 
 {% code "pkg/cardinal/internal/ecs/component_internal_test.go" %}
 ```go
@@ -170,9 +172,9 @@ func TestComponent_RegisterModelFuzz(t *testing.T) {
 ```
 {% endcode %}
 
-Now you might be thinking: wait, doesn't the implementation also use a `map`? The model is the same as the implementation. Your test essentially just compares two different maps here. Is this test even doing anything?
+Now you might be thinking: wait, doesn't the implementation also use a `map`? The model is the same as the implementation. Your test essentially just compares two maps. Is it even doing anything?
 
-I had similar doubts too when I first wrote this. The benefits of this test aren't obvious at first (to me at least), but it becomes clear once you change the implementation. For example, I could replace the map with an exotic data structure to get a 100x performance boost. This test will still work (as long as the semantics are the same, of course) because it tests the behaviour, not the implementation.
+I had similar doubts too when I first wrote this. The benefits of this test aren't obvious at first (to me at least), but it becomes clear once you change the implementation. For example, I could replace the map with an exotic data structure, e.g. to get a 100x performance boost. This test will still work (as long as the semantics are the same, of course) because it tests the behaviour, not the implementation.
 
 Note, MBT and internal assertions aren't mutually exclusive. Ideally, you should use both. It's not shown in the example above, but I also have assertions in the implementation to guard against invalid states. They check for different things: **internal assertions ensure invariants hold, MBT ensures it behaves correctly**.
 
@@ -182,7 +184,7 @@ I complement all my model-based tests with [swarm testing](https://tigerbeetle.c
 
 The idea behind swarm testing is to randomise the test configuration. In our case, that means randomising which operations are performed. We can do this by picking a subset of all possible operations and assigning each a random weight (probability of being picked).
 
-TigerBeetle uses [Zig's metaprogramming magic](https://www.openmymind.net/Basic-MetaProgramming-in-Zig/) to automatically derive operations from a struct's fields. You could probably do this in Go using [runtime reflection](https://go.dev/blog/laws-of-reflection), which I only realised while writing this... What I ended up doing was writing helper functions that take a hardcoded list of operations and randomises them:
+TigerBeetle uses [Zig's metaprogramming magic](https://www.openmymind.net/Basic-MetaProgramming-in-Zig/) to automatically derive operations from a struct's fields. You could probably do this in Go using [runtime reflection](https://go.dev/blog/laws-of-reflection), which I only realised while writing this... What I ended up doing was write helper functions that take a hardcoded list of operations and randomises them:
 
 {% code "pkg/testutils/random.go" %}
 ```go
@@ -370,13 +372,13 @@ There are a lot of variables involved in a move operation:
 - The number of entities in both archetypes.
 - Which entity is being moved.
 
-If we only consider the source and destination archetypes, the input space is already huge. If there are $N$ component types, there are $2^N$ possible archetypes ([distinct subsets](https://www.geeksforgeeks.org/dsa/number-distinct-subsets-set/)). Cardinal supports up to $2^{32}$ component types, so the theoretical number of archetypes is $2^{(2^{32})}$. This means there are $2^{(2^{32})} × 2^{(2^{32})}$ source-destination pairs. That's a number with **258,583 digits**!
+If we only consider the source and destination archetypes, the input space is already huge. If there are $N$ component types, there are $2^N$ possible archetypes ([distinct subsets](https://www.geeksforgeeks.org/dsa/number-distinct-subsets-set/)). Cardinal supports up to $2^{32}$ component types, so the theoretical number of archetypes is $2^{2^{32}}$. This means there are $2^{2^{32}} × 2^{2^{32}}$ source-destination pairs. That's a number with **258,583 digits**!
 
 To make testing this more effective, I intentionally limited the size of the state space. The rationale is based on the [small scope hypothesis](https://dspace.mit.edu/bitstream/handle/1721.1/149864/MIT-LCS-TR-735.pdf), which argues that most bugs can be found within small input sizes.[^6] Larger inputs don't necessarily lead to new execution paths. Borrowing the words of [Matklad](https://matklad.github.io/):
 
 > Most of the bugs involve small, tricky examples. If a sorting routine breaks on some array with ten thousand elements it’s highly likely that there’s a much smaller array (a handful of elements), which exposes the same bug.
 
-With a smaller scope, we can now feasibly test all possible variable combinations exhaustively. Some of you might already know where I'm heading here. Yes, I'm talking about [Exhaustigen](https://matklad.github.io/2021/11/07/generate-all-the-things.html). It's a helper library for generating combinations of multiple variables exhaustively. I ported TigerBeetle's Zig version to Go, which you can find [here](#).
+With a smaller scope, we can feasibly test all possible variable combinations exhaustively. Some of you might already know where I'm heading here. Yes, I'm talking about [Exhaustigen](https://matklad.github.io/2021/11/07/generate-all-the-things.html). It's a helper library for generating combinations of multiple variables exhaustively. I ported TigerBeetle's Zig version to Go, which you can find [here](https://github.com/Argus-Labs/world-engine/blob/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db/pkg/testutils/exhaustigen.go).
 
 For my archetype move test, I reduced my variables to:
 
@@ -485,11 +487,11 @@ It's a bit difficult to replace, so I just left it there.[^8] To guard against s
 
 I've always thought it would be hard to implement DST, considering my first reference is [TigerBeetle's VOPR](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/internals/vopr.md), which has a huge number of components and configurations. Then, I stumbled upon this [blog post](https://wickstrom.tech/2025-08-28-findings-bugs-coding-agent-lightweight-dst.html) by Oskar Wickstrom about implementing a lightweight DST for [Amp](https://ampcode.com).[^9] It showed me that at its core, DST isn't really a complicated concept, which made DST more attemptable.
 
-I had the same realisation while writing the model-based tests. They looked a whole lot like the lightweight DST from the blog post. And they are! DST is basically just a bigger model-based test, with non-deterministic components stubbed out. Since I already wrote a lot of them, implementing the DST didn't turn out to be too hard.[^10]
+I had the same realisation while writing the model-based tests. They looked a whole lot like the lightweight DST from the blog post. And they are! DST is basically just a bigger model-based test, on the whole system, with non-deterministic components stubbed out. Since I already wrote a lot of them, implementing DST didn't turn out to be too hard.[^10]
 
 ### How it Works
 
-I don't remember where I first learned this, but TigerBeetle is structured so that it moves in fixed ticks, where each tick time is injected. In production use, this uses a regular wall clock, but in simulation, it uses a simulated clock. Well, Cardinal is a tick-based game server! It was already well-prepared for DST in this regard.
+I don't remember where I first heard this, but TigerBeetle is structured so that it moves in fixed ticks, like a game engine.[^11] Time is dependency-injected into the tick, not the other way around like in traditional code. In production use, this uses a regular wall clock, but in simulation, it uses a simulated clock. Well, Cardinal is a tick-based game engine! It was already well-prepared for DST in this regard.
 
 Cardinal only updates its state on every call to `Tick`:
 
@@ -524,7 +526,7 @@ func (w *World) Tick(ctx context.Context, timestamp time.Time) {
 ```
 {% endcode %}
 
-In production use, Cardinal's `StartGame` method handles its lifecycle. This basically runs an infinite loop, calling `Tick` every N seconds. For the simulation test, all we have to do is just replace `StartGame` and have the test harness control Cardinal using `Tick`.
+In production use, Cardinal's `StartGame` method handles its lifecycle. It basically runs an infinite loop, calling `Tick` every N seconds. For the simulation test, all I had to do was just replace `StartGame` and have the test harness control Cardinal using `Tick`.
 
 Here's a simplified version of the DST harness:
 
@@ -571,10 +573,10 @@ func RunDST(t *testing.T, setup func(*World)) {
 ```
 {% endcode %}
 
-This test does a few things:
+This does a few things:
 
 1. Create a test configuration with random values. There are only a few ATM, and no fancy fault injections, but it's a start.
-2. Initialises Cardinal with that configuration and replaces non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic versions that contains assertions. The non-deterministic parts are tested separately in integration tests.
+2. Initialise Cardinal with that configuration and replace non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic fakes that contains assertions. The non-deterministic parts are tested separately in integration tests.
 3. Register systems using the user-provided `setup` function. I'll talk more about this soon.
 4. Extract type information from the command types used in the systems using reflection. We'll use this to generate random commands to send to the Cardinal.
 5. Run for N ticks (configurable) and perform a random operation each time.
@@ -586,9 +588,9 @@ While implementing this, there was a major design choice I had to make. Cardinal
 - Keeping the harness specific to a single, hand-coded game designed to test Cardinal. This allows us to add more instrumentation to verify some extra invariants and also to validate the game logic, but also means it must be a private type to access the required internal fields.
 - Make the harness game-agnostic and public. This gives a few benefits, namely, users can use it with their games, and we also get free inputs to test Cardinal on. We can only verify a subset of all our properties, but we're more likely to get something we didn't expect.
 
-In the end, I went with the second design, mainly because we can explore more of the state space with it. If we had stuck with a single input, the harness might be biased.
+In the end, I went with the second design, betting that this choice would find more bugs through user-provided inputs. I'm hoping that someone somewhere would do something so weird and unpredictable that it crashes the test. Sticking with a single input might cause the harness to be biased.
 
-So now, we have an importable DST harness that users can use, but not to test their game logic, rather to test that Cardinal works correctly with it. Here's what its usage looks like:
+So now, we have an importable DST harness that users can use, but not to test their game logic, rather to test that Cardinal works correctly with it. It's not a substitute for properly testing your game logic. Here's what its usage looks like:
 
 {% code "example_test.go" %}
 ```go
@@ -606,15 +608,17 @@ func YourTestDST(t *testing.T) {
 ```
 {% endcode %}
 
+This will run the simulation for 1000 ticks by default. You can configure this using the `-dst.ticks` flag.
+
 ### Expectations VS Reality
 
-So initially, I tested with a simple game that I asked AI to write. I was really excited because of all the hype around DST, like how it seemingly found all the bugs in [FoundationDB](https://www.foundationdb.org/). The first time I ran it, the test froze. When I reran it, it froze again! My DST has found my first bug!
+So initially, I tested with a simple game that I asked AI to write. I was really excited because of all the hype around DST, like how it seemingly found all the bugs in [FoundationDB](https://www.foundationdb.org/). The first time I ran it, the test froze. When I reran it, it froze again! My DST has found its first bug!
 
-After some investigation, I found out that it was a bug in Cardinal's scheduler. It's a deadlock that happens only when the world is reset after an odd number of ticks. A ridiculous bug! I probably would've caught this myself in local development, but the fact that the simulator caught it this fast was amazing.
+After some investigation, I found out that it was a bug in Cardinal's scheduler. It's a deadlock that happens **only when the world is reset after an odd number of ticks**. A ridiculous bug! I probably would've caught this myself in local development, but the fact that the simulator caught it this fast was amazing.
 
-Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but it turned out to be a bug in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn't sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free? Was it finding bugs but I didn't have the correct assertions to catch them?
+Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but most turned out to be bugs in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn't sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free (highly unlikely)? Was it finding bugs but I didn't have the correct assertions to catch them?
 
-I don't know the answer. And it seems I wasn't the only one with this issue. I was watching the [BugBash Podcast episode](https://youtu.be/UHdPnubbzBI?si=8Ulo3BXc3x8a5Fr-) with the co-authors of [DDIA (2nd edition)](https://dataintensive.net/), and [Chris Riccomini](https://cnr.sh/) talked about his experience adding DST to [SlateDB](https://slatedb.io/). He mentioned things like DST being high-investment but low-return, didn't explore that much state, and that it only found three known bugs. This matched perfectly with my (short) experience!
+I don't know the answer. And it seems I wasn't the only one with this issue. The other day, I was watching the [BugBash Podcast episode](https://youtu.be/UHdPnubbzBI?si=8Ulo3BXc3x8a5Fr-) with the co-authors of [DDIA (2nd edition)](https://dataintensive.net/), and [Chris Riccomini](https://cnr.sh/) talked about his experience adding DST to [SlateDB](https://slatedb.io/). He mentioned things like DST being high-investment but low-return, didn't explore that much state, and that it only found three known bugs. This matched perfectly with my (short) experience!
 
 Chris also mentioned that a better approach might be to apply DST on subcomponents much earlier in the process instead of going all in with full-system DST, which would've given more value much earlier. Coincidentally, this is what I did (if you count the model-based tests as DST), and it also aligns with my experience. I had caught several bugs from those tests. It's probably why my DST didn't catch many bugs, but that's just my wishful thinking.
 
@@ -626,7 +630,7 @@ I'm still not giving up, though. My DST harness is still small, which means it c
 
 ## End-to-End Fuzzing
 
-The final test I added was the E2E tests. This actually followed a similar structure to the DST, where we set up Cardinal with user-provided game logic and bombard it with randomised commands. The biggest difference is that it runs with the same, non-deterministic configuration as it would in production.
+The final test I added was the E2E tests. This actually followed a similar structure to the DST, where we set up Cardinal with user-provided game logic and bombard it with randomised commands. The biggest difference is that it runs with the same, non-deterministic components as it would in production.
 
 The actual harness code is pretty gnarly, so here's an extremely simplified version of it:
 
@@ -696,9 +700,9 @@ func TestE2E(t *testing.T) {
 
 ## What's Next?
 
-Phew... That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with almost 7000 words. If you read the entire thing, big props to you.
+Phew... That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with around 7000 words. If you read the entire thing, thank you and big props to you.
 
-Here's the [source code](github.com/Argus-Labs/world-engine/) if you want to take a closer look. After all this, I'm even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a [deterministic hypervisor](https://antithesis.com/blog/deterministic_hypervisor/) :), formal methods, etc.
+Here's the [source code](https://github.com/Argus-Labs/world-engine/tree/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db) if you want to take a closer look. After all this, I'm even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a [deterministic hypervisor](https://antithesis.com/blog/deterministic_hypervisor/) :), formal methods, etc.
 
 ![Big plans for this code beaver meme](test-rewrite-2.png)
 
@@ -723,3 +727,5 @@ Here's the [source code](github.com/Argus-Labs/world-engine/) if you want to tak
 [^9]: Which is also, my coding agent of choice :)
 
 [^10]: There's another way to do DST in Go. This [blog post](https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go) by [Polar Signals](https://www.polarsignals.com/) explains how they implemented DST in Go by compiling their program to [WASM](https://go.dev/wiki/WebAssembly) and (slightly) modifying the Go runtime.
+
+[^11]: Here's [the code](https://github.com/tigerbeetle/tigerbeetle/blob/42abced153621cc614ac1a1b49a365517fb849d0/src/vopr.zig#L822), check for yourself!
