@@ -3,11 +3,9 @@ layout: base.liquid
 title: About Me
 ---
 
-Hi there 👋,
-
-I'm a software developer from Indonesia. I'm interested in foundational software, cybersecurity, and
-the craft of software engineering — from compilers to command lines to user-facing apps. Outside of
-work, I enjoy reading, playing billiards, and finding good food and drinks.
+Hi, my name is Ryan Martin. I'm a software developer with way too many interests. Lately, I've been
+really into software correctness, security, and performance.
+Outside of tech, I enjoy reading, billiards, and exploring good food and drinks.
 
 Currently I'm working on the core systems behind the
 [World Engine](https://github.com/argus-labs/world-engine), a real-time game server framework, at
@@ -15,17 +13,14 @@ Currently I'm working on the core systems behind the
 
 <!-- placeholder for any previous exp -->
 
-Occasionally, I write articles about the things I find interesting. Here are a few recent ones:
+Here's [what I'm up to now](/now/).
 
-<ul style="margin-left: 1rem">
-  {% assign articles = collections.articles | sort: 'data.published' | reverse %}
-  {%- for article in articles limit:3 -%}
-    <li style="margin-top: .25rem;">
-      <a href="{{ article.page.url }}">{{ article.data.title}}</a>
-    </li>
-  {%- endfor -%}
-</ul>
+Occasionally, I write articles about things I find interesting. Here are a few recent ones:
 
+{% assign articles = collections.articles | sort: 'data.published' | reverse %}
+{% for article in articles limit:3 %}
+  - [{{ article.data.title }}]({{ article.page.url }})
+{% endfor %}
 
 If you ever want to chat or work together on a project, you can find me on
 [GitHub]({{ metadata.author.github }}), [X]({{ metadata.author.x }}),

@@ -15,6 +15,10 @@
     {
       "text": "About",
       "slug": "/"
+    },
+    {
+      "text": "Sitemap",
+      "slug": "/sitemap/"
     }
   ]
 }
