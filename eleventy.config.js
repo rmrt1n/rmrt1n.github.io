@@ -182,7 +182,7 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addGlobalData('eleventyComputed', {
     permalink: (data) => data.draft
-      ? `drafts/${crypto.createHash('md5').update(data.title).digest('hex')}/`
+      ? `drafts/${data.page.fileSlug}/`
       : data.permalink,
     eleventyExcludeFromCollections: (data) => data.draft
       ? ['articles']
