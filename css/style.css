@@ -503,7 +503,7 @@ button {
 .codeblock {
   > div {
     display: flex;
-    align-items: start;
+    align-items: center;
     gap: .5rem;
     justify-content: space-between;
     padding: .25rem;
