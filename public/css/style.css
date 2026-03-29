@@ -503,7 +503,8 @@ button {
 .codeblock {
   > div {
     display: flex;
-    align-items: center;
+    align-items: start;
+    gap: .5rem;
     justify-content: space-between;
     padding: .25rem;
     padding-left: 1rem;
@@ -515,6 +516,7 @@ button {
       font-family: var(--font-mono);
       font-size: 0.875rem;
       line-height: 1.25;
+      word-break: break-word;
     }
 
   }
