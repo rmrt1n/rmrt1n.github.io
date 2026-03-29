@@ -3,15 +3,14 @@ layout: base.liquid
 title: Tags
 ---
 
-<p>Browse by topic:</p>
-
 <ol class="tags">
   {%- for tag in collections.tags -%}
     <li><a href="#{{ tag.tag | slugify }}">#{{ tag.tag | slugify }} ({{ tag.count }})</a></li>
   {%- endfor -%}
 </ol>
 
-{%- for tag in collections.tags -%}
+{% assign tags = collections.tags | sort: 'tag' %}
+{%- for tag in tags -%}
   <h2 id="{{ tag.tag | slugify }}">
     <a href="#{{ tag.tag | slugify }}" class="header-anchor">{{ tag.tag }}</a>
   </h2>
