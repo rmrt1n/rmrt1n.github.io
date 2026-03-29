@@ -1,10 +1,10 @@
 
-# Lessons From Adopting Generative Testing
+# Rewriting My Tests With Generative Testing
 
 
 Over the past few months, I rewrote most of my test suite. It was a cleanup effort as well as a chance to rethink how I approach testing, something I've been neglecting for most of my programming career.
 
-There were two main reasons for rewriting my tests. The first reason was that the codebase I've been working on has grown, and more people are now working on it, however the existing tests weren't adequate. At the time, they were the largest source of tech debt in the project, and I'm mostly to blame for that... Most of the tests were half-broken, vibe-coded slop just there to satisfy [Codecov](https://about.codecov.io/).[^1]
+There were two main reasons for rewriting my tests. The first reason was that the codebase I've been working on has grown, and more people are now working on it, but the existing tests weren't adequate. At the time, they were the largest source of tech debt in the project, and I'm mostly to blame for that... Most of the tests were half-broken, vibe-coded slop just there to satisfy [Codecov](https://about.codecov.io/).[^1]
 
 The other reason was that I wanted to try generative testing. I read and consume a lot of content about generative testing, e.g. from [TigerBeetle](https://tigerbeetle.com/) and [Antithesis](https://antithesis.com/), and I've always wanted to apply it to my own projects.
 
@@ -82,13 +82,13 @@ Every tick, Cardinal injects commands received from external services (e.g. game
 
 Here's a diagram showing Cardinal's high-level architecture:
 
-![Cardinal's architecture diagram](test-rewrite-1.png)
+![Cardinal's architecture diagram](generative-testing-1.png)
 
 Ok, hope that made sense. Now, on to how I wrote the tests.
 
 ## Property-Based Testing Techniques
 
-I started by writing unit tests first, on small units, just to familiarise myself with PBT before moving on to larger units and the full system. This section lists down most of the techniques I learned while doing it.
+I started by writing unit tests first, on small units, just to familiarise myself with PBT before moving on to larger units and the full system. This section lists most of the techniques I learned while doing it.
 
 The hardest part of PBT is figuring out what properties to test, so I think one of the best ways to learn is to just see a lot of examples to start recognising patterns. Most of the things mentioned here came from [TigerBeetle's blog](https://tigerbeetle.com/blog/) and [source code](https://github.com/tigerbeetle/tigerbeetle), as that's where I learned them. If you're also interested in PBT/fuzzing, definitely give them a read!
 
@@ -180,7 +180,7 @@ I complement all my model-based tests with [swarm testing](https://tigerbeetle.c
 
 The idea behind swarm testing is to randomise the test configuration. In our case, that means randomising which operations are performed. We can do this by picking a subset of all possible operations and assigning each a random weight (probability of being picked).
 
-TigerBeetle uses [Zig's metaprogramming magic](https://www.openmymind.net/Basic-MetaProgramming-in-Zig/) to automatically derive operations from a struct's fields. You could probably do this in Go using [runtime reflection](https://go.dev/blog/laws-of-reflection), which I only realised while writing this... What I ended up doing was write helper functions that take a hardcoded list of operations and randomises them:
+TigerBeetle uses [Zig's metaprogramming magic](https://www.openmymind.net/Basic-MetaProgramming-in-Zig/) to automatically derive operations from a struct's fields. You could probably do this in Go using [runtime reflection](https://go.dev/blog/laws-of-reflection), which I only realised while writing this... What I ended up doing was writing helper functions that take a hardcoded list of operations and randomises them:
 
 
 ```go
@@ -248,7 +248,7 @@ func TestComponent_RegisterModelFuzz(t *testing.T) {
 ```
 
 
-Initially, I thought regular MBT was enough, until I found a bug in one of my code. It's the type of bug that can be found faster through swarm testing. Here's a snippet of the buggy code from Cardinal's event manager type. Can you spot the issue?
+Initially, I thought regular MBT was enough, until I found a bug in my code. It's the type of bug that can be found faster through swarm testing. Here's a snippet of the buggy code from Cardinal's event manager type. Can you spot the issue?
 
 
 ```go
@@ -270,7 +270,7 @@ The bug here is that `Enqueue` **blocks when the channel capacity is reached**.
 
 The existing tests never found it, and it never happened during local development, so this bug went unnoticed for a long time. While I was writing the model tests, I experimented with increasing the number of operations. The tests eventually got stuck, revealing the bug.
 
-This is exactly the kind of bug swarm testing helps catch. The original test runs both enqueue and dequeue operations, so the channel never fills up. If the dequeue operation is disabled, or is less likely to be picked, the channel quickly reaches capacity, and the bug becomes obvious!
+This is exactly the kind of bug swarm testing helps catch. The original test runs both enqueue and dequeue operations, so the channel never fills up. If the dequeue operation is disabled or is less likely to be picked, the channel quickly reaches capacity, and the bug becomes obvious!
 
 After fixing the bug, I added a regression test to ensure it doesn't happen again:
 
@@ -307,7 +307,7 @@ A big concern I had when writing these tests was how do I know whether my model 
 
 But sometimes the standard library doesn't have anything with the same behaviour as the data structure I'm testing. In these cases, I'm forced to write my own simplified model implementation. The hard part was verifying the model. How do I know if it's correct? Do I test my model? What do I test it against? Should I test my tests? It's turtles all the way down.
 
-Turns out this is a well-known problem called the [test oracle problem](https://en.wikipedia.org/wiki/Test_oracle). A test oracle is basically what determines the correct output of a test. In example-based tests, you are the oracle because you specify the expected output. In MBT, the model is the oracle. As far as I know, there's no complete solution this problem.[^5]
+Turns out this is a well-known problem called the [test oracle problem](https://en.wikipedia.org/wiki/Test_oracle). A test oracle is basically what determines the correct output of a test. In example-based tests, you are the oracle because you specify the expected output. In MBT, the model is the oracle. As far as I know, there's no complete solution to this problem.[^5]
 
 My only practical suggestion is to make your models (and tests in general) "obviously correct". Prioritise simplicity and clarity above everything else. Keep the code short and easy to audit. It doesn't matter if it's slow or inelegant. Ideally, you should be able to convince yourself (and others) that the code is correct just by reading it.
 
@@ -572,7 +572,7 @@ func RunDST(t *testing.T, setup func(*World)) {
 This does a few things:
 
 1. Create a test configuration with random values. There are only a few ATM, and no fancy fault injections, but it's a start.
-2. Initialise Cardinal with that configuration and replace non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic fakes that contains assertions. The non-deterministic parts are tested separately in integration tests.
+2. Initialise Cardinal with that configuration and replace non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic fakes that contain assertions. The non-deterministic parts are tested separately in integration tests.
 3. Register systems using the user-provided `setup` function. I'll talk more about this soon.
 4. Extract type information from the command types used in the systems using reflection. We'll use this to generate random commands to send to the Cardinal.
 5. Run for N ticks (configurable) and perform a random operation each time.
@@ -612,7 +612,7 @@ So initially, I tested with a simple game that I asked AI to write. I was really
 
 After some investigation, I found out that it was a bug in Cardinal's scheduler. It's a deadlock that happens **only when the world is reset after an odd number of ticks**. A ridiculous bug! I probably would've caught this myself in local development, but the fact that the simulator caught it this fast was amazing.
 
-Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but most turned out to be bugs in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn't sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free (highly unlikely)? Was it finding bugs but I didn't have the correct assertions to catch them?
+Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but most turned out to be bugs in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn't sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free (highly unlikely)? Was it finding bugs, but I didn't have the correct assertions to catch them?
 
 I don't know the answer. And it seems I wasn't the only one with this issue. The other day, I was watching the [BugBash Podcast episode](https://youtu.be/UHdPnubbzBI?si=8Ulo3BXc3x8a5Fr-) with the co-authors of [DDIA (2nd edition)](https://dataintensive.net/), and [Chris Riccomini](https://cnr.sh/) talked about his experience adding DST to [SlateDB](https://slatedb.io/). He mentioned things like DST being high-investment but low-return, didn't explore that much state, and that it only found three known bugs. This matched perfectly with my (short) experience!
 
@@ -673,7 +673,7 @@ sendLoop:
 
 All this does is run Cardinal in a separate goroutine and send it randomised requests. Unlike in DST, where you control the number of ticks to run, here you control the test duration. Since it uses wall clock time, it'll run much slower than other tests. This is why I made the E2E tests disabled by default. To run them, pass the `-e2e.run` flag to `go test`.
 
-The usage API is also similar to DST, but instead of passing a function to register systems, you'd return the actual `cardinal.World` instead. In DST, we randomise Cardinal's config, but in the E2E test we want it to have the same config as production to test more realistically:
+The usage API is also similar to DST, but instead of passing a function to register systems, you'd return the actual `cardinal.World` instead. In DST, we randomise Cardinal's config, but in the E2E test, we want it to have the same config as production to test more realistically:
 
 
 ```go
@@ -700,7 +700,7 @@ Phew... That was long. I had cut out a lot of things, including a section on tes
 
 Here's the [source code](https://github.com/Argus-Labs/world-engine/tree/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db) if you want to take a closer look. After all this, I'm even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a [deterministic hypervisor](https://antithesis.com/blog/deterministic_hypervisor/) :), formal methods, etc.
 
-![Big plans for this code beaver meme](test-rewrite-2.png)
+![Big plans for this code beaver meme](generative-testing-2.png)
 
 [^1]: Only the tests were slop, I actually put a lot of thought into the code itself!
 
@@ -712,7 +712,7 @@ Here's the [source code](https://github.com/Argus-Labs/world-engine/tree/ddefa5b
 
 [^5]: There are some approaches that address this problem (somewhat), e.g. [metamorphic testing](https://en.wikipedia.org/wiki/metamorphic_testing). It solves this by using oracles derived from the tests themselves (through special properties called metamorphic relations), but it's not a universal solution.
 
-[^6]: this is probably why shrinking in pbt works. while the original intent is too create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones.
+[^6]: This is probably why shrinking in pbt works. While the original intent is to create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones.
 
 [^7]: I tried to keep the explanation short earlier, so here's a concrete example. Some of my integration tests share a single, in-memory NATS server. When tests used the same seed, I noticed they would sometimes fail. The reason for this is that multiple tests were accessing the same NATS subjects, even though the tests were meant to be isolated. Using a different seed for each test solves this.
 
@@ -720,7 +720,7 @@ Here's the [source code](https://github.com/Argus-Labs/world-engine/tree/ddefa5b
 
 [^8]: It's technically easy to replace, and I'm also considering replacing it with a simpler, sequential version, but first, I need to do some benchmarks with a lot of different system schedules to understand the implications. It'll take a while, so I decided to just leave it there so I could get the DST set up first.
 
-[^9]: Which is also, my coding agent of choice :)
+[^9]: Which is also my coding agent of choice :)
 
 [^10]: There's another way to do DST in Go. This [blog post](https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go) by [Polar Signals](https://www.polarsignals.com/) explains how they implemented DST in Go by compiling their program to [WASM](https://go.dev/wiki/WebAssembly) and (slightly) modifying the Go runtime.
 

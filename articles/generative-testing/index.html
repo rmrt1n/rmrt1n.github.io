@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <script src="/js/analytics.js" defer=""></script>
-    <title>Ryan Martin | Lessons From Adopting Generative Testing</title>
+    <title>Ryan Martin | Rewriting My Tests With Generative Testing</title>
     <script src="/js/script.js" defer=""></script>
   <style id="MJX-SVG-styles">
 mjx-container[jax="SVG"] {
@@ -177,9 +177,11 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 <article>
   <header>
     
-      <p id="draft">DRAFT</p>
+    <h1>Rewriting My Tests With Generative Testing</h1>
     
-    <h1>Lessons From Adopting Generative Testing</h1>
+      <p> <!-- wrap with p just to make the line height consistent -->
+        <time>Published 30 March 2026</time>
+      </p>
     
     <ul class="tags"><li><a href="/tags/#fuzzing">#fuzzing</a></li><li><a href="/tags/#go">#go</a></li><li><a href="/tags/#testing">#testing</a></li></ul>
   </header>
@@ -189,7 +191,7 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
                <span class="sidenote-number">1.</span>
                <div class="sidenote-content"><p>Only the tests were slop, I actually put a lot of thought into the code itself! <a href="#snref1" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>There were two main reasons for rewriting my tests. The first reason was that the codebase I’ve been working on has grown, and more people are now working on it, however the existing tests weren’t adequate. At the time, they were the largest source of tech debt in the project, and I’m mostly to blame for that… Most of the tests were half-broken, vibe-coded slop just there to satisfy <a href="https://about.codecov.io/">Codecov</a>.<sup class="footnote-ref">
+            </aside><p>There were two main reasons for rewriting my tests. The first reason was that the codebase I’ve been working on has grown, and more people are now working on it, but the existing tests weren’t adequate. At the time, they were the largest source of tech debt in the project, and I’m mostly to blame for that… Most of the tests were half-broken, vibe-coded slop just there to satisfy <a href="https://about.codecov.io/">Codecov</a>.<sup class="footnote-ref">
         <a href="#fn1" id="fnref1">[1]</a>
         <a href="#sn1" id="snref1">[1]</a>
         </sup></p>
@@ -262,10 +264,10 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
 <p>To be more specific, Cardinal is a <a href="https://gamedev.stackexchange.com/questions/81608/what-is-a-tick-in-the-context-of-game-development">tick-based</a> game server framework built around an <a href="https://docs.unity3d.com/Packages/com.unity.entities@6.5/manual/concepts-ecs.html">archetypal</a> <a href="https://en.wikipedia.org/wiki/Entity_component_system">entity-component-system (ECS)</a> core. Users implement game logic as systems, which are executed each tick to advance the world state. Cardinal communicates with other services through <a href="https://nats.io/">NATS</a> and persists state using periodic snapshots.</p>
 <p>Every tick, Cardinal injects commands received from external services (e.g. game clients) into the ECS core and runs the registered systems. These systems process commands, update the world state, and emit events. After the tick ends, event handlers publish the emitted events to NATS for other services to consume.</p>
 <p>Here’s a diagram showing Cardinal’s high-level architecture:</p>
-<p><img loading="lazy" decoding="async" src="/drafts/483ba6382bf74a1cf776cc1b8a42b566/krFIKhquxE-1420.webp" alt="Cardinal's architecture diagram" width="1420" height="1444"></p>
+<p><img loading="lazy" decoding="async" src="/articles/generative-testing/krFIKhquxE-1420.webp" alt="Cardinal's architecture diagram" width="1420" height="1444"></p>
 <p>Ok, hope that made sense. Now, on to how I wrote the tests.</p>
 <h2 id="property-based-testing-techniques" tabindex="-1"><a class="header-anchor" href="#property-based-testing-techniques">Property-Based Testing Techniques</a></h2>
-<p>I started by writing unit tests first, on small units, just to familiarise myself with PBT before moving on to larger units and the full system. This section lists down most of the techniques I learned while doing it.</p>
+<p>I started by writing unit tests first, on small units, just to familiarise myself with PBT before moving on to larger units and the full system. This section lists most of the techniques I learned while doing it.</p>
 <p>The hardest part of PBT is figuring out what properties to test, so I think one of the best ways to learn is to just see a lot of examples to start recognising patterns. Most of the things mentioned here came from <a href="https://tigerbeetle.com/blog/">TigerBeetle’s blog</a> and <a href="https://github.com/tigerbeetle/tigerbeetle">source code</a>, as that’s where I learned them. If you’re also interested in PBT/fuzzing, definitely give them a read!</p>
 <h3 id="testing-data-structures" tabindex="-1"><a class="header-anchor" href="#testing-data-structures">Testing Data Structures</a></h3>
 <p>Cardinal is mostly made up of data structures. Testing them is a bit different from testing pure functions often used in PBT examples. With pure functions, you simply assert on the output. With data structures, there are two ways to do it:</p>
@@ -347,7 +349,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <h3 id="swarm-testing" tabindex="-1"><a class="header-anchor" href="#swarm-testing">Swarm Testing</a></h3>
 <p>I complement all my model-based tests with <a href="https://tigerbeetle.com/blog/2025-04-23-swarm-testing-data-structures/">swarm testing</a>. In the previous example, the test picks a random operation, where every operation has the same chance of being selected (a uniform distribution). In practice, this usually doesn’t lead to interesting scenarios.</p>
 <p>The idea behind swarm testing is to randomise the test configuration. In our case, that means randomising which operations are performed. We can do this by picking a subset of all possible operations and assigning each a random weight (probability of being picked).</p>
-<p>TigerBeetle uses <a href="https://www.openmymind.net/Basic-MetaProgramming-in-Zig/">Zig’s metaprogramming magic</a> to automatically derive operations from a struct’s fields. You could probably do this in Go using <a href="https://go.dev/blog/laws-of-reflection">runtime reflection</a>, which I only realised while writing this… What I ended up doing was write helper functions that take a hardcoded list of operations and randomises them:</p>
+<p>TigerBeetle uses <a href="https://www.openmymind.net/Basic-MetaProgramming-in-Zig/">Zig’s metaprogramming magic</a> to automatically derive operations from a struct’s fields. You could probably do this in Go using <a href="https://go.dev/blog/laws-of-reflection">runtime reflection</a>, which I only realised while writing this… What I ended up doing was writing helper functions that take a hardcoded list of operations and randomises them:</p>
 <div class="codeblock">
       <div>
         <span>pkg/testutils/random.go</span>
@@ -415,7 +417,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 	<span class="token comment">// ...</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
-<p>Initially, I thought regular MBT was enough, until I found a bug in one of my code. It’s the type of bug that can be found faster through swarm testing. Here’s a snippet of the buggy code from Cardinal’s event manager type. Can you spot the issue?</p>
+<p>Initially, I thought regular MBT was enough, until I found a bug in my code. It’s the type of bug that can be found faster through swarm testing. Here’s a snippet of the buggy code from Cardinal’s event manager type. Can you spot the issue?</p>
 <div class="codeblock">
       <div>
         <span>pkg/cardinal/internal/event/event.go</span>
@@ -435,7 +437,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <p></p></div><p></p>
 <p>The bug here is that <code>Enqueue</code> <strong>blocks when the channel capacity is reached</strong>.</p>
 <p>The existing tests never found it, and it never happened during local development, so this bug went unnoticed for a long time. While I was writing the model tests, I experimented with increasing the number of operations. The tests eventually got stuck, revealing the bug.</p>
-<p>This is exactly the kind of bug swarm testing helps catch. The original test runs both enqueue and dequeue operations, so the channel never fills up. If the dequeue operation is disabled, or is less likely to be picked, the channel quickly reaches capacity, and the bug becomes obvious!</p>
+<p>This is exactly the kind of bug swarm testing helps catch. The original test runs both enqueue and dequeue operations, so the channel never fills up. If the dequeue operation is disabled or is less likely to be picked, the channel quickly reaches capacity, and the bug becomes obvious!</p>
 <p>After fixing the bug, I added a regression test to ensure it doesn’t happen again:</p>
 <div class="codeblock">
       <div>
@@ -471,7 +473,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
                <span class="sidenote-number">5.</span>
                <div class="sidenote-content"><p>There are some approaches that address this problem (somewhat), e.g. <a href="https://en.wikipedia.org/wiki/metamorphic_testing">metamorphic testing</a>. It solves this by using oracles derived from the tests themselves (through special properties called metamorphic relations), but it's not a universal solution. <a href="#snref5" class="footnote-backref">↩︎</a></p>
 </div>
-            </aside><p>Turns out this is a well-known problem called the <a href="https://en.wikipedia.org/wiki/Test_oracle">test oracle problem</a>. A test oracle is basically what determines the correct output of a test. In example-based tests, you are the oracle because you specify the expected output. In MBT, the model is the oracle. As far as I know, there’s no complete solution this problem.<sup class="footnote-ref">
+            </aside><p>Turns out this is a well-known problem called the <a href="https://en.wikipedia.org/wiki/Test_oracle">test oracle problem</a>. A test oracle is basically what determines the correct output of a test. In example-based tests, you are the oracle because you specify the expected output. In MBT, the model is the oracle. As far as I know, there’s no complete solution to this problem.<sup class="footnote-ref">
         <a href="#fn5" id="fnref5">[5]</a>
         <a href="#sn5" id="snref5">[5]</a>
         </sup></p>
@@ -534,7 +536,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <p>If we only consider the source and destination archetypes, the input space is already huge. If there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.009ex" height="1.545ex" role="img" focusable="false" viewBox="0 -683 888 683" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D441" xlink:href="#MJX-TEX-I-1D441"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>N</mi></math></mjx-assistive-mml></mjx-container> component types, there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.74ex" height="1.914ex" role="img" focusable="false" viewBox="0 -846 1210.9 846" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="mi" transform="translate(533,363) scale(0.707)"><use data-c="1D441" xlink:href="#MJX-TEX-I-1D441"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mi>N</mi></msup></math></mjx-assistive-mml></mjx-container> possible archetypes (<a href="https://www.geeksforgeeks.org/dsa/number-distinct-subsets-set/">distinct subsets</a>). Cardinal supports up to <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="2.919ex" height="1.887ex" role="img" focusable="false" viewBox="0 -833.9 1290.1 833.9" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup></math></mjx-assistive-mml></mjx-container> component types, so the theoretical number of archetypes is <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="3.383ex" height="2.155ex" role="img" focusable="false" viewBox="0 -952.7 1495.2 952.7" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup></mrow></msup></math></mjx-assistive-mml></mjx-container>. This means there are <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="8.526ex" height="2.155ex" role="img" focusable="false" viewBox="0 -952.7 3768.5 952.7" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g></g></g><g data-mml-node="mi" transform="translate(1495.2,0)"><use data-c="D7" xlink:href="#MJX-TEX-I-D7"></use></g><g data-mml-node="msup" transform="translate(2273.2,0)"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="msup"><g data-mml-node="mn"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="TeXAtom" transform="translate(533,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use><use data-c="32" xlink:href="#MJX-TEX-N-32" transform="translate(500,0)"></use></g></g></g></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup></mrow></msup><mi>×</mi><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><msup><mn>2</mn><mrow data-mjx-texclass="ORD"><mn>32</mn></mrow></msup></mrow></msup></math></mjx-assistive-mml></mjx-container> source-destination pairs. That’s a number with <strong>258,583 digits</strong>!</p>
 <aside id="sn6" class="sidenote">
                <span class="sidenote-number">6.</span>
-               <div class="sidenote-content"><p>this is probably why shrinking in pbt works. while the original intent is too create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#snref6" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>This is probably why shrinking in pbt works. While the original intent is to create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#snref6" class="footnote-backref">↩︎</a></p>
 </div>
             </aside><p>To make testing this more effective, I intentionally limited the size of the state space. The rationale is based on the <a href="https://dspace.mit.edu/bitstream/handle/1721.1/149864/MIT-LCS-TR-735.pdf">small scope hypothesis</a>, which argues that most bugs can be found within small input sizes.<sup class="footnote-ref">
         <a href="#fn6" id="fnref6">[6]</a>
@@ -653,7 +655,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         </sup> To guard against scheduler bugs that may not be 100% reproducible, I wrote extra tests to verify the scheduler’s internal concurrency works correctly. This way, I can still have confidence in its behaviour without needing to fully eliminate its non-determinism.</p>
 <aside id="sn9" class="sidenote">
                <span class="sidenote-number">9.</span>
-               <div class="sidenote-content"><p>Which is also, my coding agent of choice :) <a href="#snref9" class="footnote-backref">↩︎</a></p>
+               <div class="sidenote-content"><p>Which is also my coding agent of choice :) <a href="#snref9" class="footnote-backref">↩︎</a></p>
 </div>
             </aside><p>I’ve always thought it would be hard to implement DST, considering my first reference is <a href="https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/internals/vopr.md">TigerBeetle’s VOPR</a>, which has a huge number of components and configurations. Then, I stumbled upon this <a href="https://wickstrom.tech/2025-08-28-findings-bugs-coding-agent-lightweight-dst.html">blog post</a> by Oskar Wickstrom about implementing a lightweight DST for <a href="https://ampcode.com">Amp</a>.<sup class="footnote-ref">
         <a href="#fn9" id="fnref9">[9]</a>
@@ -758,7 +760,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <p>This does a few things:</p>
 <ol>
 <li>Create a test configuration with random values. There are only a few ATM, and no fancy fault injections, but it’s a start.</li>
-<li>Initialise Cardinal with that configuration and replace non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic fakes that contains assertions. The non-deterministic parts are tested separately in integration tests.</li>
+<li>Initialise Cardinal with that configuration and replace non-deterministic components (e.g. NATS handlers, snapshot storage) with deterministic fakes that contain assertions. The non-deterministic parts are tested separately in integration tests.</li>
 <li>Register systems using the user-provided <code>setup</code> function. I’ll talk more about this soon.</li>
 <li>Extract type information from the command types used in the systems using reflection. We’ll use this to generate random commands to send to the Cardinal.</li>
 <li>Run for N ticks (configurable) and perform a random operation each time.</li>
@@ -793,7 +795,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <h3 id="expectations-vs-reality" tabindex="-1"><a class="header-anchor" href="#expectations-vs-reality">Expectations VS Reality</a></h3>
 <p>So initially, I tested with a simple game that I asked AI to write. I was really excited because of all the hype around DST, like how it seemingly found all the bugs in <a href="https://www.foundationdb.org/">FoundationDB</a>. The first time I ran it, the test froze. When I reran it, it froze again! My DST has found its first bug!</p>
 <p>After some investigation, I found out that it was a bug in Cardinal’s scheduler. It’s a deadlock that happens <strong>only when the world is reset after an odd number of ticks</strong>. A ridiculous bug! I probably would’ve caught this myself in local development, but the fact that the simulator caught it this fast was amazing.</p>
-<p>Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but most turned out to be bugs in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn’t sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free (highly unlikely)? Was it finding bugs but I didn’t have the correct assertions to catch them?</p>
+<p>Then I ran the test again, a lot of times. Each iteration has a different seed and configuration. Nothing. Sometimes I get a bug, but most turned out to be bugs in the harness rather than Cardinal. I tried tuning the test configuration a little bit, but still nothing. At that point, I wasn’t sure what was wrong. Was my harness too simple to find more bugs? Or was my code just bug-free (highly unlikely)? Was it finding bugs, but I didn’t have the correct assertions to catch them?</p>
 <p>I don’t know the answer. And it seems I wasn’t the only one with this issue. The other day, I was watching the <a href="https://youtu.be/UHdPnubbzBI?si=8Ulo3BXc3x8a5Fr-">BugBash Podcast episode</a> with the co-authors of <a href="https://dataintensive.net/">DDIA (2nd edition)</a>, and <a href="https://cnr.sh/">Chris Riccomini</a> talked about his experience adding DST to <a href="https://slatedb.io/">SlateDB</a>. He mentioned things like DST being high-investment but low-return, didn’t explore that much state, and that it only found three known bugs. This matched perfectly with my (short) experience!</p>
 <p>Chris also mentioned that a better approach might be to apply DST on subcomponents much earlier in the process instead of going all in with full-system DST, which would’ve given more value much earlier. Coincidentally, this is what I did (if you count the model-based tests as DST), and it also aligns with my experience. I had caught several bugs from those tests. It’s probably why my DST didn’t catch many bugs, but that’s just my wishful thinking.</p>
 <p>I’ll also add this quote from <a href="https://antithesis.com/author/will-wilson/">Will Wilson</a>, the CEO of Antithesis:</p>
@@ -847,7 +849,7 @@ sendLoop<span class="token punctuation">:</span>
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>All this does is run Cardinal in a separate goroutine and send it randomised requests. Unlike in DST, where you control the number of ticks to run, here you control the test duration. Since it uses wall clock time, it’ll run much slower than other tests. This is why I made the E2E tests disabled by default. To run them, pass the <code>-e2e.run</code> flag to <code>go test</code>.</p>
-<p>The usage API is also similar to DST, but instead of passing a function to register systems, you’d return the actual <code>cardinal.World</code> instead. In DST, we randomise Cardinal’s config, but in the E2E test we want it to have the same config as production to test more realistically:</p>
+<p>The usage API is also similar to DST, but instead of passing a function to register systems, you’d return the actual <code>cardinal.World</code> instead. In DST, we randomise Cardinal’s config, but in the E2E test, we want it to have the same config as production to test more realistically:</p>
 <div class="codeblock">
       <div>
         <span>example_test.go</span>
@@ -871,7 +873,7 @@ sendLoop<span class="token punctuation">:</span>
 <h2 id="what%E2%80%99s-next%3F" tabindex="-1"><a class="header-anchor" href="#what%E2%80%99s-next%3F">What’s Next?</a></h2>
 <p>Phew… That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with around 7000 words. If you read the entire thing, thank you and big props to you.</p>
 <p>Here’s the <a href="https://github.com/Argus-Labs/world-engine/tree/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db">source code</a> if you want to take a closer look. After all this, I’m even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a <a href="https://antithesis.com/blog/deterministic_hypervisor/">deterministic hypervisor</a> :), formal methods, etc.</p>
-<p><img loading="lazy" decoding="async" src="/drafts/483ba6382bf74a1cf776cc1b8a42b566/q6JJPjYOAk-1080.webp" alt="Big plans for this code beaver meme" width="1080" height="1075"></p>
+<p><img loading="lazy" decoding="async" src="/articles/generative-testing/q6JJPjYOAk-1080.webp" alt="Big plans for this code beaver meme" width="1080" height="1075"></p>
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
@@ -885,14 +887,14 @@ sendLoop<span class="token punctuation">:</span>
 </li>
 <li id="fn5" class="footnote-item"><p>There are some approaches that address this problem (somewhat), e.g. <a href="https://en.wikipedia.org/wiki/metamorphic_testing">metamorphic testing</a>. It solves this by using oracles derived from the tests themselves (through special properties called metamorphic relations), but it’s not a universal solution. <a href="#fnref5" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn6" class="footnote-item"><p>this is probably why shrinking in pbt works. while the original intent is too create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+<li id="fn6" class="footnote-item"><p>This is probably why shrinking in pbt works. While the original intent is to create a simpler representation for debugging, the fact remains that the same bugs found in larger inputs can usually be reproduced in smaller ones. <a href="#fnref6" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn7" class="footnote-item"><p>I tried to keep the explanation short earlier, so here’s a concrete example. Some of my integration tests share a single, in-memory NATS server. When tests used the same seed, I noticed they would sometimes fail. The reason for this is that multiple tests were accessing the same NATS subjects, even though the tests were meant to be isolated. Using a different seed for each test solves this.</p>
 <p>Also, before the rewrite, each test would create its own NATS server. This is simpler, but it fails when there are a lot of parallel tests. The tests would use up all memory in CI (and sometimes in my local machine) and <a href="https://en.wikipedia.org/wiki/Out_of_memory">OOM</a>. <a href="#fnref7" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn8" class="footnote-item"><p>It’s technically easy to replace, and I’m also considering replacing it with a simpler, sequential version, but first, I need to do some benchmarks with a lot of different system schedules to understand the implications. It’ll take a while, so I decided to just leave it there so I could get the DST set up first. <a href="#fnref8" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn9" class="footnote-item"><p>Which is also, my coding agent of choice :) <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+<li id="fn9" class="footnote-item"><p>Which is also my coding agent of choice :) <a href="#fnref9" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn10" class="footnote-item"><p>There’s another way to do DST in Go. This <a href="https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go">blog post</a> by <a href="https://www.polarsignals.com/">Polar Signals</a> explains how they implemented DST in Go by compiling their program to <a href="https://go.dev/wiki/WebAssembly">WASM</a> and (slightly) modifying the Go runtime. <a href="#fnref10" class="footnote-backref">↩︎</a></p>
 </li>
@@ -903,8 +905,41 @@ sendLoop<span class="token punctuation">:</span>
 
   </section>
   <p style="text-align: right; margin-top: 2rem;">
-    <a href="/drafts/483ba6382bf74a1cf776cc1b8a42b566.md">View markdown</a>
+    <a href="/articles/generative-testing.md">View markdown</a>
   </p>
+  
+    <section id="hey">
+      <p>
+
+      Hi 👋. If you like this post, consider
+      <a href="https://twitter.com/intent/tweet/?text=Rewriting My Tests With Generative Testing @gud_mornign&url=https://ryanmartin.me/articles/generative-testing/">
+        sharing it on X
+      </a> or
+      <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/generative-testing/&t=Rewriting My Tests With Generative Testing">
+        Hacker News
+      </a>.
+      Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
+      or <a href="https://x.com/gud_mornign">tweet me</a>.
+      You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
+      </p>
+
+      <p>Continue reading:</p>
+
+      
+        
+      
+
+      
+        
+        
+        <ul>
+          
+            <li><strong>Back: </strong><a href="/articles/aoc2024/">Advent of Code 2024 in Zig</a></li>
+          
+          
+        </ul>
+      
+    </section>
   
 </article>
 
