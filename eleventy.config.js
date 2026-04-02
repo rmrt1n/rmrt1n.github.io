@@ -41,6 +41,11 @@ export default function (eleventyConfig) {
         <a href="#sn${id}" id="snref${refid}">${caption}</a>
         </sup>`
     }
+    md.renderer.rules.footnote_block_open = (tokens, idx, options) => {
+      return (options.xhtmlOut ? '<hr class="footnotes-sep asterism" />\n' : '<hr class="footnotes-sep asterism">\n') +
+        '<section class="footnotes">\n' +
+        '<ol class="footnotes-list">\n'
+    }
     md.core.ruler.after('footnote_tail', 'sidenote_content', (state) => {
       const sidenotes = Object.fromEntries(state.tokens
         .map((token, i) => ({ token, i }))
@@ -127,6 +132,7 @@ export default function (eleventyConfig) {
     './src/ctf/js/ctf.js': '/ctf/ctf.js',
     './src/ctf/js/sw.js': '/flag/sw.js'
   })
+  eleventyConfig.addBundle('css')
 
   eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
   eleventyConfig.addFilter('cleanMarkdown', (s) =>
@@ -137,7 +143,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addShortcode("commitMessage", () => execSync('git show -s --format="%s"'))
 
   eleventyConfig.addPairedShortcode('table', (content) => (
-    `<div style="overflow-x: auto">${content}</div>`
+    `<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">${content}</div>`
   ))
   eleventyConfig.addPairedShortcode('code', (content, filename) => (
     `<div class="codeblock">

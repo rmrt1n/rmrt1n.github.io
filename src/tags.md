@@ -3,11 +3,11 @@ layout: base.liquid
 title: Tags
 ---
 
-<ol class="tags">
+<ul class="tags">
   {%- for tag in collections.tags -%}
     <li><a href="#{{ tag.tag | slugify }}">#{{ tag.tag | slugify }} ({{ tag.count }})</a></li>
   {%- endfor -%}
-</ol>
+</ul>
 
 {% assign tags = collections.tags | sort: 'tag' %}
 {%- for tag in tags -%}

@@ -145,7 +145,7 @@ func TestComponent_RegisterModelFuzz(t *testing.T) {
 
 			require.NoError(t, implErr)
 			if modelExists {
-        // Property: duplicate registrations return same ID.
+				// Property: duplicate registrations return same ID.
 				assert.Equal(t, modelID, implID)
 			} else {
 				model[name] = implID

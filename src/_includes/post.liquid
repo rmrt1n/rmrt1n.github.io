@@ -9,9 +9,7 @@ layout: base.liquid
     {% endif %}
     <h1>{{ title }}</h1>
     {% if not draft %}
-      <p> <!-- wrap with p just to make the line height consistent -->
-        <time>Published {{ published | date: "%d %B %Y" }}</time>
-      </p>
+      <p>Published <time>{{ published | date: "%d %B %Y" }}</time></p>
     {% endif %}
     <ul class="tags">
       {%- for tag in tags offset:1 -%}

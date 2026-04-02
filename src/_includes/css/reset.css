@@ -1,0 +1,85 @@
+/* Resets */
+
+/* Use a better box model. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Remove all default margin and padding. */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent font size inflation and normalize tab size. */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+	tab-size: 4;
+  color-scheme: light dark;
+}
+
+/* Full height body. */
+body {
+  min-height: 100vh;
+}
+
+/* Balanced headings. */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/* Prettier text wrapping. */
+p {
+  text-wrap: pretty;
+}
+
+/* Prevent 'sub' and 'sup' elements from affecting the line height in all browsers. */
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
+
+/* Fix hrs in Firefox. */
+hr {
+  height: 0; /* 1 */
+  color: inherit; /* 2 */
+}
+
+/* Inherit fonts for these elements. */
+button, input, optgroup, select, textarea, legend {
+  font: inherit;
+  line-height: inherit;
+}
+
+/* Better image defaults, see: https://www.youtube.com/watch?v=345V2MU3E_w. */
+img, picture, video {
+  display: block;
+  max-width: 100%;
+  vertical-align: middle;
+  height: auto;
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 1rem;
+}
+
+/* Slightly dim images in dark mode. */
+@media (prefers-color-scheme: dark) {
+  img {
+    filter: brightness(0.8) contrast(1.2);
+  }
+}
+
+/* Add a top padding for scroll targets. */
+@media (prefers-reduced-motion: no-preference) {
+  :has(:target) {
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
+  }
+}
