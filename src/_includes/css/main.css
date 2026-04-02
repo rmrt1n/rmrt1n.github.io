@@ -1,4 +1,4 @@
-/* Main stylesheet */
+/* Main stylesheet  */
 
 :root {
   --font-serif: serif;
@@ -15,21 +15,17 @@
   --rail-width: 20rem;
   --rail-gap: 1.5rem;
 
-  --color-bg: #ffffff;
-  --color-fg: #111111;
-  --color-border: #737373;
+  --color-bg: #fafafa;
+  --color-fg: #171717;
   --color-links: blue;
+  --color-border: #737373;
   --color-code: #e5e5e5;
-  --color-danger: #dc2626;
-  --color-highlight: #ffffff;
 
   @media (prefers-color-scheme: dark) {
     --color-bg: #0a0a0a;
     --color-fg: #e5e5e5;
-    --color-links: skyblue;
+    --color-links: lightblue;
     --color-code: #262626;
-    --color-danger: #ef4444;
-    --color-highlight: #404040;
   }
 }
 
@@ -51,8 +47,6 @@
   }
 }
 
-/* Layout */
-
 html {
   background-color: var(--color-bg);
   color: var(--color-fg);
@@ -69,7 +63,7 @@ body {
   }
 
   > header {
-    border-bottom: .25rem double var(--color-border);
+    border-bottom: .3rem double var(--color-border);
 
     > nav {
       display: flex;
@@ -136,7 +130,7 @@ body {
   }
 
   > footer {
-    border-top: .25rem double var(--color-border);
+    border-top: .3rem double var(--color-border);
     display: flex;
     flex-direction: column;
     padding: .5rem 0;
@@ -150,8 +144,6 @@ body {
     }
   }
 }
-
-/* Articles */
 
 body > main > article {
   max-width: var(--content-width);
@@ -168,9 +160,15 @@ body > main > article {
     }
 
     > #draft {
+      --color-draft: #dc2626; /* red-600 */
+
+      @media (prefers-color-scheme: dark) {
+        --color-draft: #f87171; /* red-400 */
+      }
+
       display: inline-block;
-      color: var(--color-danger);
-      border: .2rem solid var(--color-danger);
+      color: var(--color-draft);
+      border: .2rem solid var(--color-draft);
       font-family: var(--font-serif);
       font-size: var(--text-md);
       font-weight: bold;
@@ -266,7 +264,7 @@ body > main > article {
   }
 
   > #hey {
-    border-top: .25rem double var(--color-border);
+    border-top: .3rem double var(--color-border);
     padding-top: 1.2rem;
 
     > * + * { margin-top: 1rem; }
@@ -277,8 +275,6 @@ body > main > article {
     }
   }
 }
-
-/* Typography */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
@@ -386,13 +382,15 @@ blockquote {
   padding: .5rem;
 }
 
-/* Other elements */
-
 img {
   padding: .5rem;
   border: .05rem solid var(--color-border);
   box-shadow:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  background-color: var(--color-highlight);
+  background-color: white;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #525252;
+  }
 }
 
 table {
@@ -428,13 +426,12 @@ button {
   border: .05rem solid var(--color-border);
   padding: 0 .5rem;
 
-  &:hover {
-    background-color: var(--color-highlight);
+  &:active {
+    background-color: var(--color-code);
   }
 
-  &:active {
-    /* TODO: darken */
-    background-color: var(--color-bg);
+  &:focus {
+    outline: .1rem solid var(--color-links);
   }
 }
 
@@ -462,8 +459,6 @@ button {
   }
 }
 
-/* CTF */
-
 form#ctf {
   > * + * { margin-top: .75rem; }
 
@@ -480,8 +475,15 @@ form#ctf {
       align-items: center;
 
       > input {
+        background-color: var(--color-highlight);
+        color: var(--color-fg);
+        border: .05rem solid var(--color-border);
         padding: 0 .1rem;
         width: 100%;
+
+        &:focus {
+          outline: .1rem solid var(--color-links);
+        }
       }
     }
   }
@@ -498,23 +500,23 @@ form#ctf {
 
   &.true {
     padding: .25rem;
-    border: 1px solid var(--color-fg);
-    background-color: #86efac;
+    border: 0.05rem solid var(--color-border);
+    background-color: #dcfce7; /* green-100 */
   }
 
   &.false {
     padding: .25rem;
-    border: 1px solid var(--color-fg);
-    background-color: #fca5a5;
+    border: 0.05rem solid var(--color-border);
+    background-color: #fee2e2; /* red-100 */
   }
 
   @media (prefers-color-scheme: dark) {
     &.true {
-      background-color: #166534;
+      background-color: #052e16; /* green-950 */
     }
 
     &.false {
-      background-color: #991b1b;
+      background-color: #450a0a; /* red-950 */
     }
   }
 }
@@ -532,8 +534,6 @@ form#ctf {
     height: 3.5rem;
   }
 }
-
-/* Etc. */
 
 #conway {
   width: 100%;
