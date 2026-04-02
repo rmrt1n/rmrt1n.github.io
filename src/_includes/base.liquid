@@ -32,13 +32,9 @@
       <a href="/">ryanmartin.me</a>
       <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
-        {%- for link in site.header -%}
-          {% if page.url == link.slug %}
-            <p style="text-decoration: underline">{{ link.text }}</p>
-          {% else %}
-            <a href="{{ link.slug }}">{{ link.text }}</a>
-          {% endif %}
-        {%- endfor -%}
+        {% for link in site.header -%}
+          <a href="{{ link.slug }}" {% if page.url == link.slug %}style="font-weight: bold"{% endif %}>{{ link.text }}</a>
+        {% endfor -%}
       </nav>
     </header>
     <div id="top"></div>

@@ -4,17 +4,17 @@ layout: base.liquid
 
 <article>
   <header>
-    {% if draft %}
+    {% if draft -%}
       <p id="draft">DRAFT</p>
     {% endif %}
     <h1>{{ title }}</h1>
-    {% if not draft %}
+    {% if not draft -%}
       <p>Published <time>{{ published | date: "%d %B %Y" }}</time></p>
     {% endif %}
     <ul class="tags">
-      {%- for tag in tags offset:1 -%}
+      {% for tag in tags offset:1 -%}
         <li><a href="/tags/#{{ tag | slugify }}">#{{ tag | slugify }}</a></li>
-      {%- endfor -%}
+      {% endfor -%}
     </ul>
   </header>
   <section id="content">
@@ -23,40 +23,38 @@ layout: base.liquid
   <p style="text-align: right; margin-top: 2rem;">
     <a href="{{ page.url | slice: 0, -1 }}.md">View markdown</a>
   </p>
-  {% if not draft %}
+  {% if not draft -%}
     <section id="hey">
-      <p>
-
-      Hi 👋. If you like this post, consider
-      <a href="https://twitter.com/intent/tweet/?text={{ title }} @gud_mornign&url={{ metadata.url }}{{ page.url }}">
-        sharing it on X
-      </a> or
-      <a href="https://news.ycombinator.com/submitlink?u={{ metadata.url }}{{ page.url }}&t={{ title }}">
-        Hacker News
-      </a>.
-      Have a comment or correction? Feel free to <a href="mailto:{{ metadata.author.email }}">email</a>
-      or <a href="{{ metadata.author.x }}">tweet me</a>.
-      You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
+      <p>Hi 👋. If you like this post, consider
+        <a href="https://twitter.com/intent/tweet/?text={{ title }} @gud_mornign&url={{ metadata.url }}{{ page.url }}">
+          sharing it on X
+        </a> or
+        <a href="https://news.ycombinator.com/submitlink?u={{ metadata.url }}{{ page.url }}&t={{ title }}">
+          Hacker News
+        </a>.
+        Have a comment or correction? Feel free to <a href="mailto:{{ metadata.author.email }}">email</a>
+        or <a href="{{ metadata.author.x }}">tweet me</a>.
+        You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
       </p>
 
       <p>Continue reading:</p>
 
-      {% if page.url contains "/articles/" %}
-        {% assign posts = collections.articles | sort: 'data.published' %}
-      {% endif %}
+      {%- if page.url contains "/articles/" -%}
+        {%- assign posts = collections.articles | sort: 'data.published' -%}
+      {%- endif -%}
 
-      {% if posts %}
+      {% if posts -%}
         {% assign previous = posts | getPreviousCollectionItem: page %}
         {% assign next = posts | getNextCollectionItem: page %}
         <ul>
-          {% if previous %}
+          {% if previous -%}
             <li><strong>Back: </strong><a href="{{ previous.url }}">{{previous.data.title }}</a></li>
-          {% endif %}
-          {% if next %}
+          {% endif -%}
+          {% if next -%}
             <li><strong>Next: </strong><a href="{{ next.url }}">{{next.data.title}}</a></li>
-          {% endif %}
+          {% endif -%}
         </ul>
-      {% endif %}
+      {% endif -%}
     </section>
-  {% endif %}
+  {% endif -%}
 </article>
