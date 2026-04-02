@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Eleventy v3.1.5">
-    <meta name="description" content="true">
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta name="description" content="My personal website">
+
+    <link rel="canonical" href="https://ryanmartin.me/articles/cli-login/"><link rel="icon" type="image/png" href="/favicon.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    <script src="/js/analytics.js" defer=""></script>
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml">
+    <link rel="stylesheet" type="text/css" href="/tPQWWJrt7Y.css">
+
     <title>Ryan Martin | How to Implement Automatic CLI Login</title>
+
+    <script src="/js/analytics.js" defer=""></script>
     <script src="/js/script.js" defer=""></script>
   </head>
   <body>
@@ -21,16 +22,12 @@
       <a href="/">ryanmartin.me</a>
       <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
-            <a href="/articles/">Articles</a>
-          
-            <a href="/tags/">Tags</a>
-          
-            <a href="/projects/">Projects</a>
-          
-            <a href="/">About</a>
-          
-            <a href="/sitemap/">Sitemap</a>
-          </nav>
+        <a href="/articles/">Articles</a>
+        <a href="/tags/">Tags</a>
+        <a href="/projects/">Projects</a>
+        <a href="/">About</a>
+        <a href="/sitemap/">Sitemap</a>
+        </nav>
     </header>
     <div id="top"></div>
     <main id="main">
@@ -40,12 +37,16 @@
   <header>
     
     <h1>How to Implement Automatic CLI Login</h1>
+    <p>Published <time>10 June 2024</time></p>
     
-      <p> <!-- wrap with p just to make the line height consistent -->
-        <time>Published 10 June 2024</time>
-      </p>
-    
-    <ul class="tags"><li><a href="/tags/#authentication">#authentication</a></li><li><a href="/tags/#cryptography">#cryptography</a></li><li><a href="/tags/#javascript">#javascript</a></li><li><a href="/tags/#security">#security</a></li><li><a href="/tags/#sveltekit">#sveltekit</a></li><li><a href="/tags/#web-development">#web-development</a></li></ul>
+    <ul class="tags">
+      <li><a href="/tags/#authentication">#authentication</a></li>
+      <li><a href="/tags/#cryptography">#cryptography</a></li>
+      <li><a href="/tags/#javascript">#javascript</a></li>
+      <li><a href="/tags/#security">#security</a></li>
+      <li><a href="/tags/#sveltekit">#sveltekit</a></li>
+      <li><a href="/tags/#web-development">#web-development</a></li>
+      </ul>
   </header>
   <section id="content">
     <p>I’ve recently had the chance to work on an “automatic CLI login” feature for a <a href="https://github.com/Argus-Labs/world-cli">CLI tool</a> at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.</p>
@@ -691,7 +692,7 @@
 <p>You can also see that the decrypted token is the same as the token in the database.</p>
 <h2 id="what%E2%80%99s-next%3F" tabindex="-1"><a class="header-anchor" href="#what%E2%80%99s-next%3F">What’s Next?</a></h2>
 <p>You can find the code for this project <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login">on GitHub</a>. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!</p>
-<hr class="footnotes-sep">
+<hr class="footnotes-sep asterism">
 <section class="footnotes">
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p>I learned about how this works mostly by digging into the <a href="https://github.com/supabase/cli">Supabase CLI code</a>, so I’m biased toward this approach. You can also see <a href="https://supabase.com/blog/automatic-cli-login">Supabase’s blog post about this</a> and <a href="https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/">Fly’s guide on implementing this in Laravel</a>. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
@@ -715,48 +716,32 @@
   <p style="text-align: right; margin-top: 2rem;">
     <a href="/articles/cli-login.md">View markdown</a>
   </p>
-  
-    <section id="hey">
-      <p>
-
-      Hi 👋. If you like this post, consider
-      <a href="https://twitter.com/intent/tweet/?text=How to Implement Automatic CLI Login @gud_mornign&url=https://ryanmartin.me/articles/cli-login/">
-        sharing it on X
-      </a> or
-      <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/cli-login/&t=How to Implement Automatic CLI Login">
-        Hacker News
-      </a>.
-      Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
-      or <a href="https://x.com/gud_mornign">tweet me</a>.
-      You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
+  <section id="hey">
+      <p>Hi 👋. If you like this post, consider
+        <a href="https://twitter.com/intent/tweet/?text=How to Implement Automatic CLI Login @gud_mornign&url=https://ryanmartin.me/articles/cli-login/">
+          sharing it on X
+        </a> or
+        <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/cli-login/&t=How to Implement Automatic CLI Login">
+          Hacker News
+        </a>.
+        Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
+        or <a href="https://x.com/gud_mornign">tweet me</a>.
+        You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
       </p>
 
       <p>Continue reading:</p>
-
-      
-        
-      
-
-      
-        
         
         <ul>
-          
-            <li><strong>Back: </strong><a href="/articles/recursive-ascent/">Understanding Recursive Ascent Parsers</a></li>
-          
-          
-            <li><strong>Next: </strong><a href="/articles/clojure-fly/">Build and Deploy Web Apps With Clojure and FLy.io</a></li>
-          
-        </ul>
-      
-    </section>
-  
-</article>
+          <li><strong>Back: </strong><a href="/articles/recursive-ascent/">Understanding Recursive Ascent Parsers</a></li>
+          <li><strong>Next: </strong><a href="/articles/clojure-fly/">Build and Deploy Web Apps With Clojure and FLy.io</a></li>
+          </ul>
+      </section>
+  </article>
 
     </main>
     <footer>
       <div>
-        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2026 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>

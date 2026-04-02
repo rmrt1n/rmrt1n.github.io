@@ -4,7 +4,7 @@
   <subtitle></subtitle>
   <link href="https://ryanmartin.me/feed.xml" rel="self" />
   <link href="https://ryanmartin.me/" />
-  <updated>2026-03-29T17:48:46Z</updated>
+  <updated>2026-04-02T19:11:31Z</updated>
   <id>https://ryanmartin.me/</id>
   <author>
     <name>Ryan Martin</name>
@@ -13,7 +13,7 @@
   <entry>
     <title>Understanding Recursive Ascent Parsers</title>
     <link href="https://ryanmartin.me/articles/recursive-ascent/" />
-    <updated>2026-03-29T17:48:46Z</updated>
+    <updated>2026-04-02T19:11:31Z</updated>
     <id>https://ryanmartin.me/articles/recursive-ascent/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;Bison&lt;/a&gt; or &lt;a href=&quot;https://www.antlr.org/&quot;&gt;ANTLR&lt;/a&gt;. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.&lt;/p&gt;
@@ -76,7 +76,7 @@ expr -&amp;gt; expr &#39;-&#39; term
 expr -&amp;gt; term
 term -&amp;gt; INTEGER&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing the input &lt;code&gt;1 + 2 - 3&lt;/code&gt; according to the grammar above:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -247,7 +247,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/articles/recursive-ascent/reip9qNHGK-3085.webp&quot; alt=&quot;State transition diagram&quot; width=&quot;3085&quot; height=&quot;1272&quot;&gt;&lt;/p&gt;
 &lt;h2 id=&quot;the-action-and-goto-table&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#the-action-and-goto-table&quot;&gt;The Action and Goto Table&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to, given a non-terminal. Here’s what the action and goto table looks like for our grammar:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -438,7 +438,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If you’ve noticed, the &lt;code&gt;AST&lt;/code&gt; class above looks like a binary tree. That’s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#bottom-up-vs-top-down-parsing&quot;&gt;this diagram&lt;/a&gt; from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.&lt;/p&gt;
 &lt;h3 id=&quot;converting-the-parse-table-into-functions&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#converting-the-parse-table-into-functions&quot;&gt;Converting the Parse Table into Functions&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Our &lt;code&gt;parse&lt;/code&gt; function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -546,7 +546,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
     exit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
 &lt;p&gt;As mentioned before, reduce happens when returning from a function:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -608,7 +608,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
     &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; AST&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;factor&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
 &lt;p&gt;Now here’s where things get more interesting:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -681,7 +681,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The grammar we used has rules that contain &lt;a href=&quot;https://en.wikipedia.org/wiki/Left_recursion&quot;&gt;left recursion&lt;/a&gt;. This happens when a rule starts with a symbol that is itself, e.g. &lt;code&gt;expr -&amp;gt; expr &#39;+&#39; term&lt;/code&gt; and &lt;code&gt;term -&amp;gt; term &#39;*&#39; factor&lt;/code&gt;. Top-down parsers can’t handle this type of grammar. If you’ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.&lt;/p&gt;
 &lt;p&gt;When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn’t a problem for us. We can use a loop and a condition to check whether the recursive calls are done.&lt;/p&gt;
 &lt;p&gt;In state 1 and state 2, the parser has parsed the left side of the binary operation. In the next states, the parser will parse the right side of the binary operation:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -754,7 +754,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
     &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; state8&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;left&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; right&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; tokens&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;
 &lt;p&gt;Once the right side is parsed, we can then reduce these rules in state 7 and state 8:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -912,7 +912,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;eval&lt;/code&gt; function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our &lt;code&gt;evaluate&lt;/code&gt; function. If you run &lt;code&gt;python3 main.py test&lt;/code&gt;, you should get this output: &lt;code&gt;all tests passed!&lt;/code&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/recursive-ascent/#end&quot;&gt;End&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;And that’s all. You can find the complete code on &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent&quot;&gt;this GitHub repo&lt;/a&gt;. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;hr class=&quot;footnotes-sep asterism&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;This &lt;a href=&quot;https://www.abubalay.com/blog/2018/04/08/recursive-ascent&quot;&gt;blog post&lt;/a&gt; by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. &lt;a href=&quot;https://ryanmartin.me/articles/recursive-ascent/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -949,7 +949,7 @@ term -&amp;gt; term &#39;*&#39; factor •&lt;/code&gt;&lt;/pre&gt;
   <entry>
     <title>Rewriting My Tests With Generative Testing</title>
     <link href="https://ryanmartin.me/articles/generative-testing/" />
-    <updated>2026-03-29T17:48:46Z</updated>
+    <updated>2026-04-02T19:11:31Z</updated>
     <id>https://ryanmartin.me/articles/generative-testing/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;style id=&quot;MJX-SVG-styles&quot;&gt;
@@ -1221,7 +1221,7 @@ This is called &lt;strong&gt;model-based testing (MBT)&lt;/strong&gt;, or statef
 
 			require&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;NoError&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;t&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; implErr&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
 			&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; modelExists &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token comment&quot;&gt;// Property: duplicate registrations return same ID.&lt;/span&gt;
+				&lt;span class=&quot;token comment&quot;&gt;// Property: duplicate registrations return same ID.&lt;/span&gt;
 				assert&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;Equal&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;t&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; modelID&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; implID&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
 			&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
 				model&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;name&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; implID
@@ -1778,7 +1778,7 @@ sendLoop&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
 &lt;p&gt;Phew… That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with around 7000 words. If you read the entire thing, thank you and big props to you.&lt;/p&gt;
 &lt;p&gt;Here’s the &lt;a href=&quot;https://github.com/Argus-Labs/world-engine/tree/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db&quot;&gt;source code&lt;/a&gt; if you want to take a closer look. After all this, I’m even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a &lt;a href=&quot;https://antithesis.com/blog/deterministic_hypervisor/&quot;&gt;deterministic hypervisor&lt;/a&gt; :), formal methods, etc.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://ryanmartin.me/articles/generative-testing/q6JJPjYOAk-1080.webp&quot; alt=&quot;Big plans for this code beaver meme&quot; width=&quot;1080&quot; height=&quot;1075&quot;&gt;&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;hr class=&quot;footnotes-sep asterism&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;Only the tests were slop, I actually put a lot of thought into the code itself! &lt;a href=&quot;https://ryanmartin.me/articles/generative-testing/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -1812,7 +1812,7 @@ sendLoop&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
   <entry>
     <title>Build and Deploy Web Apps With Clojure and FLy.io</title>
     <link href="https://ryanmartin.me/articles/clojure-fly/" />
-    <updated>2026-03-29T17:48:46Z</updated>
+    <updated>2026-04-02T19:11:31Z</updated>
     <id>https://ryanmartin.me/articles/clojure-fly/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It’s a collection of insights and tips I’ve learned from building my Clojure side projects, but presented in a more structured format.&lt;/p&gt;
@@ -2564,7 +2564,7 @@ Server started on port  8080
 &lt;li&gt;&lt;a href=&quot;https://tonitalksdev.com/deploying-clojure-like-a-seasoned-hobbyist&quot;&gt;Deploying Clojure Like a Seasoned Hobbyist&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.braveclojure.com/quests/deploy/&quot;&gt;Brave Clojure’s Deploy Quest&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;hr class=&quot;footnotes-sep asterism&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;The way Fly.io works under the hood is pretty clever. Instead of running the container image with a runtime like Docker, the image is unpacked and “loaded” into a VM. See &lt;a href=&quot;https://www.youtube.com/watch?v=7iypMRKniPU&quot;&gt;this video explanation&lt;/a&gt; for more details. &lt;a href=&quot;https://ryanmartin.me/articles/clojure-fly/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -2595,7 +2595,7 @@ Server started on port  8080
   <entry>
     <title>How to Implement Automatic CLI Login</title>
     <link href="https://ryanmartin.me/articles/cli-login/" />
-    <updated>2026-03-29T17:48:46Z</updated>
+    <updated>2026-04-02T19:11:31Z</updated>
     <id>https://ryanmartin.me/articles/cli-login/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;I’ve recently had the chance to work on an “automatic CLI login” feature for a &lt;a href=&quot;https://github.com/Argus-Labs/world-cli&quot;&gt;CLI tool&lt;/a&gt; at my day job. What I mean by automatic CLI login here is when a CLI tool automatically logs in a user, so it can perform actions on behalf of the user.&lt;/p&gt;
@@ -3241,7 +3241,7 @@ Server started on port  8080
 &lt;p&gt;You can also see that the decrypted token is the same as the token in the database.&lt;/p&gt;
 &lt;h2 id=&quot;what%E2%80%99s-next%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;https://ryanmartin.me/articles/cli-login/#what%E2%80%99s-next%3F&quot;&gt;What’s Next?&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;You can find the code for this project &lt;a href=&quot;https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/cli-login&quot;&gt;on GitHub&lt;/a&gt;. I’ve only covered the minimum required to implement automatic CLI login with encryption. There’s always room for improvement. E.g., you can implement additional features such as CLI session expiry, rate-limiting, token expiry, and more. Good luck!&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;hr class=&quot;footnotes-sep asterism&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I learned about how this works mostly by digging into the &lt;a href=&quot;https://github.com/supabase/cli&quot;&gt;Supabase CLI code&lt;/a&gt;, so I’m biased toward this approach. You can also see &lt;a href=&quot;https://supabase.com/blog/automatic-cli-login&quot;&gt;Supabase’s blog post about this&lt;/a&gt; and &lt;a href=&quot;https://fly.io/laravel-bytes/making-the-cli-and-browser-talk/&quot;&gt;Fly’s guide on implementing this in Laravel&lt;/a&gt;. &lt;a href=&quot;https://ryanmartin.me/articles/cli-login/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;
@@ -3266,7 +3266,7 @@ Server started on port  8080
   <entry>
     <title>Advent of Code 2024 in Zig</title>
     <link href="https://ryanmartin.me/articles/aoc2024/" />
-    <updated>2026-03-29T17:48:46Z</updated>
+    <updated>2026-04-02T19:11:31Z</updated>
     <id>https://ryanmartin.me/articles/aoc2024/</id>
     <content type="html">
 &lt;html&gt;&lt;head&gt;&lt;style id=&quot;MJX-SVG-styles&quot;&gt;
@@ -3974,7 +3974,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 &lt;li&gt;&lt;strong&gt;No concurrency or parallelism&lt;/strong&gt; - My slowest days are the compute-heavy days that are very easily parallelisable, e.g. day 6, day 19, and day 22. Without this constraint, I can probably reach sub-20 milliseconds total(?), but that’s for another time.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;You can see the full benchmarks for &lt;code&gt;ReleaseFast&lt;/code&gt; in the table below:&lt;/p&gt;
-&lt;div style=&quot;overflow-x: auto&quot;&gt;
+&lt;div style=&quot;overflow-x: auto; border: 0.05rem solid var(--color-border);&quot;&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -4212,7 +4212,7 @@ For example: size of the input, number of rows and columns, etc. Since the input
 &lt;p&gt;So… would I do it again? Probably, though I’m not making any promises. If I do join this year, I’ll probably stick with Zig. I had my eyes on Zig since the start of 2024, so Advent of Code was the perfect excuse to learn it. This year, there aren’t any languages in particular that caught my eye, so I’ll just keep using Zig, especially since I have a proper setup ready.&lt;/p&gt;
 &lt;p&gt;If you haven’t tried Advent of Code, I highly recommend checking it out this year. It’s a great excuse to learn a new language, improve your problem-solving skills, or just learn something new. If you’re eager, you can also do the &lt;a href=&quot;https://adventofcode.com/2024/events&quot;&gt;previous years’ puzzles&lt;/a&gt; as they’re still available.&lt;/p&gt;
 &lt;p&gt;One of the best aspects of Advent of Code is the community. The &lt;a href=&quot;https://adventofcode.com/2024/events&quot;&gt;Advent of Code subreddit&lt;/a&gt; is a great place for discussion. You can ask questions and also see other people’s solutions. Some people also post really cool visualisations like &lt;a href=&quot;https://www.reddit.com/r/adventofcode/s/nylBX7xFbp&quot;&gt;this one&lt;/a&gt;. They also have &lt;a href=&quot;https://www.reddit.com/r/adventofcode/?f=flair_name%3A%22Meme%2FFunny%22&quot;&gt;memes!&lt;/a&gt;&lt;/p&gt;
-&lt;hr class=&quot;footnotes-sep&quot;&gt;
+&lt;hr class=&quot;footnotes-sep asterism&quot;&gt;
 &lt;section class=&quot;footnotes&quot;&gt;
 &lt;ol class=&quot;footnotes-list&quot;&gt;
 &lt;li id=&quot;fn1&quot; class=&quot;footnote-item&quot;&gt;&lt;p&gt;I failed my first attempt horribly with &lt;a href=&quot;https://clojure.org/&quot;&gt;Clojure&lt;/a&gt; during Advent of Code 2023. Once I reached the later half of the event, I just couldn’t solve the problems with a purely functional style. I could’ve pushed through using imperative code, but I stubbornly chose not to and gave up… &lt;a href=&quot;https://ryanmartin.me/articles/aoc2024/#fnref1&quot; class=&quot;footnote-backref&quot;&gt;↩︎&lt;/a&gt;&lt;/p&gt;

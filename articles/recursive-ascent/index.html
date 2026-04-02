@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Eleventy v3.1.5">
-    <meta name="description" content="true">
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta name="description" content="My personal website">
+
+    <link rel="canonical" href="https://ryanmartin.me/articles/recursive-ascent/"><link rel="icon" type="image/png" href="/favicon.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    <script src="/js/analytics.js" defer=""></script>
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml">
+    <link rel="stylesheet" type="text/css" href="/tPQWWJrt7Y.css">
+
     <title>Ryan Martin | Understanding Recursive Ascent Parsers</title>
+
+    <script src="/js/analytics.js" defer=""></script>
     <script src="/js/script.js" defer=""></script>
   </head>
   <body>
@@ -21,16 +22,12 @@
       <a href="/">ryanmartin.me</a>
       <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
-            <a href="/articles/">Articles</a>
-          
-            <a href="/tags/">Tags</a>
-          
-            <a href="/projects/">Projects</a>
-          
-            <a href="/">About</a>
-          
-            <a href="/sitemap/">Sitemap</a>
-          </nav>
+        <a href="/articles/">Articles</a>
+        <a href="/tags/">Tags</a>
+        <a href="/projects/">Projects</a>
+        <a href="/">About</a>
+        <a href="/sitemap/">Sitemap</a>
+        </nav>
     </header>
     <div id="top"></div>
     <main id="main">
@@ -40,12 +37,13 @@
   <header>
     
     <h1>Understanding Recursive Ascent Parsers</h1>
+    <p>Published <time>28 May 2024</time></p>
     
-      <p> <!-- wrap with p just to make the line height consistent -->
-        <time>Published 28 May 2024</time>
-      </p>
-    
-    <ul class="tags"><li><a href="/tags/#algorithms">#algorithms</a></li><li><a href="/tags/#compilers">#compilers</a></li><li><a href="/tags/#python">#python</a></li></ul>
+    <ul class="tags">
+      <li><a href="/tags/#algorithms">#algorithms</a></li>
+      <li><a href="/tags/#compilers">#compilers</a></li>
+      <li><a href="/tags/#python">#python</a></li>
+      </ul>
   </header>
   <section id="content">
     <p>Recursive ascent is an obscure parsing technique I researched about a few years ago. It’s an interesting approach to bottom-up parsing, the parsing method used by parser generators like <a href="https://www.gnu.org/software/bison/">Bison</a> or <a href="https://www.antlr.org/">ANTLR</a>. If you’re familiar with recursive descent parsing, recursive ascent parsing is the bottom-up version of it.</p>
@@ -108,7 +106,7 @@ expr -&gt; expr '-' term
 expr -&gt; term
 term -&gt; INTEGER</code></pre>
 <p>This grammar defines a language that consists only of additions and subtractions of integers. The table below shows the actions an LR parser takes when parsing the input <code>1 + 2 - 3</code> according to the grammar above:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -279,7 +277,7 @@ term -&gt; term '*' factor •</code></pre>
 <p><img loading="lazy" decoding="async" src="/articles/recursive-ascent/reip9qNHGK-3085.webp" alt="State transition diagram" width="3085" height="1272"></p>
 <h2 id="the-action-and-goto-table" tabindex="-1"><a class="header-anchor" href="#the-action-and-goto-table">The Action and Goto Table</a></h2>
 <p>Now that we have the state machine, we can translate it into the parse table. A transition between states represents a shift action. Items with a dot at the end represent reduce actions. The parse table consists of two parts, the action table and the goto table. The action table tells the parser whether to shift or to reduce based on a lookahead terminal. The goto table tells the parser which state to go to, given a non-terminal. Here’s what the action and goto table looks like for our grammar:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -470,7 +468,7 @@ term -&gt; term '*' factor •</code></pre>
 <p>If you’ve noticed, the <code>AST</code> class above looks like a binary tree. That’s because all the expressions we have are binary operations, which can be represented as a binary tree. The final AST should look like <a href="#bottom-up-vs-top-down-parsing">this diagram</a> from an earlier section. For more complex grammars, you might need to use a more complex data structure for the AST.</p>
 <h3 id="converting-the-parse-table-into-functions" tabindex="-1"><a class="header-anchor" href="#converting-the-parse-table-into-functions">Converting the Parse Table into Functions</a></h3>
 <p>Our <code>parse</code> function will start from the first state. If you recall the previous parse table, there are 4 possible actions the parser can take:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -578,7 +576,7 @@ term -&gt; term '*' factor •</code></pre>
     exit<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>As mentioned before, reduce happens when returning from a function:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -640,7 +638,7 @@ term -&gt; term '*' factor •</code></pre>
     <span class="token keyword">return</span> AST<span class="token punctuation">(</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token boolean">None</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> <span class="token string">"factor"</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>Now here’s where things get more interesting:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -713,7 +711,7 @@ term -&gt; term '*' factor •</code></pre>
 <p>The grammar we used has rules that contain <a href="https://en.wikipedia.org/wiki/Left_recursion">left recursion</a>. This happens when a rule starts with a symbol that is itself, e.g. <code>expr -&gt; expr '+' term</code> and <code>term -&gt; term '*' factor</code>. Top-down parsers can’t handle this type of grammar. If you’ve implemented a recursive descent parser before, a left-recursive rule will cause the parse function to immediately call itself before doing anything else, leading to infinite recursion and a stack overflow.</p>
 <p>When using top-down parsers, you have to refactor the grammar to be right-recursive or tail-recursive. LR parsers can handle left recursion just fine, so this isn’t a problem for us. We can use a loop and a condition to check whether the recursive calls are done.</p>
 <p>In state 1 and state 2, the parser has parsed the left side of the binary operation. In the next states, the parser will parse the right side of the binary operation:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -786,7 +784,7 @@ term -&gt; term '*' factor •</code></pre>
     <span class="token keyword">return</span> state8<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">,</span> tokens</code></pre>
 <p></p></div><p></p>
 <p>Once the right side is parsed, we can then reduce these rules in state 7 and state 8:</p>
-<div style="overflow-x: auto">
+<div style="overflow-x: auto; border: 0.05rem solid var(--color-border);">
 <table>
 <thead>
 <tr>
@@ -944,7 +942,7 @@ term -&gt; term '*' factor •</code></pre>
 <p>The <code>eval</code> function will run any Python expression. Since Python can also evaluate math expressions, we can use it as a reference to verify the correctness of our <code>evaluate</code> function. If you run <code>python3 main.py test</code>, you should get this output: <code>all tests passed!</code>.</p>
 <h2 id="end" tabindex="-1"><a class="header-anchor" href="#end">End</a></h2>
 <p>And that’s all. You can find the complete code on <a href="https://github.com/rmrt1n/rmrt1n.github.io/tree/main/code/recursive-ascent">this GitHub repo</a>. Hopefully, you have a good idea of how LR and recursive ascent parsers work now. You probably won’t ever use this technique when building a real compiler, but at least you learned something new. If you’d like to learn more about this topic or explore other parsing techniques, check out the links in the footnotes.</p>
-<hr class="footnotes-sep">
+<hr class="footnotes-sep asterism">
 <section class="footnotes">
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p>This <a href="https://www.abubalay.com/blog/2018/04/08/recursive-ascent">blog post</a> by Russel Johnston about implementing a JSON parser in Rust using recursive ascent really helped me when I first started. It’s probably the only blog post about recursive ascent on the internet besides this one. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
@@ -980,46 +978,31 @@ term -&gt; term '*' factor •</code></pre>
   <p style="text-align: right; margin-top: 2rem;">
     <a href="/articles/recursive-ascent.md">View markdown</a>
   </p>
-  
-    <section id="hey">
-      <p>
-
-      Hi 👋. If you like this post, consider
-      <a href="https://twitter.com/intent/tweet/?text=Understanding Recursive Ascent Parsers @gud_mornign&url=https://ryanmartin.me/articles/recursive-ascent/">
-        sharing it on X
-      </a> or
-      <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/recursive-ascent/&t=Understanding Recursive Ascent Parsers">
-        Hacker News
-      </a>.
-      Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
-      or <a href="https://x.com/gud_mornign">tweet me</a>.
-      You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
+  <section id="hey">
+      <p>Hi 👋. If you like this post, consider
+        <a href="https://twitter.com/intent/tweet/?text=Understanding Recursive Ascent Parsers @gud_mornign&url=https://ryanmartin.me/articles/recursive-ascent/">
+          sharing it on X
+        </a> or
+        <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/recursive-ascent/&t=Understanding Recursive Ascent Parsers">
+          Hacker News
+        </a>.
+        Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
+        or <a href="https://x.com/gud_mornign">tweet me</a>.
+        You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
       </p>
 
       <p>Continue reading:</p>
-
-      
-        
-      
-
-      
-        
         
         <ul>
-          
-          
-            <li><strong>Next: </strong><a href="/articles/cli-login/">How to Implement Automatic CLI Login</a></li>
-          
-        </ul>
-      
-    </section>
-  
-</article>
+          <li><strong>Next: </strong><a href="/articles/cli-login/">How to Implement Automatic CLI Login</a></li>
+          </ul>
+      </section>
+  </article>
 
     </main>
     <footer>
       <div>
-        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2026 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>

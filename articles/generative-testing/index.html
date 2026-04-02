@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Eleventy v3.1.5">
-    <meta name="description" content="true">
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta name="description" content="My personal website">
+
+    <link rel="canonical" href="https://ryanmartin.me/articles/generative-testing/"><link rel="icon" type="image/png" href="/favicon.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    <script src="/js/analytics.js" defer=""></script>
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml">
+    <link rel="stylesheet" type="text/css" href="/tPQWWJrt7Y.css">
+
     <title>Ryan Martin | Rewriting My Tests With Generative Testing</title>
+
+    <script src="/js/analytics.js" defer=""></script>
     <script src="/js/script.js" defer=""></script>
   <style id="MJX-SVG-styles">
 mjx-container[jax="SVG"] {
@@ -159,16 +160,12 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
       <a href="/">ryanmartin.me</a>
       <a href="/ctf" tabindex="-1">🚩👀⁉️</a>
       <nav>
-            <a href="/articles/">Articles</a>
-          
-            <a href="/tags/">Tags</a>
-          
-            <a href="/projects/">Projects</a>
-          
-            <a href="/">About</a>
-          
-            <a href="/sitemap/">Sitemap</a>
-          </nav>
+        <a href="/articles/">Articles</a>
+        <a href="/tags/">Tags</a>
+        <a href="/projects/">Projects</a>
+        <a href="/">About</a>
+        <a href="/sitemap/">Sitemap</a>
+        </nav>
     </header>
     <div id="top"></div>
     <main id="main">
@@ -178,12 +175,13 @@ mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
   <header>
     
     <h1>Rewriting My Tests With Generative Testing</h1>
+    <p>Published <time>30 March 2026</time></p>
     
-      <p> <!-- wrap with p just to make the line height consistent -->
-        <time>Published 30 March 2026</time>
-      </p>
-    
-    <ul class="tags"><li><a href="/tags/#fuzzing">#fuzzing</a></li><li><a href="/tags/#go">#go</a></li><li><a href="/tags/#testing">#testing</a></li></ul>
+    <ul class="tags">
+      <li><a href="/tags/#fuzzing">#fuzzing</a></li>
+      <li><a href="/tags/#go">#go</a></li>
+      <li><a href="/tags/#testing">#testing</a></li>
+      </ul>
   </header>
   <section id="content">
     <p>Over the past few months, I rewrote most of my test suite. It was a cleanup effort as well as a chance to rethink how I approach testing, something I’ve been neglecting for most of my programming career.</p>
@@ -317,7 +315,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 
 			require<span class="token punctuation">.</span><span class="token function">NoError</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> implErr<span class="token punctuation">)</span>
 			<span class="token keyword">if</span> modelExists <span class="token punctuation">{</span>
-        <span class="token comment">// Property: duplicate registrations return same ID.</span>
+				<span class="token comment">// Property: duplicate registrations return same ID.</span>
 				assert<span class="token punctuation">.</span><span class="token function">Equal</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> modelID<span class="token punctuation">,</span> implID<span class="token punctuation">)</span>
 			<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
 				model<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> implID
@@ -874,7 +872,7 @@ sendLoop<span class="token punctuation">:</span>
 <p>Phew… That was long. I had cut out a lot of things, including a section on testing concurrent code, but I still ended up with around 7000 words. If you read the entire thing, thank you and big props to you.</p>
 <p>Here’s the <a href="https://github.com/Argus-Labs/world-engine/tree/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db">source code</a> if you want to take a closer look. After all this, I’m even more excited about software correctness. There are so many more things I want to try, e.g. improve my DST harness, test using a <a href="https://antithesis.com/blog/deterministic_hypervisor/">deterministic hypervisor</a> :), formal methods, etc.</p>
 <p><img loading="lazy" decoding="async" src="/articles/generative-testing/q6JJPjYOAk-1080.webp" alt="Big plans for this code beaver meme" width="1080" height="1075"></p>
-<hr class="footnotes-sep">
+<hr class="footnotes-sep asterism">
 <section class="footnotes">
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p>Only the tests were slop, I actually put a lot of thought into the code itself! <a href="#fnref1" class="footnote-backref">↩︎</a></p>
@@ -907,46 +905,31 @@ sendLoop<span class="token punctuation">:</span>
   <p style="text-align: right; margin-top: 2rem;">
     <a href="/articles/generative-testing.md">View markdown</a>
   </p>
-  
-    <section id="hey">
-      <p>
-
-      Hi 👋. If you like this post, consider
-      <a href="https://twitter.com/intent/tweet/?text=Rewriting My Tests With Generative Testing @gud_mornign&url=https://ryanmartin.me/articles/generative-testing/">
-        sharing it on X
-      </a> or
-      <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/generative-testing/&t=Rewriting My Tests With Generative Testing">
-        Hacker News
-      </a>.
-      Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
-      or <a href="https://x.com/gud_mornign">tweet me</a>.
-      You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
+  <section id="hey">
+      <p>Hi 👋. If you like this post, consider
+        <a href="https://twitter.com/intent/tweet/?text=Rewriting My Tests With Generative Testing @gud_mornign&url=https://ryanmartin.me/articles/generative-testing/">
+          sharing it on X
+        </a> or
+        <a href="https://news.ycombinator.com/submitlink?u=https://ryanmartin.me/articles/generative-testing/&t=Rewriting My Tests With Generative Testing">
+          Hacker News
+        </a>.
+        Have a comment or correction? Feel free to <a href="mailto:hi@ryanmartin.me">email</a>
+        or <a href="https://x.com/gud_mornign">tweet me</a>.
+        You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
       </p>
 
       <p>Continue reading:</p>
-
-      
-        
-      
-
-      
-        
         
         <ul>
-          
-            <li><strong>Back: </strong><a href="/articles/aoc2024/">Advent of Code 2024 in Zig</a></li>
-          
-          
-        </ul>
-      
-    </section>
-  
-</article>
+          <li><strong>Back: </strong><a href="/articles/aoc2024/">Advent of Code 2024 in Zig</a></li>
+          </ul>
+      </section>
+  </article>
 
     </main>
     <footer>
       <div>
-        <small>© 2024-2025 Ryan Martin - CC BY-NC-SA 4.0</small>
+        <small>© 2024-2026 Ryan Martin - CC BY-NC-SA 4.0</small>
         <small><a href="#top">Back to top ⤴</a></small>
       </div>
       <small>
