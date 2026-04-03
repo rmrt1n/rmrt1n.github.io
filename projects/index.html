@@ -9,7 +9,22 @@
     <link rel="canonical" href="https://ryanmartin.me/projects/"><link rel="icon" type="image/png" href="/favicon.png">
     <link rel="manifest" href="/manifest.json">
     <link rel="alternate" type="application/rss+xml" href="/feed.xml">
-    <link rel="stylesheet" type="text/css" href="/iFZeBssXUJ.css">
+
+    <script>
+      // Set before paint to prevent flash.
+      var globalTheme = ''
+      function selectTheme(theme) {
+        if (theme === 'system') {
+          localStorage.removeItem('theme')
+        } else {
+          localStorage.setItem('theme', theme)
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+        globalTheme = theme
+      }
+      selectTheme(localStorage.getItem('theme') ?? 'system')
+    </script>
+    <link rel="stylesheet" type="text/css" href="/QXOtk5W6wg.css">
 
     <title>Ryan Martin | Projects</title>
 
@@ -41,6 +56,12 @@
       <div>
         <p>© 2024-2026 Ryan Martin. <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></p>
         <p><a href="#top">Back to top ⤴</a></p>
+      </div>
+      <div id="theme" hidden="">
+        <span>Theme:</span>
+        <label><input type="radio" name="theme" value="system">System</label>
+        <label><input type="radio" name="theme" value="light">Light</label>
+        <label><input type="radio" name="theme" value="dark">Dark</label>
       </div>
       <p>
         <a href="/feed.xml">

@@ -9,7 +9,22 @@
     <link rel="canonical" href="https://ryanmartin.me/colophon/"><link rel="icon" type="image/png" href="/favicon.png">
     <link rel="manifest" href="/manifest.json">
     <link rel="alternate" type="application/rss+xml" href="/feed.xml">
-    <link rel="stylesheet" type="text/css" href="/iFZeBssXUJ.css">
+
+    <script>
+      // Set before paint to prevent flash.
+      var globalTheme = ''
+      function selectTheme(theme) {
+        if (theme === 'system') {
+          localStorage.removeItem('theme')
+        } else {
+          localStorage.setItem('theme', theme)
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+        globalTheme = theme
+      }
+      selectTheme(localStorage.getItem('theme') ?? 'system')
+    </script>
+    <link rel="stylesheet" type="text/css" href="/QXOtk5W6wg.css">
 
     <title>Ryan Martin | Colophon</title>
 
@@ -60,9 +75,9 @@ as articles and snippets, is licensed under the Creative Commons license
 <h2 id="version" tabindex="-1"><a class="header-anchor" href="#version">Version</a></h2>
 <p>Last updated on <time>03 April 2026</time>:</p>
 <pre class="language-plaintext">
-<code class="language-plaintext"><a href="https://github.com/rmrt1n/rmrt1n.github.io/commit/02b8e63
-" style="display:inline-block">02b8e63
-</a> – feat: update colophon
+<code class="language-plaintext"><a href="https://github.com/rmrt1n/rmrt1n.github.io/commit/4415f64
+" style="display:inline-block">4415f64
+</a> – feat: theme picker
 </code></pre>
 
     </main>
@@ -70,6 +85,12 @@ as articles and snippets, is licensed under the Creative Commons license
       <div>
         <p>© 2024-2026 Ryan Martin. <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></p>
         <p><a href="#top">Back to top ⤴</a></p>
+      </div>
+      <div id="theme" hidden="">
+        <span>Theme:</span>
+        <label><input type="radio" name="theme" value="system">System</label>
+        <label><input type="radio" name="theme" value="light">Light</label>
+        <label><input type="radio" name="theme" value="dark">Dark</label>
       </div>
       <p>
         <a href="/feed.xml">

@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'rmctf-'
-const CACHE_VERSION = 2 // NOTE: bump this version every update
+const CACHE_VERSION = 1 // NOTE: toggle this version every update to cache deps (0/1)
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION
 
 self.addEventListener('install', (event) => {
@@ -9,7 +9,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
         '/flag/',
-        '/iFZeBssXUJ.css',
+        '/QXOtk5W6wg.css',
         '/favicon.png',
         '/manifest.json',
       ])
