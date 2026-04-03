@@ -17,7 +17,7 @@ validate your flags once you've found all 10. There's a secret prize in store
 for you if you managed to find them all!
 
 This challenge is about learning new things and having fun. There are some [hints](#hints) below,
-but if you're stuck and need more hints, feel free to [reach out]({{ metadata.author.x }}).
+but if you're stuck and need more hints, feel free to [reach out]({{ site.author.x }}).
 
 **Spoiler alert!** This site is open source. Please don't spoil the fun for yourself by digging
 through the repo!

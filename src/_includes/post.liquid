@@ -26,14 +26,14 @@ layout: base.liquid
   {% if not draft -%}
     <section id="hey">
       <p>Hi 👋. If you like this post, consider
-        <a href="https://twitter.com/intent/tweet/?text={{ title }} @gud_mornign&url={{ metadata.url }}{{ page.url }}">
+        <a href="https://twitter.com/intent/tweet/?text={{ title }} @gud_mornign&url={{ site.url }}{{ page.url }}">
           sharing it on X
         </a> or
-        <a href="https://news.ycombinator.com/submitlink?u={{ metadata.url }}{{ page.url }}&t={{ title }}">
+        <a href="https://news.ycombinator.com/submitlink?u={{ site.url }}{{ page.url }}&t={{ title }}">
           Hacker News
         </a>.
-        Have a comment or correction? Feel free to <a href="mailto:{{ metadata.author.email }}">email</a>
-        or <a href="{{ metadata.author.x }}">tweet me</a>.
+        Have a comment or correction? Feel free to <a href="mailto:{{ site.author.email }}">email</a>
+        or <a href="{{ site.author.x }}">tweet me</a>.
         You can also subscribe to new articles with <a href="/feed.xml">this feed</a>.
       </p>
 

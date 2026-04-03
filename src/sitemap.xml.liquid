@@ -7,7 +7,7 @@ eleventyExcludeFromCollections: true
 {% assign pages = collections.all | sort: 'url' %}
 {% for page in pages %}
 <url>
-  <loc>{{ metadata.url }}{{ page.url | url }}</loc>
+  <loc>{{ site.url }}{{ page.url | url }}</loc>
   <lastmod>{{ page.date | toISODateString }}</lastmod>
 </url>
 {% endfor %}

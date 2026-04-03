@@ -23,8 +23,8 @@ Occasionally, I write articles about things I find interesting. Here are a few r
 {% endfor %}
 
 If you ever want to chat or work together on a project, you can find me on
-[GitHub]({{ metadata.author.github }}), [X]({{ metadata.author.x }}),
-[LinkedIn]({{ metadata.author.linkedin }}), or email me directly at
-[{{ metadata.author.email }}](mailto:{{ metadata.author.email }}).
+[GitHub]({{ site.author.github }}), [X]({{ site.author.x }}),
+[LinkedIn]({{ site.author.linkedin }}), or email me directly at
+[{{ site.author.email }}](mailto:{{ site.author.email }}).
 
 – Ryan.
