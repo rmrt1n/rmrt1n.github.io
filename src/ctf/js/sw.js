@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'rmctf-'
-const CACHE_VERSION = 1 // NOTE: toggle this version every update to cache deps (0/1)
+const CACHE_VERSION = 0 // NOTE: toggle this version every update to cache deps (0/1)
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION
 
 self.addEventListener('install', (event) => {
