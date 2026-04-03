@@ -14,10 +14,6 @@ The visual design of this site is largely inspired by the
 fan of brutalist aesthetics. I try to keep the design simple so the focus stays on the content.
 Extra features are usually there to improve the reading experience.
 
-Fonts used are based on a slightly modified [Modern Font Stacks](https://modernfontstacks.com/).
-Heading text uses transitional typefaces and body text uses neo-grotesques. Code blocks are
-set in [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono).
-
 The site is hosted on [GitHub Pages](https://pages.github.com/) and doesn't use cookies or analytics
 scripts.
 

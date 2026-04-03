@@ -9,6 +9,7 @@ import footnote from 'markdown-it-footnote'
 import toc from 'markdown-it-table-of-contents'
 import crypto from 'node:crypto'
 import { execSync } from 'node:child_process'
+import { readdir, readFile, writeFile } from 'node:fs/promises'
 
 export default function (eleventyConfig) {
   eleventyConfig.setLibrary('md', markdownIt({
@@ -193,6 +194,17 @@ export default function (eleventyConfig) {
     eleventyExcludeFromCollections: (data) => data.draft
       ? ['articles']
       : data.eleventyExcludeFromCollections,
+  })
+
+  // Update sw.js w the css bundle name.
+  eleventyConfig.on('eleventy.after', async ({ directories }) => {
+    const result = await readdir(directories.output)
+    const css = result.filter((file) => file.endsWith('.css'))[0]
+    console.assert(css, 'css bundle not found')
+
+    const sw = `${directories.output}/flag/sw.js`
+    const contents = await readFile(sw, 'utf-8')
+    await writeFile(sw, contents.replace('__CSS_FILE__', css))
   })
 
   return {
