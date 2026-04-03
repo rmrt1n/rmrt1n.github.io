@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'flags'
 
-const wasm = await WebAssembly.instantiateStreaming(fetch('/checker.wasm'));
+const wasm = await WebAssembly.instantiateStreaming(fetch('/checker.wasm'))
 
 const flags = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
 
@@ -17,8 +17,8 @@ document.querySelectorAll('#ctf input').forEach((input) => {
 
 document.getElementById('clear').addEventListener('click', (_) => {
   if (!confirm('Clear all inputs?')) return
-  document.querySelectorAll('#ctf input').forEach((input) => input.value = '');
-  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('#ctf input').forEach((input) => input.value = '')
+  localStorage.removeItem(STORAGE_KEY)
 })
 
 function showBanner(html, right) {
