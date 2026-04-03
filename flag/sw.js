@@ -1,4 +1,6 @@
-const CACHE_NAME = 'rmctf-1'; // NOTE: bump this version every update
+const CACHE_PREFIX = 'rmctf-'
+const CACHE_VERSION = 2 // NOTE: bump this version every update
+const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
@@ -10,14 +12,24 @@ self.addEventListener('install', (event) => {
         '/iFZeBssXUJ.css',
         '/favicon.png',
         '/manifest.json',
-      ]);
+      ])
     })
-  );
-});
+  )
+})
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((name) => {
+          if (name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME) {
+            return caches.delete(name)
+          }
+        })
+      )
+    }).then(() => self.clients.claim())
+  )
+})
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
