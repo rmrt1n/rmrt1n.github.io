@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rmctf';
+const CACHE_NAME = 'rmctf-1'; // NOTE: bump this version every update
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
@@ -7,11 +7,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
         '/flag/',
-        '/css/style.css',
-        '/css/reset.css',
-        '/css/modern-normalize.css',
-        '/css/github.css',
-        '/css/github-dark.css',
+        '/iFZeBssXUJ.css',
         '/favicon.png',
         '/manifest.json',
       ]);
