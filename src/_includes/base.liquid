@@ -14,6 +14,21 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="alternate" type="application/rss+xml" href="/feed.xml">
 
+    <script>
+      // Set before paint to prevent flash.
+      var globalTheme = ''
+      function selectTheme(theme) {
+        if (theme === 'system') {
+          localStorage.removeItem('theme')
+        } else {
+          localStorage.setItem('theme', theme)
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+        globalTheme = theme
+      }
+      selectTheme(localStorage.getItem('theme') ?? 'system')
+    </script>
+
     {%- css -%}
       {% include 'css/reset.css' %}
       {% include 'css/main.css' %}
@@ -50,6 +65,12 @@
       <div>
         <p>&copy; 2024-{{ 'now' | date: '%Y' }} Ryan Martin. <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></p>
         <p><a href="#top">Back to top ⤴</a></p>
+      </div>
+      <div id="theme" hidden>
+        <span>Theme:</span>
+        <label><input type="radio" name="theme" value="system">System</label>
+        <label><input type="radio" name="theme" value="light">Light</label>
+        <label><input type="radio" name="theme" value="dark">Dark</label>
       </div>
       <p>
         <a href="/feed.xml">

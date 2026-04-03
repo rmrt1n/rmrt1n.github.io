@@ -21,3 +21,11 @@ https://ryanmartin.me/ctf/
 }
 
 psst()
+
+document.getElementById('theme').removeAttribute('hidden')
+document.querySelectorAll('#theme input[name="theme"]').forEach((input) => {
+  input.checked = input.value === globalTheme;
+  input.addEventListener('change', () => {
+    selectTheme(input.value);
+  })
+})

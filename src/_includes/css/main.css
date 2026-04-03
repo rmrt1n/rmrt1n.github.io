@@ -15,18 +15,11 @@
   --rail-width: 20rem;
   --rail-gap: 1.5rem;
 
-  --color-bg: #fafafa;
-  --color-fg: #171717;
-  --color-links: blue;
+  --color-bg: light-dark(#fafafa, #0a0a0a);
+  --color-fg: light-dark(#171717, #e5e5e5);
+  --color-links: light-dark(blue, lightblue);
   --color-border: #737373;
-  --color-code: #e5e5e5;
-
-  @media (prefers-color-scheme: dark) {
-    --color-bg: #0a0a0a;
-    --color-fg: #e5e5e5;
-    --color-links: lightblue;
-    --color-code: #262626;
-  }
+  --color-code: light-dark(#e5e5e5, #262626);
 }
 
 /* Highlight targeted anchor link after click with fade away. */
@@ -48,7 +41,11 @@ h2:target, h3:target
 html {
   background-color: var(--color-bg);
   color: var(--color-fg);
-  font: 90%/1.5 var(--font-sans); /* 14px */
+  font: 100%/1.5 var(--font-sans); /* 14px */
+  color-scheme: light dark;
+
+  &[data-theme="light"] { color-scheme: light; }
+  &[data-theme="dark"]  { color-scheme: dark; }
 }
 
 body {
@@ -99,7 +96,7 @@ body {
   }
 
   > main {
-    padding: 1.2rem 0;
+    padding: 1.5rem 0;
     container: main-layout / inline-size;
 
     &:has(article) {
@@ -131,8 +128,11 @@ body {
     display: flex;
     flex-direction: column;
     padding: .5rem 0;
+    font-size: .95em;
 
-    > div {
+    > * + * { margin-top: .1rem };
+
+    > div:first-child {
       display: flex;
       align-items: start;
       justify-content: space-between;
@@ -140,6 +140,17 @@ body {
 
       a {
         text-wrap: nowrap;
+      }
+    }
+
+    > #theme {
+      display: flex;
+      align-items: center;
+      gap: 0 .75rem;
+
+      input {
+        margin-right: .25rem;
+        accent-color: var(--color-links);
       }
     }
   }
@@ -160,11 +171,7 @@ body > main > article {
     }
 
     > #draft {
-      --color-draft: #dc2626; /* red-600 */
-
-      @media (prefers-color-scheme: dark) {
-        --color-draft: #f87171; /* red-400 */
-      }
+      --color-draft: light-dark(#dc2626, #f87171); /* red-600/400 */
 
       display: inline-block;
       color: var(--color-draft);
@@ -384,11 +391,7 @@ img {
   padding: .5rem;
   border: .05rem solid var(--color-border);
   box-shadow:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  background-color: white;
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #525252;
-  }
+  background-color: light-dark(white, #525252);
 }
 
 table {
@@ -499,23 +502,13 @@ form#ctf {
   &.true {
     padding: .25rem;
     border: 0.05rem solid var(--color-border);
-    background-color: #dcfce7; /* green-100 */
+    background-color: light-dark(#dcfce7, #052e16); /* green-100/950 */
   }
 
   &.false {
     padding: .25rem;
     border: 0.05rem solid var(--color-border);
-    background-color: #fee2e2; /* red-100 */
-  }
-
-  @media (prefers-color-scheme: dark) {
-    &.true {
-      background-color: #052e16; /* green-950 */
-    }
-
-    &.false {
-      background-color: #450a0a; /* red-950 */
-    }
+    background-color: light-dark(#fee2e2, #450a0a); /* red-100/950 */
   }
 }
 
