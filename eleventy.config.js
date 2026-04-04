@@ -44,7 +44,7 @@ export default function (eleventyConfig) {
     }
     md.renderer.rules.footnote_block_open = (tokens, idx, options) => {
       return (options.xhtmlOut ? '<hr class="footnotes-sep asterism" />\n' : '<hr class="footnotes-sep asterism">\n') +
-        '<section class="footnotes">\n' +
+        '<section class="footnotes" aria-label="footnotes">\n' +
         '<ol class="footnotes-list">\n'
     }
     md.core.ruler.after('footnote_tail', 'sidenote_content', (state) => {
@@ -178,7 +178,6 @@ export default function (eleventyConfig) {
   })
   eleventyConfig.addBundle('css')
 
-  eleventyConfig.addFilter('toISODateString', (d) => d && d.toISOString().split('T')[0])
   eleventyConfig.addFilter('cleanMarkdown', (s) =>
     s.replaceAll('[[toc]]', '').replaceAll(/\{.*\}/g, '')
   )

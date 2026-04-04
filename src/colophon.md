@@ -34,7 +34,7 @@ as articles and snippets, is licensed under the Creative Commons license
 
 ## Version
 
-Last updated on <time>{{ 'now' | date: '%d %B %Y' }}</time>:
+Last updated on <time datetime="{{ 'now' | date: '%Y-%m-%d' }}">{{ 'now' | date: '%d %B %Y' }}</time>:
 
 <pre class="language-plaintext">
 <code class="language-plaintext"><a href="https://github.com/rmrt1n/rmrt1n.github.io/commit/{% commitHash %}" style="display:inline-block">{% commitHash %}</a> – {% commitMessage %}</code></pre>

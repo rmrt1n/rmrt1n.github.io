@@ -18,7 +18,7 @@ title: Tags
     {% assign posts = collections[tag.tag] | sort: 'data.published' | reverse %}
     {%- for post in posts -%}
         <li>
-          <time>{{ post.data.published | toISODateString }}</time>
+          <time>{{ post.data.published | date: '%Y-%m-%d' }}</time>
           <a href="{{ post.page.url }}">{{ post.data.title }}</a>
         </li>
     {%- endfor -%}

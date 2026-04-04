@@ -13,7 +13,7 @@ updates via [this RSS feed](/feed.xml). If you have any feedback or corrections 
   {% assign articles = collections.articles | sort: 'data.published' | reverse %}
   {%- for article in articles -%}
     <li>
-      <time>{{ article.data.published | toISODateString }}</time>
+      <time>{{ article.data.published | date: '%Y-%m-%d' }}</time>
       <a href="{{ article.page.url }}">{{ article.data.title}}</a>
     </li>
   {%- endfor -%}
