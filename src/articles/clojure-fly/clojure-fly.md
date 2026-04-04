@@ -7,7 +7,7 @@ tags:
   - Networking
   - Web Development
 published: 2024-10-20
-updated: 2026-03-17
+updated: 2026-04-04
 ---
 
 This post walks through a small web development project using Clojure, covering everything from building the app to packaging and deploying it. It's a collection of insights and tips I've learned from building my Clojure side projects, but presented in a more structured format.
@@ -552,7 +552,7 @@ If you rebuild the project and run `java -jar target/standalone.jar` again, it s
 # separate base from build layer so any additional deps installed are cached
 FROM clojure:temurin-21-tools-deps-bookworm-slim AS base
 
-FROM base as build
+FROM base AS build
 WORKDIR /opt
 COPY . .
 RUN clj -T:build uber
