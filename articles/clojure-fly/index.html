@@ -24,7 +24,7 @@
       }
       selectTheme(localStorage.getItem('theme') ?? 'system')
     </script>
-    <link rel="stylesheet" type="text/css" href="/zferatC_aZ.css">
+    <link rel="stylesheet" type="text/css" href="/Li4cQKJnv5.css">
 
     <title>Ryan Martin | Build and Deploy Web Apps With Clojure and FLy.io</title>
 
@@ -185,11 +185,11 @@
    <span class="token punctuation">[</span>clojure.java.io <span class="token symbol">:as</span> io<span class="token punctuation">]</span>
    <span class="token punctuation">[</span>integrant.core <span class="token symbol">:as</span> ig<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> read-config
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">read-config</span>
   <span class="token punctuation">[</span><span class="token punctuation">]</span>
   <span class="token punctuation">{</span><span class="token symbol">:system/config</span> <span class="token punctuation">(</span><span class="token function">aero/read-config</span> <span class="token punctuation">(</span><span class="token function">io/resource</span> <span class="token string">"config.edn"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/expand-key <span class="token symbol">:system/config</span>
+<span class="token punctuation">(</span><span class="token keyword">defmethod</span> <span class="token definitions">ig/expand-key</span> <span class="token symbol">:system/config</span>
   <span class="token punctuation">[</span>_ opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>server database<span class="token punctuation">]</span><span class="token punctuation">}</span> opts<span class="token punctuation">]</span>
     <span class="token punctuation">{</span><span class="token symbol">:server/jetty</span> <span class="token punctuation">(</span><span class="token keyword">assoc</span> server <span class="token symbol">:handler</span> <span class="token punctuation">(</span><span class="token function">ig/ref</span> <span class="token symbol">:handler/ring</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -222,7 +222,7 @@
    <span class="token punctuation">[</span>ring.adapter.jetty <span class="token symbol">:as</span> jetty<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/init-key <span class="token symbol">:server/jetty</span>
+<span class="token punctuation">(</span><span class="token keyword">defmethod</span> <span class="token definitions">ig/init-key</span> <span class="token symbol">:server/jetty</span>
   <span class="token punctuation">[</span>_ opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>handler port<span class="token punctuation">]</span><span class="token punctuation">}</span> opts
         jetty-opts <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> opts <span class="token punctuation">(</span><span class="token keyword">dissoc</span> <span class="token symbol">:handler</span> <span class="token symbol">:auth</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">assoc</span> <span class="token symbol">:join?</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -230,15 +230,15 @@
     <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Server started on port "</span> port<span class="token punctuation">)</span>
     server<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/halt-key! <span class="token symbol">:server/jetty</span>
+<span class="token punctuation">(</span><span class="token keyword">defmethod</span> <span class="token definitions">ig/halt-key!</span> <span class="token symbol">:server/jetty</span>
   <span class="token punctuation">[</span>_ server<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">.stop</span> server<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/init-key <span class="token symbol">:handler/ring</span>
+<span class="token punctuation">(</span><span class="token keyword">defmethod</span> <span class="token definitions">ig/init-key</span> <span class="token symbol">:handler/ring</span>
   <span class="token punctuation">[</span>_ opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">handler/handler</span> opts<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defmethod</span> ig/init-key <span class="token symbol">:database/sql</span>
+<span class="token punctuation">(</span><span class="token keyword">defmethod</span> <span class="token definitions">ig/init-key</span> <span class="token symbol">:database/sql</span>
   <span class="token punctuation">[</span>_ opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span>datasource <span class="token punctuation">(</span><span class="token function">jdbc/get-datasource</span> opts<span class="token punctuation">)</span><span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token function">util/setup-db</span> datasource<span class="token punctuation">)</span>
@@ -254,7 +254,7 @@
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>next.jdbc <span class="token symbol">:as</span> jdbc<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> setup-db
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">setup-db</span>
   <span class="token punctuation">[</span>db<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">jdbc/execute-one!</span>
    db
@@ -274,7 +274,7 @@
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>ring.util.response <span class="token symbol">:as</span> res<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> handler
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">handler</span>
   <span class="token punctuation">[</span>_opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"hi world"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
@@ -304,11 +304,11 @@ Server started on port  8080
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>reitit.ring <span class="token symbol">:as</span> ring<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">def</span> routes
+<span class="token punctuation">(</span><span class="token keyword">def</span> <span class="token definitions">routes</span>
   <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token string">"/"</span> <span class="token punctuation">{</span><span class="token symbol">:get</span>  index-page
          <span class="token symbol">:post</span> index-action<span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> handler
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">handler</span>
   <span class="token punctuation">[</span>opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">ring/ring-handler</span>
    <span class="token punctuation">(</span><span class="token function">ring/router</span> routes<span class="token punctuation">)</span>
@@ -332,7 +332,7 @@ Server started on port  8080
       </div>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> components-middleware
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">components-middleware</span>
   <span class="token punctuation">[</span>components<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>database auth<span class="token punctuation">]</span><span class="token punctuation">}</span> components<span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">[</span>handler<span class="token punctuation">]</span>
@@ -370,7 +370,7 @@ Server started on port  8080
    <span class="token punctuation">[</span>ring.util.response <span class="token symbol">:as</span> res<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> wrap-basic-auth
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">wrap-basic-auth</span>
   <span class="token punctuation">[</span>handler<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
     <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>headers auth<span class="token punctuation">]</span><span class="token punctuation">}</span> req
@@ -395,7 +395,7 @@ Server started on port  8080
    <span class="token comment">;; ...</span>
   <span class="token punctuation">(</span><span class="token symbol">:import</span> java.util.Base64<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> base64-encode
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">base64-encode</span>
   <span class="token punctuation">[</span>s<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">.encodeToString</span> <span class="token punctuation">(</span><span class="token function">Base64/getEncoder</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">.getBytes</span> s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
@@ -411,7 +411,7 @@ Server started on port  8080
    <span class="token punctuation">[</span>ring.middleware.params <span class="token symbol">:refer</span> <span class="token punctuation">[</span>wrap-params<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> handler
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">handler</span>
   <span class="token punctuation">[</span>opts<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token function">ring/ring-handler</span>
    <span class="token comment">;; ...</span>
@@ -437,7 +437,7 @@ Server started on port  8080
    <span class="token punctuation">[</span>next.jdbc.sql <span class="token symbol">:as</span> sql<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> template
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">template</span>
   <span class="token punctuation">[</span>bookmarks<span class="token punctuation">]</span>
   <span class="token punctuation">[</span><span class="token symbol">:html</span>
    <span class="token punctuation">[</span><span class="token symbol">:head</span>
@@ -464,7 +464,7 @@ Server started on port  8080
            <span class="token punctuation">[</span><span class="token symbol">:a</span> <span class="token punctuation">{</span><span class="token symbol">:href</span> url<span class="token punctuation">}</span> url<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
         bookmarks<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> index-page
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">index-page</span>
   <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">try</span>
     <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span>bookmarks <span class="token punctuation">(</span><span class="token function">sql/query</span> <span class="token punctuation">(</span><span class="token symbol">:db</span> req<span class="token punctuation">)</span>
@@ -489,15 +489,15 @@ Server started on port  8080
   <span class="token punctuation">(</span><span class="token symbol">:import</span> java.util.Base64<span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> preprend-doctype
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">preprend-doctype</span>
   <span class="token punctuation">[</span>s<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">str</span> <span class="token string">"&lt;!doctype html&gt;"</span> s<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> render
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">render</span>
   <span class="token punctuation">[</span>hiccup<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> hiccup h/html str preprend-doctype res/response <span class="token punctuation">(</span><span class="token function">res/content-type</span> <span class="token string">"text/html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> server-error
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">server-error</span>
   <span class="token punctuation">[</span>e<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Caught exception: "</span> e<span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> <span class="token punctuation">(</span><span class="token function">res/response</span> <span class="token string">"Internal server error"</span><span class="token punctuation">)</span>
@@ -512,7 +512,7 @@ Server started on port  8080
       </div>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> index-action
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">index-action</span>
   <span class="token punctuation">[</span>req<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">try</span>
     <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token symbol">:keys</span> <span class="token punctuation">[</span>db form-params<span class="token punctuation">]</span><span class="token punctuation">}</span> req
@@ -534,7 +534,7 @@ Server started on port  8080
       </div>
 <pre class="language-clojure"><code class="language-clojure"><span class="token comment">;; ...</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> -main <span class="token punctuation">[</span>&amp; _<span class="token punctuation">]</span>
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">-main</span> <span class="token punctuation">[</span>&amp; _<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">-&gt;</span> <span class="token punctuation">(</span><span class="token function">read-config</span><span class="token punctuation">)</span> ig/expand ig/init<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p></p></div><p></p>
 <p>Now, you should be able to run the app using <code>clj -M -m acme.main</code>. That’s all the code needed for the app. In the next section, we’ll package the app into a Docker image to deploy to Fly.</p>
@@ -567,11 +567,11 @@ Server started on port  8080
   <span class="token punctuation">(</span><span class="token symbol">:require</span>
    <span class="token punctuation">[</span>clojure.tools.build.api <span class="token symbol">:as</span> b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">def</span> basis <span class="token punctuation">(</span><span class="token function">delay</span> <span class="token punctuation">(</span><span class="token function">b/create-basis</span> <span class="token punctuation">{</span><span class="token symbol">:project</span> <span class="token string">"deps.edn"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token punctuation">(</span><span class="token keyword">def</span> src-dirs <span class="token punctuation">[</span><span class="token string">"src"</span> <span class="token string">"resources"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token punctuation">(</span><span class="token keyword">def</span> class-dir <span class="token string">"target/classes"</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">def</span> <span class="token definitions">basis</span> <span class="token punctuation">(</span><span class="token function">delay</span> <span class="token punctuation">(</span><span class="token function">b/create-basis</span> <span class="token punctuation">{</span><span class="token symbol">:project</span> <span class="token string">"deps.edn"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">def</span> <span class="token definitions">src-dirs</span> <span class="token punctuation">[</span><span class="token string">"src"</span> <span class="token string">"resources"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token keyword">def</span> <span class="token definitions">class-dir</span> <span class="token string">"target/classes"</span><span class="token punctuation">)</span>
 
-<span class="token punctuation">(</span><span class="token keyword">defn</span> uber
+<span class="token punctuation">(</span><span class="token keyword">defn</span> <span class="token definitions">uber</span>
   <span class="token punctuation">[</span>_<span class="token punctuation">]</span>
   <span class="token punctuation">(</span><span class="token keyword">println</span> <span class="token string">"Cleaning build directory..."</span><span class="token punctuation">)</span>
   <span class="token punctuation">(</span><span class="token function">b/delete</span> <span class="token punctuation">{</span><span class="token symbol">:path</span> <span class="token string">"target"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
@@ -630,7 +630,7 @@ Server started on port  8080
 <span class="token comment"># separate base from build layer so any additional deps installed are cached</span>
 <span class="token instruction"><span class="token keyword">FROM</span> clojure:temurin-21-tools-deps-bookworm-slim <span class="token keyword">AS</span> base</span>
 
-<span class="token instruction"><span class="token keyword">FROM</span> base <span class="token keyword">as</span> build</span>
+<span class="token instruction"><span class="token keyword">FROM</span> base <span class="token keyword">AS</span> build</span>
 <span class="token instruction"><span class="token keyword">WORKDIR</span> /opt</span>
 <span class="token instruction"><span class="token keyword">COPY</span> . .</span>
 <span class="token instruction"><span class="token keyword">RUN</span> clj -T:build uber</span>

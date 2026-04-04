@@ -545,7 +545,7 @@ If you rebuild the project and run `java -jar target/standalone.jar` again, it s
 # separate base from build layer so any additional deps installed are cached
 FROM clojure:temurin-21-tools-deps-bookworm-slim AS base
 
-FROM base as build
+FROM base AS build
 WORKDIR /opt
 COPY . .
 RUN clj -T:build uber

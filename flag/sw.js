@@ -1,5 +1,6 @@
 const CACHE_PREFIX = 'rmctf-'
-const CACHE_VERSION = 0 // NOTE: toggle this version every update to cache deps (0/1)
+// TODO: automate
+const CACHE_VERSION = 1 // NOTE: toggle this version every update to cache deps (0/1)
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION
 
 self.addEventListener('install', (event) => {
@@ -9,7 +10,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
         '/flag/',
-        '/zferatC_aZ.css',
+        '/Li4cQKJnv5.css',
         '/favicon.png',
         '/manifest.json',
       ])

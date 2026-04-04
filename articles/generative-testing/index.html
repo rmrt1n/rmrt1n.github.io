@@ -24,7 +24,7 @@
       }
       selectTheme(localStorage.getItem('theme') ?? 'system')
     </script>
-    <link rel="stylesheet" type="text/css" href="/zferatC_aZ.css">
+    <link rel="stylesheet" type="text/css" href="/Li4cQKJnv5.css">
 
     <title>Ryan Martin | Rewriting My Tests With Generative Testing</title>
 
@@ -297,17 +297,17 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/ecs/component.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> componentManager <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> <span class="token definitions">componentManager</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
 	nextID    componentID            <span class="token comment">// The next available component ID</span>
 	catalog   <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>componentID <span class="token comment">// Component name -&gt; component ID</span>
 	factories <span class="token punctuation">[</span><span class="token punctuation">]</span>columnFactory        <span class="token comment">// Component ID -&gt; column factory</span>
 <span class="token punctuation">}</span>
 
 <span class="token comment">// register registers a new component type and returns its ID.</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token function">register</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> factory columnFactory<span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token definitions">register</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> factory columnFactory<span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
 
 <span class="token comment">// getID returns a component's ID given its name.</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token function">getID</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cm <span class="token operator">*</span>componentManager<span class="token punctuation">)</span> <span class="token definitions">getID</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>componentID<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
 <p>While the manager does more internally, the bulk of its work is component registrations, which basically involves mapping component IDs to their names. Since this behaviour is essentially like a map, I used Go’s built-in <code>map</code> as the model. Here’s a simplified version of the test:</p>
 <div class="codeblock">
@@ -315,7 +315,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/ecs/component_internal_test.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
 	impl <span class="token operator">:=</span> <span class="token function">newComponentManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	model <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>componentID<span class="token punctuation">)</span>
@@ -368,11 +368,11 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/testutils/random.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> OpWeights <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">uint64</span> <span class="token comment">// Operation names -&gt; weights</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> <span class="token definitions">OpWeights</span> <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">uint64</span> <span class="token comment">// Operation names -&gt; weights</span>
 
 <span class="token comment">// RandOpWeights selects a random subset of operations and assigns random weights to them.</span>
 <span class="token comment">// At minimum 1 operation is enabled, at most all operations are enabled.</span>
-<span class="token keyword">func</span> <span class="token function">RandOpWeights</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span> OpWeights <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">RandOpWeights</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span> OpWeights <span class="token punctuation">{</span>
 	assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>ops<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"you need multiple operations to randomize"</span><span class="token punctuation">)</span>
 
 	<span class="token comment">// Randomly select how many operations to enable (1 to len(ops)).</span>
@@ -391,7 +391,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <span class="token punctuation">}</span>
 
 <span class="token comment">// RandWeightedOp returns a random weighted operation from a OpWeights.</span>
-<span class="token keyword">func</span> <span class="token function">RandWeightedOp</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops OpWeights<span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">RandWeightedOp</span><span class="token punctuation">(</span>r <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand<span class="token punctuation">,</span> ops OpWeights<span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span>
 	<span class="token keyword">var</span> total <span class="token builtin">uint64</span>
 	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> weight <span class="token operator">:=</span> <span class="token keyword">range</span> ops <span class="token punctuation">{</span>
 		total <span class="token operator">+=</span> weight
@@ -412,7 +412,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/ecs/component_internal_test.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">TestComponent_RegisterModelFuzz</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
 
 	<span class="token comment">// Get a random weighted subset of your operations.</span>
@@ -436,7 +436,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/event/event.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">NewManager</span><span class="token punctuation">(</span>channelCapacity <span class="token builtin">int</span><span class="token punctuation">)</span> Manager <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">NewManager</span><span class="token punctuation">(</span>channelCapacity <span class="token builtin">int</span><span class="token punctuation">)</span> Manager <span class="token punctuation">{</span>
 	<span class="token keyword">return</span> Manager<span class="token punctuation">{</span>
 		channel<span class="token punctuation">:</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> Event<span class="token punctuation">,</span> channelCapacity<span class="token punctuation">)</span><span class="token punctuation">,</span>
 		<span class="token comment">// ...</span>
@@ -444,7 +444,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 <span class="token punctuation">}</span>
 
 <span class="token comment">// Enqueue enqueues an event into the Manager.</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Manager<span class="token punctuation">)</span> <span class="token function">Enqueue</span><span class="token punctuation">(</span>event Event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Manager<span class="token punctuation">)</span> <span class="token definitions">Enqueue</span><span class="token punctuation">(</span>event Event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	e<span class="token punctuation">.</span>channel <span class="token operator">&lt;-</span> event
 <span class="token punctuation">}</span></code></pre>
 <p></p></div><p></p>
@@ -457,7 +457,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/event/event_test.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestEvent_EnqueueChannelFull</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">TestEvent_EnqueueChannelFull</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	synctest<span class="token punctuation">.</span><span class="token function">Test</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 		<span class="token keyword">const</span> channelCapacity <span class="token operator">=</span> <span class="token number">16</span>
 		<span class="token keyword">const</span> totalEvents <span class="token operator">=</span> channelCapacity <span class="token operator">*</span> <span class="token number">3</span> <span class="token comment">// Well beyond channel capacity</span>
@@ -499,7 +499,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/ecs/archetype.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> archetype <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">type</span> <span class="token definitions">archetype</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
 	id         archetypeID      <span class="token comment">// Corresponds to the index in the archetypes array</span>
 	components bitmap<span class="token punctuation">.</span>Bitmap    <span class="token comment">// Bitmap of components contained in this archetype</span>
 	rows       sparseSet        <span class="token comment">// Maps entity ID -&gt; row index in entities and columns</span>
@@ -514,7 +514,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <button onclick="copy(this)">Copy</button>
       </div>
 <pre class="language-go"><code class="language-go"><span class="token comment">// moveEntity moves an entity from one archetype to another.</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>a <span class="token operator">*</span>archetype<span class="token punctuation">)</span> <span class="token function">moveEntity</span><span class="token punctuation">(</span>destination <span class="token operator">*</span>archetype<span class="token punctuation">,</span> eid EntityID<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>a <span class="token operator">*</span>archetype<span class="token punctuation">)</span> <span class="token definitions">moveEntity</span><span class="token punctuation">(</span>destination <span class="token operator">*</span>archetype<span class="token punctuation">,</span> eid EntityID<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	<span class="token keyword">if</span> a <span class="token operator">==</span> destination <span class="token punctuation">{</span>
 		<span class="token keyword">return</span>
 	<span class="token punctuation">}</span>
@@ -572,7 +572,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/internal/ecs/archetype_internal_test.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestArchetype_MoveExhaustive</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">TestArchetype_MoveExhaustive</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
 
 	<span class="token comment">// Generate all possible subsets (archetype) with N component types.</span>
@@ -626,7 +626,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
       </div>
 <pre class="language-go"><code class="language-go"><span class="token keyword">var</span> Seed <span class="token builtin">uint64</span> <span class="token comment">// Global test seed</span>
 
-<span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	Seed <span class="token operator">=</span> <span class="token function">uint64</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">UnixNano</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 	<span class="token keyword">if</span> envSeed <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Getenv</span><span class="token punctuation">(</span><span class="token string">"TEST_SEED"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> envSeed <span class="token operator">!=</span> <span class="token string">""</span> <span class="token punctuation">{</span>
 		parsed<span class="token punctuation">,</span> err <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">ParseUint</span><span class="token punctuation">(</span>envSeed<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">64</span><span class="token punctuation">)</span>
@@ -637,7 +637,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
 	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"to reproduce: TEST_SEED=0x%x\n"</span><span class="token punctuation">,</span> Seed<span class="token punctuation">)</span>
 <span class="token punctuation">}</span>
 
-<span class="token keyword">func</span> <span class="token function">NewRand</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">NewRand</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">*</span>rand<span class="token punctuation">.</span>Rand <span class="token punctuation">{</span>
 	t<span class="token punctuation">.</span><span class="token function">Helper</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	<span class="token comment">// We derive a unique seed for each test by XOR-ing the global seed with a hash of the test name.</span>
 	h <span class="token operator">:=</span> fnv<span class="token punctuation">.</span><span class="token function">New64a</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -699,7 +699,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
       </div>
 <pre class="language-go"><code class="language-go"><span class="token comment">// NOTE: The World type is Cardinal.</span>
 
-<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>World<span class="token punctuation">)</span> <span class="token function">Tick</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> timestamp time<span class="token punctuation">.</span>Time<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>World<span class="token punctuation">)</span> <span class="token definitions">Tick</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> timestamp time<span class="token punctuation">.</span>Time<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	w<span class="token punctuation">.</span>currentTick<span class="token punctuation">.</span>timestamp <span class="token operator">=</span> timestamp
 
 	<span class="token comment">// Collect the commands for this tick.</span>
@@ -731,7 +731,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/dst.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">RunDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token operator">*</span>World<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">RunDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token operator">*</span>World<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
 	cfg <span class="token operator">:=</span> <span class="token function">newDSTConfig</span><span class="token punctuation">(</span>prng<span class="token punctuation">)</span>
 	fix <span class="token operator">:=</span> <span class="token function">newDSTFixture</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> cfg<span class="token punctuation">,</span> setup<span class="token punctuation">)</span>
@@ -794,7 +794,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
       </div>
 <pre class="language-go"><code class="language-go"><span class="token keyword">import</span> <span class="token string">"github.com/argus-labs/world-engine/pkg/cardinal"</span>
 
-<span class="token keyword">func</span> <span class="token function">YourTestDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">YourTestDST</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	cardinal<span class="token punctuation">.</span><span class="token function">RunDST</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>w <span class="token operator">*</span>cardinal<span class="token punctuation">.</span>World<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 		<span class="token comment">// Register your systems here...</span>
 		cardinal<span class="token punctuation">.</span><span class="token function">RegisterSystem</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> system<span class="token punctuation">.</span>PlayerSpawnerSystem<span class="token punctuation">,</span> cardinal<span class="token punctuation">.</span><span class="token function">WithHook</span><span class="token punctuation">(</span>cardinal<span class="token punctuation">.</span>Init<span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -824,7 +824,7 @@ This is called <strong>model-based testing (MBT)</strong>, or stateful PBT, stat
         <span>pkg/cardinal/e2e.go</span>
         <button onclick="copy(this)">Copy</button>
       </div>
-<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">RunE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup E2ESetupFunc<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<pre class="language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token definitions">RunE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">,</span> setup E2ESetupFunc<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	prng <span class="token operator">:=</span> testutils<span class="token punctuation">.</span><span class="token function">NewRand</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span>
 	cfg <span class="token operator">:=</span> <span class="token function">newE2EConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	fix <span class="token operator">:=</span> <span class="token function">newE2EFixture</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> setup<span class="token punctuation">)</span>
@@ -870,7 +870,7 @@ sendLoop<span class="token punctuation">:</span>
       </div>
 <pre class="language-go"><code class="language-go"><span class="token keyword">import</span> <span class="token string">"github.com/argus-labs/world-engine/pkg/cardinal"</span>
 
-<span class="token keyword">func</span> <span class="token function">TestE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">func</span> <span class="token definitions">TestE2E</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 	cardinal<span class="token punctuation">.</span><span class="token function">RunE2E</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>cardinal<span class="token punctuation">.</span>World <span class="token punctuation">{</span>
 		world<span class="token punctuation">,</span> err <span class="token operator">:=</span> cardinal<span class="token punctuation">.</span><span class="token function">NewWorld</span><span class="token punctuation">(</span>cardinal<span class="token punctuation">.</span>WorldOptions<span class="token punctuation">{</span>
 			<span class="token comment">// Your world configuration...</span>
