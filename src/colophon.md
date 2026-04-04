@@ -5,15 +5,10 @@ title: Colophon
 
 ## Technology and Design
 
-<!-- This site is built with [Eleventy (11ty)](https://www.11ty.dev/). I've tried a lot of different web -->
-<!-- frameworks, but I keep coming back to it. It's simple, flexible, has a lot of useful plugins, and -->
-<!-- just gets the job done. -->
-
 This site is built with the [Eleventy (11ty)](https://www.11ty.dev/) static site generator and is
 hosted on [GitHub Pages](https://pages.github.com/). Styling and bits of interactivity are done
-using plain CSS and JavaScript.
-I write my articles in [Obsidian](https://obsidian.md/)
-and just manually copy+paste them into this site's repo.
+using plain CSS and JavaScript. I write my articles in [Obsidian](https://obsidian.md/) and just
+manually copy+paste them into this site's repo.
 
 The visual design of this site is largely inspired by the
 [BMFW](http://bettermotherfuckingwebsite.com/) and [Craigslist](https://craigslist.org/). I'm a big

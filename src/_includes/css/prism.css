@@ -1,23 +1,32 @@
-/* Prism GitHub theme */
+/* Custom prism theme based on Tonsky's Alabaster (https://tonsky.me/blog/syntax-highlighting/),
+ * but ignoring the comment highlight rule. Most code my posts have been simplified, comments are
+ * there for extra guidance, hence why they're dimmed. NOTE: Some styles will only work in this
+ * site because I added custom Prism rules to match my desired tokens. See eleventy.config.js for
+ * more details. */
 
-/**
- * Github Light theme for Prism.js
- * Based on Github: https://github.com
- * @author Katorly
- */
+:root {
+  --color-code-bg: light-dark(#f5f5f5, #202020);
+  --color-code-fg: var(--color-fg);
+  --color-code-comments: light-dark(#737373, #a3a3a3);
+  --color-code-punctuation: light-dark(#a3a3a3, #737373);
+  --color-code-strings: light-dark(#15803d, #86efac);
+  --color-code-constants: light-dark(#b45309, #fcd34d);
+  --color-code-definitions: light-dark(#1d4ed8, #93c5fd);
+}
+
 /* General */
+
 pre[class*='language-'],
 code[class*='language-'] {
-  color: #24292f;
-  font-size: 13px;
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   text-shadow: none;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  direction: ltr;
   text-align: left;
+  direction: ltr;
   white-space: pre;
   word-spacing: normal;
   word-break: normal;
-  line-height: 1.5;
   -moz-tab-size: 4;
   -o-tab-size: 4;
   tab-size: 4;
@@ -26,245 +35,54 @@ code[class*='language-'] {
   -ms-hyphens: none;
   hyphens: none;
 }
+
 pre[class*='language-']::selection,
 code[class*='language-']::selection,
 pre[class*='language-']::mozselection,
 code[class*='language-']::mozselection {
   text-shadow: none;
-  background: #9fc6e9;
+  /* background: #9fc6e9; */ /* Doesn't work? */
 }
+
 @media print {
   pre[class*='language-'],
   code[class*='language-'] {
     text-shadow: none;
   }
 }
+
 pre[class*='language-'] {
   padding: 1em;
-  margin: 0.5em 0;
   overflow: auto;
-  background: #f6f8fa;
-}
-:not(pre) > code[class*='language-'] {
-  padding: 0.1em 0.3em;
-  border-radius: 0.3em;
-  color: #24292f;
-  background: #eff1f3;
-}
-/* Line highlighting */
-pre[data-line] {
-  position: relative;
-}
-pre[class*='language-'] > code[class*='language-'] {
-  position: relative;
-  z-index: 1;
-}
-.line-highlight {
-  position: absolute;
-  left: 0;
-  right: 0;
-  padding: inherit 0;
-  margin-top: 1em;
-  background: #fff8c5;
-  box-shadow: inset 5px 0 0 #eed888;
-  z-index: 0;
-  pointer-events: none;
-  line-height: inherit;
-  white-space: pre;
-}
-/* Tokens */
-.namespace {
-  opacity: 0.7;
-}
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-  color: #6e7781;
-}
-.token.punctuation {
-  color: #24292f;
-}
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted {
-  color: #0550ae;
-}
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted {
-  color: #0a3069;
-}
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-  color: #0550ae;
-}
-.token.atrule,
-.token.attr-value,
-.token.keyword {
-  color: #cf222e;
-}
-.token.function {
-  color: #8250df;
-}
-.token.regex,
-.token.important,
-.token.variable {
-  color: #0a3069;
-}
-.token.important,
-.token.bold {
-  font-weight: bold;
-}
-.token.italic {
-  font-style: italic;
-}
-.token.entity {
-  cursor: help;
+  background: light-dark(#f5f5f5, #202020);
 }
 
-@media (prefers-color-scheme: dark) {
-  /**
-   * Github Dark theme for Prism.js
-   * Based on Github: https://github.com
-   * @author Katorly
-   */
-  /* General */
-  pre[class*='language-'],
-  code[class*='language-'] {
-    color: #c9d1d9;
-    font-size: 13px;
-    text-shadow: none;
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    direction: ltr;
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    line-height: 1.5;
-    -moz-tab-size: 4;
-    -o-tab-size: 4;
-    tab-size: 4;
-    -webkit-hyphens: none;
-    -moz-hyphens: none;
-    -ms-hyphens: none;
-    hyphens: none;
-  }
-  pre[class*='language-']::selection,
-  code[class*='language-']::selection,
-  pre[class*='language-']::mozselection,
-  code[class*='language-']::mozselection {
-    text-shadow: none;
-    background: #234879;
-  }
-  @media print {
-    pre[class*='language-'],
-    code[class*='language-'] {
-      text-shadow: none;
-    }
-  }
-  pre[class*='language-'] {
-    padding: 1em;
-    margin: 0.5em 0;
-    overflow: auto;
-    background: #161b22;
-  }
-  :not(pre) > code[class*='language-'] {
-    padding: 0.1em 0.3em;
-    border-radius: 0.3em;
-    color: #c9d1d9;
-    background: #343942;
-  }
-  /* Line highlighting */
-  pre[data-line] {
-    position: relative;
-  }
-  pre[class*='language-'] > code[class*='language-'] {
-    position: relative;
-    z-index: 1;
-  }
-  .line-highlight {
-    position: absolute;
-    left: 0;
-    right: 0;
-    padding: inherit 0;
-    margin-top: 1em;
-    background: #2f2a1e;
-    box-shadow: inset 5px 0 0 #674c16;
-    z-index: 0;
-    pointer-events: none;
-    line-height: inherit;
-    white-space: pre;
-  }
-  /* Tokens */
-  .namespace {
-    opacity: 0.7;
-  }
-  .token.comment,
-  .token.prolog,
-  .token.doctype,
-  .token.cdata {
-    color: #8b949e;
-  }
-  .token.punctuation {
-    color: #c9d1d9;
-  }
-  .token.property,
-  .token.tag,
-  .token.boolean,
-  .token.number,
-  .token.constant,
-  .token.symbol,
-  .token.deleted {
-    color: #79c0ff;
-  }
-  .token.selector,
-  .token.attr-name,
-  .token.string,
-  .token.char,
-  .token.builtin,
-  .token.inserted {
-    color: #a5d6ff;
-  }
-  .token.operator,
-  .token.entity,
-  .token.url,
-  .language-css .token.string,
-  .style .token.string {
-    color: #a5d6ff;
-    background: #161b22;
-  }
-  .token.atrule,
-  .token.attr-value,
-  .token.keyword {
-    color: #a5d6ff;
-  }
-  .token.function {
-    color: #d2a8ff;
-  }
-  .token.regex,
-  .token.important,
-  .token.variable {
-    color: #a8daff;
-  }
-  .token.important,
-  .token.bold {
-    font-weight: bold;
-  }
-  .token.italic {
-    font-style: italic;
-  }
-  .token.entity {
-    cursor: help;
-  }
+/* I dont' use inlined code blocks with language, hence no styles for it. */
+
+/* Tokens. I'm only supporting languages I use for my blog posts ATM. */
+
+.token.comment {
+  color: var(--color-code-comments);
+}
+
+.token.punctuation {
+  color: var(--color-code-punctuation);
+}
+
+.token.string {
+  color: var(--color-code-strings);
+}
+
+.token.char, .token.number, .token.boolean, .token.symbol {
+  color: var(--color-code-constants);
+}
+
+.language-python .token.function, .language-python .token.class-name,
+.language-javascript .token.definitions,
+.language-clojure .token.definitions,
+.language-zig .token.definitions,
+.language-go .token.definitions
+{
+  color: var(--color-code-definitions);
+  font-weight: bold;
 }

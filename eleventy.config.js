@@ -96,7 +96,50 @@ export default function (eleventyConfig) {
   })
 
   eleventyConfig.addPlugin(InputPathToUrlTransformPlugin)
-  eleventyConfig.addPlugin(syntaxHighlight)
+  eleventyConfig.addPlugin(syntaxHighlight, {
+    // Extra Prism rules added by GPT 5.4. I couldn't bother writing the regex myself.
+    languages: ['javascript', 'clojure', 'zig', 'go'],
+    init: ({ Prism }) => {
+      Prism.languages.insertBefore('javascript', 'function-variable', {
+        definitions: {
+          // Approximate top-level declarations by requiring the name to start at line start.
+          pattern: /(^(?:(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+|(?:export\s+(?:default\s+)?)?class\s+|(?:export\s+)?const\s+))[$A-Z_a-z][\w$]*/m,
+          lookbehind: true,
+        },
+      })
+      Prism.languages.insertBefore('clojure', 'keyword', {
+        definitions: {
+          // Highlight names introduced by top-level def-like forms.
+          pattern: /(^\s*\((?:def[a-z-!?*+<>=/.]*|deftype|defrecord|defprotocol|defstruct|definterface)\s+)[\w*+!?'<>=/.-]+/m,
+          lookbehind: true,
+        },
+      })
+      Prism.languages.insertBefore('zig', 'class-name', {
+        definitions: [
+          {
+            pattern: /(^\s*(?:pub\s+)?(?:inline\s+)?(?:noinline\s+)?(?:export\s+)?(?:extern\s+)?fn\s+)\w+/m,
+            lookbehind: true,
+          },
+          {
+            pattern: /(^\s*(?:pub\s+)?const\s+)\w+(?=\s*=\s*(?:(?:extern|packed)\s+)?(?:struct|enum|union|opaque)\b)/m,
+            lookbehind: true,
+          },
+        ],
+      })
+      Prism.languages.insertBefore('go', 'keyword', {
+        definitions: [
+          {
+            pattern: /(^\s*func(?:\s*\([^\n)]*\))?\s+)[A-Za-z_]\w*/m,
+            lookbehind: true,
+          },
+          {
+            pattern: /(^\s*type\s+)[A-Za-z_]\w*/m,
+            lookbehind: true,
+          },
+        ],
+      })
+    },
+  })
   eleventyConfig.addPlugin(feedPlugin, {
     type: 'atom',
     outputPath: '/feed.xml',

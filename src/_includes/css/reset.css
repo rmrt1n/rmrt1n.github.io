@@ -70,8 +70,13 @@ img, picture, video {
 }
 
 /* Slightly dim images in dark mode. */
+@media (prefers-color-scheme: light) {
+  :root[data-theme="dark"] img {
+    filter: brightness(0.8) contrast(1.2);
+  }
+}
 @media (prefers-color-scheme: dark) {
-  img {
+  :root:not([data-theme="light"]) img {
     filter: brightness(0.8) contrast(1.2);
   }
 }

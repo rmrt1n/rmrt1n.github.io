@@ -20,6 +20,11 @@
   --color-links: light-dark(blue, lightblue);
   --color-border: #737373;
   --color-code: light-dark(#e5e5e5, #262626);
+
+  color-scheme: light dark;
+
+  &[data-theme="light"] { color-scheme: light; }
+  &[data-theme="dark"]  { color-scheme: dark; }
 }
 
 /* Highlight targeted anchor link after click with fade away. */
@@ -41,11 +46,7 @@ h2:target, h3:target
 html {
   background-color: var(--color-bg);
   color: var(--color-fg);
-  font: 100%/1.5 var(--font-sans); /* 14px */
-  color-scheme: light dark;
-
-  &[data-theme="light"] { color-scheme: light; }
-  &[data-theme="dark"]  { color-scheme: dark; }
+  font: 100%/1.5 var(--font-sans);
 }
 
 body {

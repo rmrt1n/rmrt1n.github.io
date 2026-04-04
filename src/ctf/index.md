@@ -1,6 +1,6 @@
 ---
 layout: base.liquid
-title: Capture The Flag 🚩
+title: Capture The Flag
 ---
 
 There are 10 flags hidden in this website. Can you find them all?
