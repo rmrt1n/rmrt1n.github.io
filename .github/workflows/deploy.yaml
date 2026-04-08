@@ -39,11 +39,11 @@ jobs:
       - name: Add Zig to PATH
         run: echo "$HOME/.local/zig/0.15.2" >> "$GITHUB_PATH"
 
-      - name: Cache npm
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # 5.0.3
+      - name: Install pnpm
+        uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # 5.0.0
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+          version: latest
+          cache: true
 
       - name: Cache Eleventy .cache
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # 5.0.3
@@ -51,8 +51,8 @@ jobs:
           path: ./.cache
           key: ${{ runner.os }}-eleventy-fetch-cache
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm ci
+      - run: pnpm build
 
       - name: Upload static files as artifact
         id: deployment
