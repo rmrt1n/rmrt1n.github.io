@@ -235,6 +235,15 @@ export default function (eleventyConfig) {
   // -----------------------------------------------------------------------------------------------
   // Collections, data, output transformation.
   // -----------------------------------------------------------------------------------------------
+  eleventyConfig.addGlobalData('eleventyComputed', {
+    permalink: (data) => data.draft
+      ? `drafts/${data.page.fileSlug}/`
+      : data.permalink,
+    eleventyExcludeFromCollections: (data) => data.draft
+      ? ['articles']
+      : data.eleventyExcludeFromCollections,
+  })
+
   eleventyConfig.addCollection('tags', (collection) => {
     const frequencies = collection
       .getAll()
@@ -264,15 +273,6 @@ export default function (eleventyConfig) {
       '__$ ',
       `<code style="user-select:none;color:var(--color-links)">$ </code>`,
     )
-  })
-
-  eleventyConfig.addGlobalData('eleventyComputed', {
-    permalink: (data) => data.draft
-      ? `drafts/${data.page.fileSlug}/`
-      : data.permalink,
-    eleventyExcludeFromCollections: (data) => data.draft
-      ? ['articles']
-      : data.eleventyExcludeFromCollections,
   })
 
   // -----------------------------------------------------------------------------------------------

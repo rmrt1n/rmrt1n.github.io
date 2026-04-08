@@ -5,7 +5,7 @@ tags:
   - Go
   - Testing
 published: 2026-03-30
-updated: 2026-03-30
+updated: 2026-04-09
 ---
 
 Over the past few months, I rewrote most of my test suite. It was a cleanup effort as well as a chance to rethink how I approach testing, something I've been neglecting for most of my programming career.
@@ -379,7 +379,7 @@ To make testing this more effective, I intentionally limited the size of the sta
 
 > Most of the bugs involve small, tricky examples. If a sorting routine breaks on some array with ten thousand elements it’s highly likely that there’s a much smaller array (a handful of elements), which exposes the same bug.
 
-With a smaller scope, we can feasibly test all possible variable combinations exhaustively. Some of you might already know where I'm heading here. Yes, I'm talking about [Exhaustigen](https://matklad.github.io/2021/11/07/generate-all-the-things.html). It's a helper library for generating combinations of multiple variables exhaustively. I ported TigerBeetle's Zig version to Go, which you can find [here](https://github.com/Argus-Labs/world-engine/blob/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db/pkg/testutils/exhaustigen.go).
+With a smaller scope, we can feasibly test all possible variable combinations exhaustively. Some of you might already know where I'm heading here. Yes, I'm talking about [Exhaustigen](https://matklad.github.io/2021/11/07/generate-all-the-things.html). It's a helper library for generating combinations of multiple variables exhaustively. I ported TigerBeetle's Zig version to Go, which you can find in the repository as [`exhaustigen.go`](https://github.com/Argus-Labs/world-engine/blob/ddefa5b7cc9992e5db41a5d181520d7e2f87f0db/pkg/testutils/exhaustigen.go).
 
 For my archetype move test, I reduced my variables to:
 
