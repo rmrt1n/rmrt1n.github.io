@@ -51,7 +51,7 @@ jobs:
           path: ./.cache
           key: ${{ runner.os }}-eleventy-fetch-cache
 
-      - run: pnpm ci
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
       - name: Upload static files as artifact
