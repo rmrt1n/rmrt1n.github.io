@@ -11,7 +11,7 @@ You fell for the oldest trick in the book LOL! But seriously, the flag is right 
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/flag/sw.js')
+      navigator.serviceWorker.register('/__SW_FILE__')
         .then((reg) => console.log('Service Worker registered:', reg.scope))
         .catch((error) => console.error('Service Worker registration failed:', error))
     });

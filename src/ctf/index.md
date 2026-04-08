@@ -72,4 +72,7 @@ made just for fun and for educational purposes. It's designed for both CTF newco
 looking for a short, cozy challenge. It's inspired by
 [Garrit's Challenge](https://garrit.xyz/ctf).
 
-<script type="module" src="/ctf/ctf.js"></script>
+{% js 'ctf' %}
+  {% include './js/ctf.js' %}
+{% endjs %}
+<script type="module" src="{% getBundleFileUrl 'js', 'ctf' %}"></script>

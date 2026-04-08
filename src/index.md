@@ -21,6 +21,7 @@ Occasionally, I write articles about things I find interesting. Here are a few r
 {% for article in articles limit:3 %}
   - [{{ article.data.title }}]({{ article.page.url }})
 {% endfor %}
+- [See more...](/articles/)
 
 If you ever want to chat or work together on a project, you can find me on
 [GitHub]({{ site.author.github }}), [X]({{ site.author.x }}),

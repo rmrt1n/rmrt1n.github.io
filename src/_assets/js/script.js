@@ -29,3 +29,5 @@ document.querySelectorAll('#theme input[name="theme"]').forEach((input) => {
     selectTheme(input.value);
   })
 })
+
+document.querySelectorAll('.codeblock button').forEach((button) => button.removeAttribute('hidden'))

@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'flags'
 
-const wasm = await WebAssembly.instantiateStreaming(fetch('/checker.wasm'))
+const wasm = await WebAssembly.instantiateStreaming(fetch('/__WASM_FILE__'))
 
 const flags = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
 

@@ -9,7 +9,7 @@
     {%- comment -%} TODO: OpenGraph meta tags {% endcomment %}
 
     <link rel="canonical" href="{{ site.url }}{{ page.url }}">
-    {%- comment -%} TODO: default to svg favicon {%- endcomment -%}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json">
     <link rel="alternate" type="application/rss+xml" href="/feed.xml">
@@ -30,16 +30,23 @@
     </script>
 
     {%- css -%}
-      {% include 'css/reset.css' %}
-      {% include 'css/main.css' %}
-      {% include 'css/prism.css' %}
+      {% include '../_assets/css/reset.css' %}
+      {% include '../_assets/css/main.css' %}
+      {% include '../_assets/css/prism.css' %}
     {% endcss %}
     <link rel="stylesheet" type="text/css" href="{% getBundleFileUrl 'css' %}" />
 
     <title>{{ site.author.name }} | {{ title }}</title>
 
-    <script src="/js/analytics.js" defer></script>
-    <script src="/js/script.js" defer></script>
+    {% js %}
+      {% include '../_assets/js/script.js' %}
+      {%- if eleventy.env.runMode == 'build' -%}
+        {% include '../_assets/js/analytics.gen.js' %}
+      {%- else -%}
+        {% include '../ctf/js/analytics.js' %}
+      {%- endif -%}
+    {% endjs -%}
+    <script src="{% getBundleFileUrl 'js' %}" defer></script>
   </head>
   <body>
     <a href="#main" id="skip-link">Skip to main content</a>
