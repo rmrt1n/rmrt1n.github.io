@@ -39,12 +39,12 @@
     <title>{{ site.author.name }} | {{ title }}</title>
 
     {% js %}
-      {% include '../_assets/js/script.js' %}
       {%- if eleventy.env.runMode == 'build' -%}
         {% include '../_assets/js/analytics.gen.js' %}
       {%- else -%}
         {% include '../ctf/js/analytics.js' %}
-      {%- endif -%}
+      {% endif %}
+      {% include '../_assets/js/script.js' %}
     {% endjs -%}
     <script src="{% getBundleFileUrl 'js' %}" defer></script>
   </head>
