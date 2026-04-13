@@ -97,7 +97,7 @@ body {
   }
 
   > main {
-    padding: 1.5rem 0;
+    padding: 1.5rem 0 3rem 0;
     container: main-layout / inline-size;
 
     &:has(article) {
@@ -262,6 +262,7 @@ body > main > article {
   > #hey {
     border-top: .3rem double var(--color-border);
     padding-top: 1.2rem;
+    margin-bottom: -1.8rem; /* (3 - 1.2) so it looks consistent
 
     > * + * { margin-top: 1rem; }
 
