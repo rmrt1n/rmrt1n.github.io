@@ -262,7 +262,7 @@ body > main > article {
   > #hey {
     border-top: .3rem double var(--color-border);
     padding-top: 1.2rem;
-    margin-bottom: -1.8rem; /* (3 - 1.2) so it looks consistent
+    margin-bottom: -1.2rem; /* eyeball so it looks consistent */
 
     > * + * { margin-top: 1rem; }
 
